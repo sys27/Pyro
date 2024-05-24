@@ -1,0 +1,6 @@
+﻿services:
+  pyro:
+    image: pyro
+    build:
+      context: .
+      dockerfile: Pyro/Dockerfile

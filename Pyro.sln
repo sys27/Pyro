@@ -1,0 +1,51 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pyro", "Pyro\Pyro.csproj", "{9A0D4867-D50B-4AC5-AE02-915FFC62A79A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7C907764-1677-4C52-89CC-409E082E841C}"
+	ProjectSection(SolutionItems) = preProject
+		docker-compose.yml = docker-compose.yml
+		.gitignore = .gitignore
+		Directory.Packages.props = Directory.Packages.props
+		.editorconfig = .editorconfig
+		.stylecop.json = .stylecop.json
+		Rules.ruleset = Rules.ruleset
+		Directory.Build.targets = Directory.Build.targets
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pyro.Domain", "Pyro.Domain\Pyro.Domain.csproj", "{1F0DF9CE-F557-406F-86CD-8CFC045DB403}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pyro.Infrastructure", "Pyro.Infrastructure\Pyro.Infrastructure.csproj", "{C2D4FD96-A3C9-4FB1-B26D-7FA08977AAF3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pyro.Domain.Core", "Pyro.Domain.Core\Pyro.Domain.Core.csproj", "{00B74122-71B4-4826-9992-A013AE3B94A2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pyro.Domain.Identity", "Pyro.Domain.Identity\Pyro.Domain.Identity.csproj", "{F8F49194-B0E1-4C19-832D-C5B4A4B85289}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9A0D4867-D50B-4AC5-AE02-915FFC62A79A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A0D4867-D50B-4AC5-AE02-915FFC62A79A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A0D4867-D50B-4AC5-AE02-915FFC62A79A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A0D4867-D50B-4AC5-AE02-915FFC62A79A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F0DF9CE-F557-406F-86CD-8CFC045DB403}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F0DF9CE-F557-406F-86CD-8CFC045DB403}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F0DF9CE-F557-406F-86CD-8CFC045DB403}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F0DF9CE-F557-406F-86CD-8CFC045DB403}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C2D4FD96-A3C9-4FB1-B26D-7FA08977AAF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2D4FD96-A3C9-4FB1-B26D-7FA08977AAF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2D4FD96-A3C9-4FB1-B26D-7FA08977AAF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2D4FD96-A3C9-4FB1-B26D-7FA08977AAF3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00B74122-71B4-4826-9992-A013AE3B94A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00B74122-71B4-4826-9992-A013AE3B94A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00B74122-71B4-4826-9992-A013AE3B94A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00B74122-71B4-4826-9992-A013AE3B94A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8F49194-B0E1-4C19-832D-C5B4A4B85289}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8F49194-B0E1-4C19-832D-C5B4A4B85289}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8F49194-B0E1-4C19-832D-C5B4A4B85289}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8F49194-B0E1-4C19-832D-C5B4A4B85289}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
