@@ -15,6 +15,7 @@ public class Permission
 
     private readonly List<Role> roles = [];
 
+    // TODO: hide id
     public Guid Id { get; init; }
 
     public required string Name { get; init; }

@@ -20,7 +20,9 @@ internal class RoleConfiguration : IEntityTypeConfiguration<Role>
             .ValueGeneratedNever();
 
         builder.Property(x => x.Name)
-            .IsRequired();
+            .IsRequired()
+            .HasMaxLength(50)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
 
         builder.HasMany(x => x.Permissions)
             .WithMany(x => x.Roles)

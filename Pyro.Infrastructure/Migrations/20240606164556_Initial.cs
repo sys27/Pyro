@@ -58,7 +58,7 @@ namespace Pyro.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "BLOB", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false)
+                    Name = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -71,8 +71,8 @@ namespace Pyro.Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "BLOB", nullable: false),
                     Email = table.Column<string>(type: "TEXT", nullable: false),
-                    Password = table.Column<byte[]>(type: "BLOB", nullable: false),
-                    Salt = table.Column<byte[]>(type: "BLOB", nullable: false),
+                    Password = table.Column<byte[]>(type: "BLOB", maxLength: 64, nullable: false),
+                    Salt = table.Column<byte[]>(type: "BLOB", maxLength: 16, nullable: false),
                     IsLocked = table.Column<bool>(type: "INTEGER", nullable: false, defaultValue: false)
                 },
                 constraints: table =>

@@ -20,13 +20,18 @@ internal class UserConfiguration : IEntityTypeConfiguration<User>
             .ValueGeneratedNever();
 
         builder.Property(x => x.Email)
-            .IsRequired();
+            .IsRequired()
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
 
         builder.Property(x => x.Password)
-            .IsRequired();
+            .IsRequired()
+            .HasMaxLength(64)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
 
         builder.Property(x => x.Salt)
-            .IsRequired();
+            .IsRequired()
+            .HasMaxLength(16)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
 
         builder.Property(x => x.IsLocked)
             .HasDefaultValue(false);

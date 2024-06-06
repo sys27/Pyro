@@ -121,6 +121,7 @@ namespace Pyro.Infrastructure.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -160,10 +161,12 @@ namespace Pyro.Infrastructure.Migrations
 
                     b.Property<byte[]>("Password")
                         .IsRequired()
+                        .HasMaxLength(64)
                         .HasColumnType("BLOB");
 
                     b.Property<byte[]>("Salt")
                         .IsRequired()
+                        .HasMaxLength(16)
                         .HasColumnType("BLOB");
 
                     b.HasKey("Id");
