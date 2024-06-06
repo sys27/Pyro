@@ -5,5 +5,5 @@ namespace Pyro.Domain.Core.Models;
 
 public abstract record IntegrationEvent : IIntegrationEvent
 {
-    public Guid MessageId { get; init; } = Guid.NewGuid();
+    public Guid MessageId { get; init; }
 }

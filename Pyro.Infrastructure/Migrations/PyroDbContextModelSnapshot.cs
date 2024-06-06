@@ -55,6 +55,10 @@ namespace Pyro.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("TokenId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_AuthenticationTokens_TokenId");
+
                     b.HasIndex("UserId");
 
                     b.ToTable("AuthenticationTokens", (string)null);

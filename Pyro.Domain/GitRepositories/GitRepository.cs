@@ -16,7 +16,7 @@ public class GitRepository : DomainEntity
 
     private readonly string name;
 
-    public Guid Id { get; init; } = Guid.NewGuid();
+    public Guid Id { get; init; }
 
     public required string Name
     {

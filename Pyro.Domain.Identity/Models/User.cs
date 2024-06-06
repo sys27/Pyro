@@ -8,7 +8,7 @@ public class User
     private readonly List<Role> roles = [];
     private readonly List<AuthenticationToken> tokens = [];
 
-    public Guid Id { get; init; } = Guid.NewGuid();
+    public Guid Id { get; init; }
 
     public required string Email { get; init; }
 

@@ -4,8 +4,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Pyro.Domain.Identity.Models;
-using static Pyro.Domain.Identity.Models.Permission;
-using static Pyro.Domain.Identity.Models.Role;
 
 namespace Pyro.Infrastructure.DataAccess.Configurations.Identity;
 
@@ -56,17 +54,7 @@ internal class RoleConfiguration : IEntityTypeConfiguration<Role>
 
                     j.HasIndex("PermissionId");
 
-                    j.HasData(
-                        new { RoleId = SeedData.GetRole(Admin).Id, PermissionId = SeedData.GetPermission(RepositoryView).Id },
-                        new { RoleId = SeedData.GetRole(Admin).Id, PermissionId = SeedData.GetPermission(RepositoryEdit).Id },
-                        new { RoleId = SeedData.GetRole(Admin).Id, PermissionId = SeedData.GetPermission(RepositoryManage).Id },
-                        new { RoleId = SeedData.GetRole(Admin).Id, PermissionId = SeedData.GetPermission(UserView).Id },
-                        new { RoleId = SeedData.GetRole(Admin).Id, PermissionId = SeedData.GetPermission(UserEdit).Id },
-                        new { RoleId = SeedData.GetRole(Admin).Id, PermissionId = SeedData.GetPermission(UserManage).Id },
-                        new { RoleId = SeedData.GetRole("User").Id, PermissionId = SeedData.GetPermission(RepositoryView).Id },
-                        new { RoleId = SeedData.GetRole("User").Id, PermissionId = SeedData.GetPermission(RepositoryEdit).Id },
-                        new { RoleId = SeedData.GetRole("User").Id, PermissionId = SeedData.GetPermission(UserView).Id },
-                        new { RoleId = SeedData.GetRole("User").Id, PermissionId = SeedData.GetPermission(UserEdit).Id });
+                    j.HasData(SeedData.RolePermissions);
                 });
 
         builder.HasIndex(x => x.Name)

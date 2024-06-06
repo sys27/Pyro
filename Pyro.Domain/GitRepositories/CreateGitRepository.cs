@@ -35,6 +35,7 @@ public class CreateGitRepositoryHandler : IRequestHandler<CreateGitRepository, G
     {
         var gitRepository = new GitRepository
         {
+            Id = Guid.NewGuid(),
             Name = request.Name,
         };
         gitRepository = await repository.AddGitRepository(gitRepository, cancellationToken);

@@ -11,7 +11,7 @@ using Pyro.Infrastructure.DataAccess;
 namespace Pyro.Infrastructure.Migrations
 {
     [DbContext(typeof(PyroDbContext))]
-    [Migration("20240603175331_Initial")]
+    [Migration("20240606122342_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -57,6 +57,10 @@ namespace Pyro.Infrastructure.Migrations
                         .HasColumnType("BLOB");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("TokenId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_AuthenticationTokens_TokenId");
 
                     b.HasIndex("UserId");
 

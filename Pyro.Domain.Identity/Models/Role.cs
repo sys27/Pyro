@@ -10,7 +10,7 @@ public class Role
     private readonly List<Permission> permissions = [];
     private readonly List<User> users = [];
 
-    public Guid Id { get; init; } = Guid.NewGuid();
+    public Guid Id { get; init; }
 
     public required string Name { get; init; }
 

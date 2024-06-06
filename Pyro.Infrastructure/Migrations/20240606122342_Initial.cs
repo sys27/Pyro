@@ -198,6 +198,12 @@ namespace Pyro.Infrastructure.Migrations
                 values: new object[] { new Guid("9aa993eb-e3db-4fce-ba9f-b0bb23395b9d"), new Guid("f9ba057a-35b0-4d10-8326-702d8f7ec966") });
 
             migrationBuilder.CreateIndex(
+                name: "IX_AuthenticationTokens_TokenId",
+                table: "AuthenticationTokens",
+                column: "TokenId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_AuthenticationTokens_UserId",
                 table: "AuthenticationTokens",
                 column: "UserId");
