@@ -8,6 +8,7 @@ using JWT;
 using JWT.Algorithms;
 using JWT.Extensions.AspNetCore;
 using JWT.Extensions.AspNetCore.Factories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Pyro;
@@ -80,6 +81,8 @@ builder.Services.AddAuthentication().AddJwt(options =>
     options.Keys = ["secret"]; // TODO:
 });
 builder.Services.AddAuthorization();
+builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
+builder.Services.AddSingleton<IAuthorizationHandler, PermissionRequirementHandler>();
 builder.Services.AddSingleton<ICurrentUserProvider, CurrentUserProvider>();
 
 var app = builder.Build();

@@ -33,7 +33,11 @@ public static class GitRepositoryEndpoints
                     ? Results.Ok(result)
                     : Results.NotFound();
             })
+            .RequireAuthorization("repository.view")
             .Produces<GitRepositoryResponse>()
+            .Produces(400)
+            .Produces(401)
+            .Produces(403)
             .Produces(404)
             .WithName("Get Repository")
             .WithOpenApi();
@@ -52,8 +56,11 @@ public static class GitRepositoryEndpoints
 
                 return Results.Created($"/repositories/{command.Name}", result);
             })
+            .RequireAuthorization("repository.edit")
             .Produces<GitRepositoryResponse>(201)
-            .Produces(404)
+            .Produces(400)
+            .Produces(401)
+            .Produces(403)
             .WithName("Create Repository")
             .WithOpenApi();
 

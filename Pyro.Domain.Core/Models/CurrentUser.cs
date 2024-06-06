@@ -7,4 +7,8 @@ public record CurrentUser(
     Guid Id,
     string Email,
     IEnumerable<string> Roles,
-    IEnumerable<string> Permissions);
+    IEnumerable<string> Permissions)
+{
+    public bool HasPermission(string permission)
+        => Permissions.Contains(permission);
+}
