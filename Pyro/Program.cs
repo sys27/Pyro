@@ -10,6 +10,7 @@ using JWT.Extensions.AspNetCore;
 using JWT.Extensions.AspNetCore.Factories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.EntityFrameworkCore;
 using Pyro;
 using Pyro.BackgroundServices;
@@ -85,6 +86,9 @@ builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProv
 builder.Services.AddSingleton<IAuthorizationHandler, PermissionRequirementHandler>();
 builder.Services.AddSingleton<ICurrentUserProvider, CurrentUserProvider>();
 
+builder.Services.AddSpaStaticFiles(options =>
+    options.RootPath = Path.Combine(Directory.GetCurrentDirectory(), "../Pyro.UI/dist/browser"));
+
 var app = builder.Build();
 
 app.UseProblemDetails();
@@ -99,7 +103,11 @@ else
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
+{
+    app.UseSpaStaticFiles();
+}
+
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -107,5 +115,23 @@ app.MapGroup("/api")
     .RequireAuthorization()
     .MapIdentityEndpoints()
     .MapGitRepositoryEndpoints();
+
+app.UseWhen(
+    context => !context.Request.Path.StartsWithSegments("/api"),
+    then => then.UseSpa(spa =>
+    {
+        // TODO: release
+        const int port = 4200;
+
+        spa.Options.SourcePath = Path.Combine(Directory.GetCurrentDirectory(), "../Pyro.UI");
+        spa.Options.DevServerPort = port;
+        spa.Options.PackageManagerCommand = "npm";
+
+        if (app.Environment.IsDevelopment())
+        {
+            spa.UseAngularCliServer("asp");
+            spa.UseProxyToSpaDevelopmentServer($"http://localhost:{port}");
+        }
+    }));
 
 app.Run();
