@@ -1,1 +1,19 @@
+<p-toolbar styleClass="toolbar">
+  <div class="p-toolbar-group-start gap-2">
+    <span>Pyro</span>
+    <p-button label="Repositories"
+              routerLink="/repositories" />
+  </div>
+  <div class="p-toolbar-group-end gap-2">
+    <p-iconField iconPosition="left">
+      <p-inputIcon styleClass="pi pi-search" />
+      <input type="text"
+             pInputText
+             placeholder="Search" />
+    </p-iconField>
+    <p-button icon="pi pi-sign-in"
+              routerLink="/login" />
+    <p-button icon="pi pi-user" />
+  </div>
+</p-toolbar>
 <router-outlet></router-outlet>

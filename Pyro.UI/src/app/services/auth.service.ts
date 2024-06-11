@@ -10,14 +10,19 @@ type LoginResponse = {
     providedIn: 'root'
 })
 export class AuthService {
-    public constructor(private httpClient: HttpClient) { }
+    public constructor(
+        private httpClient: HttpClient
+    ) { }
 
     public login(email: string, password: string): void {
         this.httpClient
             .post<LoginResponse>('/api/identity/login', { email, password })
-            .subscribe(response => {
-                localStorage.setItem('accessToken', response.accessToken);
-                localStorage.setItem('refreshToken', response.refreshToken);
+            .subscribe({
+                next: response => {
+                    localStorage.setItem('accessToken', response.accessToken);
+                    localStorage.setItem('refreshToken', response.refreshToken);
+                },
+                error: error => console.error(error)
             });
     }
 }
