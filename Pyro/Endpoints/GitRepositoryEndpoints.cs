@@ -42,6 +42,23 @@ public static class GitRepositoryEndpoints
             .WithName("Get Repository")
             .WithOpenApi();
 
+        repositories.MapGet("/", async (
+                IMediator mediator,
+                CancellationToken cancellationToken) =>
+            {
+                var command = new GetGitRepositories();
+                var gitRepository = await mediator.Send(command, cancellationToken);
+                var result = gitRepository.ToResponse();
+
+                return Results.Ok(result);
+            })
+            .RequireAuthorization("repository.view")
+            .Produces<IReadOnlyList<GitRepositoryResponse>>()
+            .Produces(401)
+            .Produces(403)
+            .WithName("Get Repositories")
+            .WithOpenApi();
+
         repositories.MapPost("/", async (
                 IMediator mediator,
                 PyroDbContext dbContext,

@@ -17,6 +17,8 @@ public static partial class DtoMapper
     [MapperIgnoreSource(nameof(GitRepository.DomainEvents))]
     public static partial GitRepositoryResponse ToResponse(this GitRepository gitRepository);
 
+    public static partial IReadOnlyList<GitRepositoryResponse> ToResponse(this IReadOnlyList<GitRepository> gitRepository);
+
     public static partial CreateGitRepository ToCommand(this CreateGitRepositoryRequest request);
 
     [MapperIgnoreSource(nameof(Permission.Id))]

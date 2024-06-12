@@ -13,6 +13,15 @@ internal class GitRepositoryRepository : IGitRepositoryRepository
     public GitRepositoryRepository(PyroDbContext dbContext)
         => this.dbContext = dbContext;
 
+    public async Task<IReadOnlyList<GitRepository>> GetRepositories(
+        CancellationToken cancellationToken = default)
+    {
+        var gitRepositories = await dbContext.GitRepositories
+            .ToListAsync(cancellationToken);
+
+        return gitRepositories;
+    }
+
     public async Task<GitRepository?> GetGitRepository(
         Guid id,
         CancellationToken cancellationToken = default)

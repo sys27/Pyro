@@ -5,6 +5,9 @@ namespace Pyro.Domain.GitRepositories;
 
 public interface IGitRepositoryRepository
 {
+    Task<IReadOnlyList<GitRepository>> GetRepositories(
+        CancellationToken cancellationToken = default);
+
     Task<GitRepository?> GetGitRepository(
         Guid id,
         CancellationToken cancellationToken = default);

@@ -15,6 +15,7 @@ export class AuthService {
     ) { }
 
     public login(email: string, password: string): void {
+        // TODO: error handling
         this.httpClient
             .post<LoginResponse>('/api/identity/login', { email, password })
             .subscribe({
@@ -24,5 +25,9 @@ export class AuthService {
                 },
                 error: error => console.error(error)
             });
+    }
+
+    public getAccessToken(): string | null {
+        return localStorage.getItem('accessToken');
     }
 }

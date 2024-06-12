@@ -16,8 +16,10 @@ internal class PermissionPolicyProvider : DefaultAuthorizationPolicyProvider
 
     public override Task<AuthorizationPolicy?> GetPolicyAsync(string policyName)
     {
-        var builder = new AuthorizationPolicyBuilder(JwtAuthenticationDefaults.AuthenticationScheme);
-        builder.AddRequirements(new PermissionRequirement(policyName));
+        var builder = new AuthorizationPolicyBuilder()
+            .AddAuthenticationSchemes(JwtAuthenticationDefaults.AuthenticationScheme)
+            .RequireAuthenticatedUser()
+            .AddRequirements(new PermissionRequirement(policyName));
         var policy = builder.Build();
 
         return Task.FromResult<AuthorizationPolicy?>(policy);

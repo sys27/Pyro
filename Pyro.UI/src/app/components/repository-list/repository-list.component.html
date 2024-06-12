@@ -1,2 +1,6 @@
-<p>repo-list works!</p>
-<p-button label="Submit" />
+<h1>Repositories</h1>
+<ul>
+  <li *ngFor="let repo of repositories$ | async">
+    {{ repo.name }}
+  </li>
+</ul>

@@ -19,11 +19,18 @@ internal class PermissionRequirementHandler : AuthorizationHandler<PermissionReq
         AuthorizationHandlerContext context,
         PermissionRequirement requirement)
     {
-        var currentUser = currentUserProvider.GetCurrentUser();
-        if (!currentUser.HasPermission(requirement.Permission))
+        if (context.User.Identity?.IsAuthenticated is false)
+        {
             context.Fail();
-
-        context.Succeed(requirement);
+        }
+        else
+        {
+            var currentUser = currentUserProvider.GetCurrentUser();
+            if (!currentUser.HasPermission(requirement.Permission))
+                context.Fail();
+            else
+                context.Succeed(requirement);
+        }
 
         return Task.CompletedTask;
     }
