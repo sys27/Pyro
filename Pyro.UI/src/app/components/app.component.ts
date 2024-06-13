@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { PrimeNGConfig } from 'primeng/api';
@@ -7,7 +8,6 @@ import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { ToolbarModule } from 'primeng/toolbar';
 import { AuthService } from '../services/auth.service';
-import { CommonModule } from '@angular/common';
 
 @Component({
     selector: 'app-root',
@@ -21,10 +21,10 @@ import { CommonModule } from '@angular/common';
         ButtonModule,
         InputTextModule,
         IconFieldModule,
-        InputIconModule
+        InputIconModule,
     ],
     templateUrl: './app.component.html',
-    styleUrl: './app.component.css'
+    styleUrl: './app.component.css',
 })
 export class AppComponent implements OnInit {
     public title = 'Pyro';
@@ -32,7 +32,7 @@ export class AppComponent implements OnInit {
     public constructor(
         private readonly primeNg: PrimeNGConfig,
         public readonly authService: AuthService,
-    ) { }
+    ) {}
 
     public ngOnInit(): void {
         this.primeNg.ripple = true;

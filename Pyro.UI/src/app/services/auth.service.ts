@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, Subject, map, switchMap } from 'rxjs';
+import { BehaviorSubject, Observable, switchMap } from 'rxjs';
 import { CurrentUser } from '../models/current-user';
 
 type LoginResponse = {
@@ -9,14 +9,13 @@ type LoginResponse = {
 };
 
 @Injectable({
-    providedIn: 'root'
+    providedIn: 'root',
 })
 export class AuthService {
-    private readonly currentUserSubject: BehaviorSubject<CurrentUser | null> = new BehaviorSubject<CurrentUser | null>(null);
+    private readonly currentUserSubject: BehaviorSubject<CurrentUser | null> =
+        new BehaviorSubject<CurrentUser | null>(null);
 
-    public constructor(
-        private httpClient: HttpClient
-    ) {
+    public constructor(private httpClient: HttpClient) {
         this.updateCurrentUser();
 
         this.currentUser.subscribe(currentUser => console.log(currentUser));
@@ -24,18 +23,16 @@ export class AuthService {
 
     public login(email: string, password: string): Observable<CurrentUser | null> {
         // TODO: error handling
-        return this.httpClient
-            .post<LoginResponse>('/api/identity/login', { email, password })
-            .pipe(
-                switchMap(response => {
-                    localStorage.setItem('accessToken', response.accessToken);
-                    localStorage.setItem('refreshToken', response.refreshToken);
+        return this.httpClient.post<LoginResponse>('/api/identity/login', { email, password }).pipe(
+            switchMap(response => {
+                localStorage.setItem('accessToken', response.accessToken);
+                localStorage.setItem('refreshToken', response.refreshToken);
 
-                    this.updateCurrentUser();
+                this.updateCurrentUser();
 
-                    return this.currentUser;
-                })
-            );
+                return this.currentUser;
+            }),
+        );
     }
 
     private getUserFromJwt(jwt: string): CurrentUser {
@@ -52,7 +49,7 @@ export class AuthService {
             parsedPayload.sub,
             parsedPayload.email,
             parsedPayload.roles,
-            parsedPayload.permissions
+            parsedPayload.permissions,
         );
     }
 

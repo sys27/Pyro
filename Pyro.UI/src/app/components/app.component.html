@@ -1,23 +1,27 @@
 <p-toolbar styleClass="toolbar">
   <div class="p-toolbar-group-start gap-2">
     <span>Pyro</span>
-    <p-button label="Repositories"
-              routerLink="/repositories" />
+    <p-button
+      label="Repositories"
+      routerLink="/repositories" />
   </div>
 
   <div class="p-toolbar-group-end gap-2">
     <p-iconField iconPosition="left">
       <p-inputIcon styleClass="pi pi-search" />
-      <input type="text"
-             pInputText
-             placeholder="Search" />
+      <input
+        type="text"
+        pInputText
+        placeholder="Search" />
     </p-iconField>
 
-    <p-button *ngIf="authService.currentUser | async as user; else showLogin"
-              icon="pi pi-user" />
+    <p-button
+      *ngIf="authService.currentUser | async as user; else showLogin"
+      icon="pi pi-user" />
     <ng-template #showLogin>
-      <p-button icon="pi pi-sign-in"
-                routerLink="/login" />
+      <p-button
+        icon="pi pi-sign-in"
+        routerLink="/login" />
     </ng-template>
   </div>
 </p-toolbar>
