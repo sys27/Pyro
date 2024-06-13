@@ -7,6 +7,7 @@ using Pyro.Dtos;
 using Pyro.Dtos.Requests;
 using Pyro.Dtos.Responses;
 using Pyro.Infrastructure.DataAccess;
+using static Pyro.Domain.Identity.Models.Permission;
 
 namespace Pyro.Endpoints;
 
@@ -33,7 +34,7 @@ public static class GitRepositoryEndpoints
                     ? Results.Ok(result)
                     : Results.NotFound();
             })
-            .RequireAuthorization("repository.view")
+            .RequirePermission(RepositoryView)
             .Produces<GitRepositoryResponse>()
             .Produces(400)
             .Produces(401)
@@ -52,7 +53,7 @@ public static class GitRepositoryEndpoints
 
                 return Results.Ok(result);
             })
-            .RequireAuthorization("repository.view")
+            .RequirePermission(RepositoryView)
             .Produces<IReadOnlyList<GitRepositoryResponse>>()
             .Produces(401)
             .Produces(403)
@@ -73,7 +74,7 @@ public static class GitRepositoryEndpoints
 
                 return Results.Created($"/repositories/{command.Name}", result);
             })
-            .RequireAuthorization("repository.edit")
+            .RequirePermission(RepositoryEdit)
             .Produces<GitRepositoryResponse>(201)
             .Produces(400)
             .Produces(401)

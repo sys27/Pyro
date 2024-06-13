@@ -7,11 +7,13 @@ import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { ToolbarModule } from 'primeng/toolbar';
 import { AuthService } from '../services/auth.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
     selector: 'app-root',
     standalone: true,
     imports: [
+        CommonModule,
         RouterOutlet,
         RouterLink,
         RouterLinkActive,
@@ -28,8 +30,8 @@ export class AppComponent implements OnInit {
     public title = 'Pyro';
 
     public constructor(
-        private primeNg: PrimeNGConfig,
-        private authService: AuthService,
+        private readonly primeNg: PrimeNGConfig,
+        public readonly authService: AuthService,
     ) { }
 
     public ngOnInit(): void {

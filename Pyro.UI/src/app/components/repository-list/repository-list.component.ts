@@ -3,7 +3,7 @@ import { RepositoryService } from '../../services/repository.service';
 import { ButtonModule } from 'primeng/button';
 import { Observable } from 'rxjs';
 import { CommonModule } from '@angular/common';
-import { Repository } from '../../models/Repository';
+import { Repository } from '../../models/repository';
 
 @Component({
     selector: 'app-repo-list',

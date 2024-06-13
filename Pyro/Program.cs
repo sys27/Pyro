@@ -107,6 +107,23 @@ if (!app.Environment.IsDevelopment())
 {
     app.UseSpaStaticFiles();
 }
+else
+{
+    app.UseWhen(
+        context => !context.Request.Path.StartsWithSegments("/api"),
+        then => then.UseSpa(spa =>
+        {
+            // TODO: release
+            const int port = 4200;
+
+            spa.Options.SourcePath = Path.Combine(Directory.GetCurrentDirectory(), "../Pyro.UI");
+            spa.Options.DevServerPort = port;
+            spa.Options.PackageManagerCommand = "npm";
+
+            spa.UseAngularCliServer("asp");
+            spa.UseProxyToSpaDevelopmentServer($"http://localhost:{port}");
+        }));
+}
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -115,23 +132,5 @@ app.MapGroup("/api")
     .RequireAuthorization()
     .MapIdentityEndpoints()
     .MapGitRepositoryEndpoints();
-
-app.UseWhen(
-    context => !context.Request.Path.StartsWithSegments("/api"),
-    then => then.UseSpa(spa =>
-    {
-        // TODO: release
-        const int port = 4200;
-
-        spa.Options.SourcePath = Path.Combine(Directory.GetCurrentDirectory(), "../Pyro.UI");
-        spa.Options.DevServerPort = port;
-        spa.Options.PackageManagerCommand = "npm";
-
-        if (app.Environment.IsDevelopment())
-        {
-            spa.UseAngularCliServer("asp");
-            spa.UseProxyToSpaDevelopmentServer($"http://localhost:{port}");
-        }
-    }));
 
 app.Run();

@@ -36,8 +36,13 @@ export class LoginComponent {
         let email = this.formGroup.value.email!;
         let password = this.formGroup.value.password!;
 
-        this.authService.login(email, password);
+        this.authService
+            .login(email, password)
+            .subscribe(currentUser => {
+                if (!currentUser)
+                    return;
 
-        this.router.navigate(['/repositories']);
+                this.router.navigate(['/repositories']);
+            });
     }
 }

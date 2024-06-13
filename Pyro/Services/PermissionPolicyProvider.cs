@@ -9,6 +9,8 @@ namespace Pyro.Services;
 
 internal class PermissionPolicyProvider : DefaultAuthorizationPolicyProvider
 {
+    public const string PolicyPrefix = "Permission:";
+
     public PermissionPolicyProvider(IOptions<AuthorizationOptions> options)
         : base(options)
     {
@@ -16,10 +18,14 @@ internal class PermissionPolicyProvider : DefaultAuthorizationPolicyProvider
 
     public override Task<AuthorizationPolicy?> GetPolicyAsync(string policyName)
     {
+        if (!policyName.StartsWith(PolicyPrefix, StringComparison.InvariantCulture))
+            return base.GetPolicyAsync(policyName);
+
+        var permission = policyName[PolicyPrefix.Length..];
         var builder = new AuthorizationPolicyBuilder()
             .AddAuthenticationSchemes(JwtAuthenticationDefaults.AuthenticationScheme)
             .RequireAuthenticatedUser()
-            .AddRequirements(new PermissionRequirement(policyName));
+            .AddRequirements(new PermissionRequirement(permission));
         var policy = builder.Build();
 
         return Task.FromResult<AuthorizationPolicy?>(policy);
