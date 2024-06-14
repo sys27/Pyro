@@ -31,10 +31,13 @@ export class LoginComponent {
         let email = this.formGroup.value.email!;
         let password = this.formGroup.value.password!;
 
-        this.authService.login(email, password).subscribe(currentUser => {
-            if (!currentUser) return;
+        this.authService.login(email, password).subscribe({
+            next: currentUser => {
+                if (!currentUser) return;
 
-            this.location.back();
+                this.location.back();
+            },
+            error: error => {},
         });
     }
 }

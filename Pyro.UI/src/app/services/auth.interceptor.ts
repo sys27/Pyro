@@ -1,8 +1,8 @@
-import { HttpHandlerFn, HttpRequest } from '@angular/common/http';
+import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { AuthService } from './auth.service';
 
-export function authInterceptor(req: HttpRequest<unknown>, next: HttpHandlerFn) {
+export const authInterceptor: HttpInterceptorFn = (req, next) => {
     let authService = inject(AuthService);
     let accessToken = authService.getAccessToken();
     if (accessToken) {
@@ -14,4 +14,4 @@ export function authInterceptor(req: HttpRequest<unknown>, next: HttpHandlerFn) 
     }
 
     return next(req);
-}
+};

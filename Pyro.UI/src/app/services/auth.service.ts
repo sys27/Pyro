@@ -1,17 +1,17 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, switchMap } from 'rxjs';
+import { Endpoints } from '../endpoints';
 import { CurrentUser } from '../models/current-user';
-
-type LoginResponse = {
-    accessToken: string;
-    refreshToken: string;
-};
+import { Response } from '../models/response';
 
 @Injectable({
     providedIn: 'root',
 })
 export class AuthService {
+    private static readonly accessTokenKey: string = 'accessToken';
+    private static readonly refreshTokenKey: string = 'refreshToken';
+
     private readonly currentUserSubject: BehaviorSubject<CurrentUser | null> =
         new BehaviorSubject<CurrentUser | null>(null);
 
@@ -21,18 +21,28 @@ export class AuthService {
         this.currentUser.subscribe(currentUser => console.log(currentUser));
     }
 
+    private isLoginResponse(object: any): object is LoginResponse {
+        return 'accessToken' in object && 'refreshToken' in object;
+    }
+
     public login(email: string, password: string): Observable<CurrentUser | null> {
-        // TODO: error handling
-        return this.httpClient.post<LoginResponse>('/api/identity/login', { email, password }).pipe(
-            switchMap(response => {
-                localStorage.setItem('accessToken', response.accessToken);
-                localStorage.setItem('refreshToken', response.refreshToken);
+        return this.httpClient
+            .post<Response<LoginResponse>>(Endpoints.Login, { email, password })
+            .pipe(
+                switchMap(response => {
+                    if (this.isLoginResponse(response)) {
+                        localStorage.setItem(AuthService.accessTokenKey, response.accessToken);
+                        localStorage.setItem(AuthService.refreshTokenKey, response.refreshToken);
+                    } else {
+                        localStorage.removeItem(AuthService.accessTokenKey);
+                        localStorage.removeItem(AuthService.refreshTokenKey);
+                    }
 
-                this.updateCurrentUser();
+                    this.updateCurrentUser();
 
-                return this.currentUser;
-            }),
-        );
+                    return this.currentUser;
+                }),
+            );
     }
 
     private getUserFromJwt(jwt: string): CurrentUser {
@@ -64,10 +74,15 @@ export class AuthService {
     }
 
     public getAccessToken(): string | null {
-        return localStorage.getItem('accessToken');
+        return localStorage.getItem(AuthService.accessTokenKey);
     }
 
     public get currentUser(): Observable<CurrentUser | null> {
         return this.currentUserSubject.asObservable();
     }
+}
+
+interface LoginResponse {
+    accessToken: string;
+    refreshToken: string;
 }
