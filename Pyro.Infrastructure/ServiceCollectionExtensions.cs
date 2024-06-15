@@ -6,6 +6,7 @@ using Pyro.Domain;
 using Pyro.Domain.Core;
 using Pyro.Domain.GitRepositories;
 using Pyro.Domain.Identity;
+using Pyro.Domain.UserProfiles;
 using Pyro.Infrastructure.DataAccess;
 using Pyro.Infrastructure.Messaging;
 
@@ -18,5 +19,6 @@ public static class ServiceCollectionExtensions
             .AddScoped<IBus, Bus>()
             .AddScoped<IGitService, GitService>()
             .AddScoped<IGitRepositoryRepository, GitRepositoryRepository>()
-            .AddScoped<IUserRepository, UserRepository>();
+            .AddScoped<IUserRepository, UserRepository>()
+            .AddScoped<IUserProfileRepository, UserProfileRepository>();
 }

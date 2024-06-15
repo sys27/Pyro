@@ -213,7 +213,6 @@ namespace Pyro.Infrastructure.Migrations
                         .HasColumnType("BLOB");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("TEXT");
 

@@ -11,7 +11,7 @@ using Pyro.Infrastructure.DataAccess;
 namespace Pyro.Infrastructure.Migrations
 {
     [DbContext(typeof(PyroDbContext))]
-    [Migration("20240606164556_Initial")]
+    [Migration("20240615212302_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -120,6 +120,7 @@ namespace Pyro.Infrastructure.Migrations
             modelBuilder.Entity("Pyro.Domain.Identity.Models.Role", b =>
                 {
                     b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("BLOB");
 
                     b.Property<string>("Name")
@@ -151,6 +152,7 @@ namespace Pyro.Infrastructure.Migrations
             modelBuilder.Entity("Pyro.Domain.Identity.Models.User", b =>
                 {
                     b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("BLOB");
 
                     b.Property<string>("Email")
@@ -188,6 +190,49 @@ namespace Pyro.Infrastructure.Migrations
                             IsLocked = false,
                             Password = new byte[] { 239, 163, 54, 78, 41, 129, 181, 60, 27, 181, 100, 116, 243, 128, 253, 209, 87, 147, 27, 73, 138, 190, 50, 65, 18, 253, 153, 127, 194, 97, 240, 29, 179, 58, 68, 117, 170, 97, 172, 236, 70, 27, 167, 168, 87, 3, 66, 53, 11, 34, 206, 209, 211, 150, 81, 227, 19, 161, 249, 24, 45, 138, 206, 197 },
                             Salt = new byte[] { 109, 28, 230, 18, 208, 250, 67, 218, 171, 6, 152, 200, 162, 109, 186, 132 }
+                        });
+                });
+
+            modelBuilder.Entity("Pyro.Domain.UserProfiles.UserAvatar", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("BLOB");
+
+                    b.Property<byte[]>("Image")
+                        .IsRequired()
+                        .HasColumnType("BLOB");
+
+                    b.HasKey("Id")
+                        .HasName("PK_UserAvatar");
+
+                    b.ToTable("UserAvatars", (string)null);
+                });
+
+            modelBuilder.Entity("Pyro.Domain.UserProfiles.UserProfile", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("BLOB");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Status")
+                        .HasMaxLength(150)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id")
+                        .HasName("PK_UserProfile");
+
+                    b.ToTable("UserProfiles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("f9ba057a-35b0-4d10-8326-702d8f7ec966"),
+                            Name = "Pyro"
                         });
                 });
 
@@ -320,6 +365,24 @@ namespace Pyro.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Pyro.Domain.Identity.Models.User", b =>
+                {
+                    b.HasOne("Pyro.Domain.UserProfiles.UserProfile", null)
+                        .WithOne()
+                        .HasForeignKey("Pyro.Domain.Identity.Models.User", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Pyro.Domain.UserProfiles.UserAvatar", b =>
+                {
+                    b.HasOne("Pyro.Domain.UserProfiles.UserProfile", null)
+                        .WithOne("Avatar")
+                        .HasForeignKey("Pyro.Domain.UserProfiles.UserAvatar", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("RolePermission", b =>
                 {
                     b.HasOne("Pyro.Domain.Identity.Models.Permission", null)
@@ -353,6 +416,11 @@ namespace Pyro.Infrastructure.Migrations
             modelBuilder.Entity("Pyro.Domain.Identity.Models.User", b =>
                 {
                     b.Navigation("Tokens");
+                });
+
+            modelBuilder.Entity("Pyro.Domain.UserProfiles.UserProfile", b =>
+                {
+                    b.Navigation("Avatar");
                 });
 #pragma warning restore 612, 618
         }

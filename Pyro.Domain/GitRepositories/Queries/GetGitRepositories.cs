@@ -3,7 +3,7 @@
 
 using MediatR;
 
-namespace Pyro.Domain.GitRepositories;
+namespace Pyro.Domain.GitRepositories.Queries;
 
 public record GetGitRepositories : IRequest<IReadOnlyList<GitRepository>>;
 

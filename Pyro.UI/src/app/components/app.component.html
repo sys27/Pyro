@@ -1,12 +1,29 @@
 <p-toolbar styleClass="toolbar">
   <div class="p-toolbar-group-start gap-2">
-    <span>Pyro</span>
     <p-button
-      label="Repositories"
-      routerLink="/repositories" />
-    <p-button
-      label="Users"
-      routerLink="/users" />
+      label="Pyro"
+      icon="pi pi-server"
+      routerLink="/"
+      text="true"
+      severity="warning" />
+    <p-buttonGroup>
+      <p-button
+        label="Repositories"
+        routerLink="/repositories"
+        outlined="true" />
+      <p-button
+        icon="pi pi-plus"
+        outlined="true" />
+    </p-buttonGroup>
+    <p-buttonGroup>
+      <p-button
+        label="Users"
+        routerLink="/users"
+        outlined="true" />
+      <p-button
+        icon="pi pi-plus"
+        outlined="true" />
+    </p-buttonGroup>
   </div>
 
   <div class="p-toolbar-group-end gap-2">

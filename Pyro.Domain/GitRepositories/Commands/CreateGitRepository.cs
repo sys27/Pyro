@@ -5,7 +5,7 @@ using FluentValidation;
 using MediatR;
 using Pyro.Domain.Core;
 
-namespace Pyro.Domain.GitRepositories;
+namespace Pyro.Domain.GitRepositories.Commands;
 
 public record CreateGitRepository(string Name) : IRequest<GitRepository>;
 

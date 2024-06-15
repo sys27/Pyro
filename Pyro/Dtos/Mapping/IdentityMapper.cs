@@ -1,26 +1,17 @@
 // Copyright (c) Dmytro Kyshchenko. All rights reserved.
 // Licensed under the GPL-3.0 license. See LICENSE file in the project root for full license information.
 
-using Pyro.Domain.GitRepositories;
 using Pyro.Domain.Identity.Commands;
 using Pyro.Domain.Identity.Models;
 using Pyro.Dtos.Requests;
 using Pyro.Dtos.Responses;
 using Riok.Mapperly.Abstractions;
 
-namespace Pyro.Dtos;
+namespace Pyro.Dtos.Mapping;
 
 [Mapper]
-public static partial class DtoMapper
+public static partial class IdentityMapper
 {
-    [MapperIgnoreSource(nameof(GitRepository.Id))]
-    [MapperIgnoreSource(nameof(GitRepository.DomainEvents))]
-    public static partial GitRepositoryResponse ToResponse(this GitRepository gitRepository);
-
-    public static partial IReadOnlyList<GitRepositoryResponse> ToResponse(this IReadOnlyList<GitRepository> gitRepository);
-
-    public static partial CreateGitRepository ToCommand(this CreateGitRepositoryRequest request);
-
     [MapperIgnoreSource(nameof(Permission.Id))]
     [MapperIgnoreSource(nameof(Permission.Roles))]
     public static partial PermissionResponse ToResponse(this Permission permission);
@@ -40,6 +31,8 @@ public static partial class DtoMapper
     public static partial UserResponse ToResponse(this User user);
 
     public static partial IReadOnlyList<UserResponse> ToResponse(this IReadOnlyList<User> user);
+
+    public static partial CreateUser ToCommand(this CreateUserRequest user);
 
     [MapProperty([nameof(TokenPair.AccessToken), nameof(Token.Value)], [nameof(TokenPairResponse.AccessToken)])]
     [MapProperty([nameof(TokenPair.RefreshToken), nameof(Token.Value)], [nameof(TokenPairResponse.RefreshToken)])]

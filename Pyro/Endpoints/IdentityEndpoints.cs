@@ -4,7 +4,7 @@
 using MediatR;
 using Pyro.Domain.Identity.Commands;
 using Pyro.Domain.Identity.Queries;
-using Pyro.Dtos;
+using Pyro.Dtos.Mapping;
 using Pyro.Dtos.Requests;
 using Pyro.Dtos.Responses;
 using Pyro.Infrastructure.DataAccess;
@@ -57,6 +57,47 @@ public static class IdentityEndpoints
             .WithName("Get User By Email")
             .WithOpenApi();
 
+        usersBuilder.MapPost("/", async (
+                IMediator mediator,
+                PyroDbContext dbContext,
+                CreateUserRequest request,
+                CancellationToken cancellationToken) =>
+            {
+                var command = request.ToCommand();
+                await mediator.Send(command, cancellationToken);
+                await dbContext.SaveChangesAsync(cancellationToken);
+
+                return Results.Created($"/users/{request.Email}", new { request.Email });
+            })
+            .Produces(201)
+            .WithName("Create User")
+            .WithOpenApi();
+
+        usersBuilder.MapPut("/{email}", async (
+                IMediator mediator,
+                PyroDbContext dbContext,
+                string email,
+                UpdateUserRequest request,
+                CancellationToken cancellationToken) =>
+            {
+                var user = await mediator.Send(new GetUser(email), cancellationToken);
+                if (user is null)
+                    return Results.NotFound();
+
+                var command = new UpdateUser(user, request.Roles);
+                user = await mediator.Send(command, cancellationToken);
+                await dbContext.SaveChangesAsync(cancellationToken);
+
+                return Results.Ok(user.ToResponse());
+            })
+            .Produces<UserResponse>()
+            .Produces(400)
+            .Produces(401)
+            .Produces(403)
+            .Produces(404)
+            .WithName("Update User")
+            .WithOpenApi();
+
         return app;
     }
 
@@ -66,15 +107,22 @@ public static class IdentityEndpoints
             .WithTags("Roles");
 
         rolesBuilder.MapGet("/", async (
-            IMediator mediator,
-            CancellationToken cancellationToken) =>
-        {
-            var request = new GetRoles();
-            var roles = await mediator.Send(request, cancellationToken);
-            var result = roles.ToResponse();
+                IMediator mediator,
+                CancellationToken cancellationToken) =>
+            {
+                var request = new GetRoles();
+                var roles = await mediator.Send(request, cancellationToken);
+                var result = roles.ToResponse();
 
-            return Results.Ok(result);
-        });
+                return Results.Ok(result);
+            })
+            .AllowAnonymous()
+            .CacheOutput(b => b.Tag("roles"))
+            .Produces<IReadOnlyList<RoleResponse>>()
+            .Produces(401)
+            .Produces(403)
+            .WithName("Get Roles")
+            .WithOpenApi();
 
         return app;
     }
@@ -85,15 +133,22 @@ public static class IdentityEndpoints
             .WithTags("Permissions");
 
         permissionsBuilder.MapGet("/", async (
-            IMediator mediator,
-            CancellationToken cancellationToken) =>
-        {
-            var request = new GetPermissions();
-            var permissions = await mediator.Send(request, cancellationToken);
-            var result = permissions.ToResponse();
+                IMediator mediator,
+                CancellationToken cancellationToken) =>
+            {
+                var request = new GetPermissions();
+                var permissions = await mediator.Send(request, cancellationToken);
+                var result = permissions.ToResponse();
 
-            return Results.Ok(result);
-        });
+                return Results.Ok(result);
+            })
+            .AllowAnonymous()
+            .CacheOutput(b => b.Tag("permissions"))
+            .Produces<IReadOnlyList<PermissionResponse>>()
+            .Produces(401)
+            .Produces(403)
+            .WithName("Get Permissions")
+            .WithOpenApi();
 
         return app;
     }

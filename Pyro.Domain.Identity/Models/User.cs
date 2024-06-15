@@ -15,6 +15,20 @@ public class User : DomainEntity
     private byte[] password;
     private byte[] salt;
 
+    public static User Create(string email, byte[] password, byte[] salt)
+    {
+        var user = new User
+        {
+            Id = Guid.NewGuid(),
+            Email = email,
+            Password = password,
+            Salt = salt,
+        };
+        user.PublishEvent(new UserCreated(user.Id));
+
+        return user;
+    }
+
     public Guid Id { get; init; }
 
     public required string Email
@@ -81,6 +95,9 @@ public class User : DomainEntity
 
         roles.Add(role);
     }
+
+    public void ClearRoles()
+        => roles.Clear();
 
     public void AddToken(AuthenticationToken token)
     {

@@ -61,6 +61,7 @@ builder.Services.AddValidatorsFromAssemblyContaining<GitRepository>();
 builder.Services.AddMediatR(c => c
     .RegisterServicesFromAssemblyContaining<GitRepository>()
     .RegisterServicesFromAssemblyContaining<User>()
+    .RegisterServicesFromAssemblyContaining<Program>()
     .AddOpenBehavior(typeof(LoggingPipeline<,>))
     .AddOpenBehavior(typeof(ValidatorPipeline<,>)));
 
@@ -88,6 +89,13 @@ builder.Services.AddSingleton<ICurrentUserProvider, CurrentUserProvider>();
 
 builder.Services.AddSpaStaticFiles(options =>
     options.RootPath = Path.Combine(Directory.GetCurrentDirectory(), "../Pyro.UI/dist/browser"));
+
+builder.Services.AddOutputCache(options =>
+{
+    options.AddBasePolicy(p => p.Expire(TimeSpan.FromHours(1)).Tag("permissions"));
+    options.AddBasePolicy(p => p.Expire(TimeSpan.FromHours(1)).Tag("roles"));
+    options.AddBasePolicy(p => p.Tag("all"));
+});
 
 var app = builder.Build();
 
@@ -127,6 +135,7 @@ else
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseOutputCache();
 
 app.MapGroup("/api")
     .RequireAuthorization()

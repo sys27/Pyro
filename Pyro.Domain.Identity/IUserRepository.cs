@@ -18,7 +18,9 @@ public interface IUserRepository
         string email,
         CancellationToken cancellationToken = default);
 
-    Task<IEnumerable<Role>> GetRolesAsync(CancellationToken cancellationToken);
+    Task<User> AddUser(User user, CancellationToken cancellationToken);
 
-    Task<IEnumerable<Permission>> GetPermissionsAsync(CancellationToken cancellationToken);
+    Task<IReadOnlyList<Role>> GetRolesAsync(CancellationToken cancellationToken);
+
+    Task<IReadOnlyList<Permission>> GetPermissionsAsync(CancellationToken cancellationToken);
 }

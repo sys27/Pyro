@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { PrimeNGConfig } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
+import { ButtonGroupModule } from 'primeng/buttongroup';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
@@ -19,6 +20,7 @@ import { AuthService } from '../services/auth.service';
         RouterLinkActive,
         ToolbarModule,
         ButtonModule,
+        ButtonGroupModule,
         InputTextModule,
         IconFieldModule,
         InputIconModule,

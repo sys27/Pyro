@@ -28,7 +28,8 @@ public class DomainEventInterceptor : SaveChangesInterceptor
         var domainEntities = context.ChangeTracker
             .Entries<DomainEntity>()
             .Select(x => x.Entity)
-            .Where(x => x.DomainEvents.Any());
+            .Where(x => x.DomainEvents.Any())
+            .ToArray();
 
         foreach (var domainEntity in domainEntities)
         {

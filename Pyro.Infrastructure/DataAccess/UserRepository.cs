@@ -40,7 +40,14 @@ public class UserRepository : IUserRepository
         return user;
     }
 
-    public async Task<IEnumerable<Role>> GetRolesAsync(CancellationToken cancellationToken)
+    public async Task<User> AddUser(User user, CancellationToken cancellationToken)
+    {
+        var entity = await dbContext.Set<User>().AddAsync(user, cancellationToken);
+
+        return entity.Entity;
+    }
+
+    public async Task<IReadOnlyList<Role>> GetRolesAsync(CancellationToken cancellationToken)
     {
         var roles = await dbContext
             .Set<Role>()
@@ -51,7 +58,7 @@ public class UserRepository : IUserRepository
         return roles;
     }
 
-    public async Task<IEnumerable<Permission>> GetPermissionsAsync(CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<Permission>> GetPermissionsAsync(CancellationToken cancellationToken)
     {
         var permissions = await dbContext
             .Set<Permission>()

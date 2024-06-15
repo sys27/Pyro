@@ -2,8 +2,8 @@
 // Licensed under the GPL-3.0 license. See LICENSE file in the project root for full license information.
 
 using MediatR;
-using Pyro.Domain.GitRepositories;
-using Pyro.Dtos;
+using Pyro.Domain.GitRepositories.Queries;
+using Pyro.Dtos.Mapping;
 using Pyro.Dtos.Requests;
 using Pyro.Dtos.Responses;
 using Pyro.Infrastructure.DataAccess;
@@ -49,7 +49,7 @@ public static class GitRepositoryEndpoints
             {
                 var command = new GetGitRepositories();
                 var gitRepository = await mediator.Send(command, cancellationToken);
-                var result = gitRepository.ToResponse();
+                var result = DtoMapper.ToResponse(gitRepository);
 
                 return Results.Ok(result);
             })
@@ -66,11 +66,11 @@ public static class GitRepositoryEndpoints
                 CreateGitRepositoryRequest request,
                 CancellationToken cancellationToken) =>
             {
-                var command = request.ToCommand();
+                var command = DtoMapper.ToCommand(request);
                 var gitRepository = await mediator.Send(command, cancellationToken);
                 await dbContext.SaveChangesAsync(cancellationToken);
 
-                var result = gitRepository.ToResponse();
+                var result = DtoMapper.ToResponse(gitRepository);
 
                 return Results.Created($"/repositories/{command.Name}", result);
             })

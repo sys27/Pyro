@@ -15,6 +15,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
                 currentUser &&
                 currentUser.expiresIn <= new Date()
             ) {
+                // TODO: catch errors
+                // TODO: handle multiple requests
                 return authService.refresh();
             }
 

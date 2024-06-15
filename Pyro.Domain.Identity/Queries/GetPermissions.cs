@@ -6,9 +6,9 @@ using Pyro.Domain.Identity.Models;
 
 namespace Pyro.Domain.Identity.Queries;
 
-public record GetPermissions : IRequest<IEnumerable<Permission>>;
+public record GetPermissions : IRequest<IReadOnlyList<Permission>>;
 
-public class GetPermissionsHandler : IRequestHandler<GetPermissions, IEnumerable<Permission>>
+public class GetPermissionsHandler : IRequestHandler<GetPermissions, IReadOnlyList<Permission>>
 {
     private readonly IUserRepository repository;
 
@@ -17,7 +17,7 @@ public class GetPermissionsHandler : IRequestHandler<GetPermissions, IEnumerable
         this.repository = repository;
     }
 
-    public async Task<IEnumerable<Permission>> Handle(GetPermissions request, CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<Permission>> Handle(GetPermissions request, CancellationToken cancellationToken)
     {
         var permissions = await repository.GetPermissionsAsync(cancellationToken);
 

@@ -4,7 +4,7 @@
 using FluentValidation;
 using MediatR;
 
-namespace Pyro.Domain.GitRepositories;
+namespace Pyro.Domain.GitRepositories.Queries;
 
 public record GetGitRepository(string Name) : IRequest<GitRepository?>;
 
