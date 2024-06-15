@@ -15,7 +15,7 @@ import { RepositoryService } from '../../services/repository.service';
 export class RepositoryListComponent implements OnInit {
     public repositories$: Observable<RepositoryItem[]> | undefined;
 
-    public constructor(private repoService: RepositoryService) {}
+    public constructor(private readonly repoService: RepositoryService) {}
 
     public ngOnInit(): void {
         this.repositories$ = this.repoService.getRepositories();

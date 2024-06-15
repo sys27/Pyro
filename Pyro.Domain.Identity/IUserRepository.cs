@@ -7,6 +7,9 @@ namespace Pyro.Domain.Identity;
 
 public interface IUserRepository
 {
+    Task<IReadOnlyList<User>> GetUsers(
+        CancellationToken cancellationToken = default);
+
     Task<User?> GetUserById(
         Guid id,
         CancellationToken cancellationToken = default);

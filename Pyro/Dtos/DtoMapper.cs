@@ -36,7 +36,10 @@ public static partial class DtoMapper
     [MapperIgnoreSource(nameof(User.Password))]
     [MapperIgnoreSource(nameof(User.Salt))]
     [MapperIgnoreSource(nameof(User.Tokens))]
+    [MapperIgnoreSource(nameof(User.DomainEvents))]
     public static partial UserResponse ToResponse(this User user);
+
+    public static partial IReadOnlyList<UserResponse> ToResponse(this IReadOnlyList<User> user);
 
     [MapProperty([nameof(TokenPair.AccessToken), nameof(Token.Value)], [nameof(TokenPairResponse.AccessToken)])]
     [MapProperty([nameof(TokenPair.RefreshToken), nameof(Token.Value)], [nameof(TokenPairResponse.RefreshToken)])]

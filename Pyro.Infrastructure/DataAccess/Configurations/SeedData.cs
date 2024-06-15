@@ -2,6 +2,7 @@
 // Licensed under the GPL-3.0 license. See LICENSE file in the project root for full license information.
 
 using Pyro.Domain.Identity.Models;
+using Pyro.Domain.UserProfiles;
 using static Pyro.Domain.Identity.Models.Permission;
 using static Pyro.Domain.Identity.Models.Role;
 
@@ -14,6 +15,8 @@ public static class SeedData
     public static readonly IReadOnlyCollection<User> Users;
     public static readonly IReadOnlyCollection<object> RolePermissions;
     public static readonly IReadOnlyCollection<object> UserRoles;
+
+    public static readonly IReadOnlyCollection<UserProfile> UserProfiles;
 
     static SeedData()
     {
@@ -62,6 +65,15 @@ public static class SeedData
         UserRoles =
         [
             new { UserId = GetUser("pyro@localhost.local").Id, RoleId = GetRole(Admin).Id }
+        ];
+
+        UserProfiles =
+        [
+            new UserProfile
+            {
+                Id = GetUser("pyro@localhost.local").Id,
+                Name = "Pyro",
+            }
         ];
     }
 

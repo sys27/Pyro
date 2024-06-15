@@ -1,8 +1,7 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit, input } from '@angular/core';
-import { Observable } from 'rxjs';
 import { Repository } from '../../models/repository';
 import { RepositoryService } from '../../services/repository.service';
-import { CommonModule } from '@angular/common';
 
 @Component({
     selector: 'repo-list',
@@ -13,11 +12,17 @@ import { CommonModule } from '@angular/common';
 })
 export class RepositoryComponent implements OnInit {
     public readonly repositoryName = input.required<string>({ alias: 'name' });
-    public repository: Observable<Repository> | undefined;
+    private _repository: Repository | undefined;
 
     public constructor(private repoService: RepositoryService) {}
 
     public ngOnInit(): void {
-        this.repository = this.repoService.getRepository(this.repositoryName());
+        this.repoService
+            .getRepository(this.repositoryName())
+            .subscribe(repo => (this._repository = repo));
+    }
+
+    public get repository(): Repository | undefined {
+        return this._repository;
     }
 }

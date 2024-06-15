@@ -17,7 +17,8 @@ internal class RoleConfiguration : IEntityTypeConfiguration<Role>
 
         builder.Property(x => x.Id)
             .HasColumnType("BLOB")
-            .ValueGeneratedNever();
+            .IsRequired()
+            .ValueGeneratedOnAdd();
 
         builder.Property(x => x.Name)
             .IsRequired()

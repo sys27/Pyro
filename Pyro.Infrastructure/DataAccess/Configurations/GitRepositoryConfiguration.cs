@@ -18,10 +18,12 @@ internal class GitRepositoryConfiguration : IEntityTypeConfiguration<GitReposito
 
         builder.Property(x => x.Id)
             .HasColumnType("BLOB")
-            .IsRequired();
+            .IsRequired()
+            .ValueGeneratedOnAdd();
 
         builder.Property(x => x.Name)
-            .HasMaxLength(50);
+            .HasMaxLength(50)
+            .IsRequired();
 
         builder.HasIndex(x => x.Name)
             .IsUnique()

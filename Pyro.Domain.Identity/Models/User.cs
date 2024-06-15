@@ -2,10 +2,11 @@
 // Licensed under the GPL-3.0 license. See LICENSE file in the project root for full license information.
 
 using System.Diagnostics.CodeAnalysis;
+using Pyro.Domain.Core.Models;
 
 namespace Pyro.Domain.Identity.Models;
 
-public class User
+public class User : DomainEntity
 {
     private readonly List<Role> roles = [];
     private readonly List<AuthenticationToken> tokens = [];

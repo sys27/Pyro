@@ -17,7 +17,8 @@ public class AuthenticationTokenConfiguration : IEntityTypeConfiguration<Authent
 
         builder.Property(x => x.Id)
             .HasColumnType("BLOB")
-            .IsRequired();
+            .IsRequired()
+            .ValueGeneratedOnAdd();
 
         builder.Property(x => x.TokenId)
             .HasColumnType("BLOB")

@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, switchMap } from 'rxjs';
+import { BehaviorSubject, Observable, switchMap, take } from 'rxjs';
 import { Endpoints } from '../endpoints';
 import { CurrentUser } from '../models/current-user';
 import { Response } from '../models/response';
@@ -17,12 +17,14 @@ export class AuthService {
 
     public constructor(private httpClient: HttpClient) {
         this.updateCurrentUser();
-
-        this.currentUser.subscribe(currentUser => console.log(currentUser));
     }
 
     private isLoginResponse(object: any): object is LoginResponse {
         return 'accessToken' in object && 'refreshToken' in object;
+    }
+
+    private isRefreshResponse(object: any): object is RefreshResponse {
+        return 'accessToken' in object;
     }
 
     public login(email: string, password: string): Observable<CurrentUser | null> {
@@ -42,6 +44,32 @@ export class AuthService {
 
                     return this.currentUser;
                 }),
+                take(1),
+            );
+    }
+
+    public refresh(): Observable<CurrentUser | null> {
+        let refreshToken = localStorage.getItem(AuthService.refreshTokenKey);
+        if (!refreshToken) {
+            throw new Error('No refresh token');
+        }
+
+        return this.httpClient
+            .post<Response<RefreshResponse>>(Endpoints.Refresh, { refreshToken })
+            .pipe(
+                switchMap(response => {
+                    if (this.isRefreshResponse(response)) {
+                        localStorage.setItem(AuthService.accessTokenKey, response.accessToken);
+                    } else {
+                        localStorage.removeItem(AuthService.accessTokenKey);
+                        localStorage.removeItem(AuthService.refreshTokenKey);
+                    }
+
+                    this.updateCurrentUser();
+
+                    return this.currentUser;
+                }),
+                take(1),
             );
     }
 
@@ -56,6 +84,8 @@ export class AuthService {
         let parsedPayload = JSON.parse(decodedPayload);
 
         return new CurrentUser(
+            jwt,
+            new Date(parsedPayload.exp * 1000),
             parsedPayload.sub,
             parsedPayload.email,
             parsedPayload.roles,
@@ -85,4 +115,8 @@ export class AuthService {
 interface LoginResponse {
     accessToken: string;
     refreshToken: string;
+}
+
+interface RefreshResponse {
+    accessToken: string;
 }

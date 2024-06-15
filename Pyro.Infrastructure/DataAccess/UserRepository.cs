@@ -12,20 +12,21 @@ public class UserRepository : IUserRepository
     private readonly PyroDbContext dbContext;
 
     public UserRepository(PyroDbContext dbContext)
+        => this.dbContext = dbContext;
+
+    public async Task<IReadOnlyList<User>> GetUsers(
+        CancellationToken cancellationToken = default)
     {
-        this.dbContext = dbContext;
+        var users = await Users.ToListAsync(cancellationToken);
+
+        return users;
     }
 
     public async Task<User?> GetUserById(
         Guid id,
         CancellationToken cancellationToken = default)
     {
-        var user = await dbContext
-            .Set<User>()
-            .Include(x => x.Roles)
-            .ThenInclude(x => x.Permissions)
-            .Include(x => x.Tokens)
-            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        var user = await Users.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
 
         return user;
     }
@@ -34,12 +35,7 @@ public class UserRepository : IUserRepository
         string email,
         CancellationToken cancellationToken = default)
     {
-        var user = await dbContext
-            .Set<User>()
-            .Include(x => x.Roles)
-            .ThenInclude(x => x.Permissions)
-            .Include(x => x.Tokens)
-            .FirstOrDefaultAsync(x => x.Email == email, cancellationToken);
+        var user = await Users.FirstOrDefaultAsync(x => x.Email == email, cancellationToken);
 
         return user;
     }
@@ -64,4 +60,11 @@ public class UserRepository : IUserRepository
 
         return permissions;
     }
+
+    private IQueryable<User> Users
+        => dbContext
+            .Set<User>()
+            .Include(x => x.Roles)
+            .ThenInclude(x => x.Permissions)
+            .Include(x => x.Tokens);
 }

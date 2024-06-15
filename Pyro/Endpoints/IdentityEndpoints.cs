@@ -22,10 +22,24 @@ public static class IdentityEndpoints
 
     private static IEndpointRouteBuilder MapUserEndpoints(this IEndpointRouteBuilder app)
     {
-        var users = app.MapGroup("/users")
+        var usersBuilder = app.MapGroup("/users")
             .WithTags("Users");
 
-        users.MapGet("/{email}", async (
+        usersBuilder.MapGet("/", async (
+                IMediator mediator,
+                CancellationToken cancellationToken) =>
+            {
+                var request = new GetUsers();
+                var users = await mediator.Send(request, cancellationToken);
+                var result = users.ToResponse();
+
+                return Results.Ok(result);
+            })
+            .Produces<IReadOnlyCollection<UserResponse>>()
+            .WithName("Get Users")
+            .WithOpenApi();
+
+        usersBuilder.MapGet("/{email}", async (
                 IMediator mediator,
                 string email,
                 CancellationToken cancellationToken) =>
