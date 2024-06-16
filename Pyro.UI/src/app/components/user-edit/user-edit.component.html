@@ -1,41 +1,46 @@
-<form
-  [formGroup]="form"
-  (ngSubmit)="onSubmit()">
-  <div class="field">
-    <label for="email">Email:</label>
-    <input
-      id="email"
-      type="email"
-      class="w-full"
-      pInputText
-      formControlName="email" />
-  </div>
+<div class="flex align-items-center justify-content-center">
+  <form
+    class="w-6"
+    [formGroup]="form"
+    (ngSubmit)="onSubmit()">
+    <h1>Edit User</h1>
 
-  <div class="field">
-    <label for="roles">Roles:</label>
-    <p-multiSelect
-      id="roles"
-      formControlName="roles"
-      styleClass="w-full"
-      [options]="roles"
-      optionLabel="name"
-      placeholder="Select Roles"
-      [filter]="false" />
-  </div>
+    <div class="field">
+      <label for="email">Email:</label>
+      <input
+        id="email"
+        type="email"
+        class="w-full"
+        pInputText
+        formControlName="email" />
+    </div>
 
-  <div class="field">
-    <p-checkbox
-      inputId="isLocked"
-      formControlName="isLocked"
-      [binary]="true"
-      label="Is Locked" />
-  </div>
+    <div class="field">
+      <label for="roles">Roles:</label>
+      <p-multiSelect
+        id="roles"
+        formControlName="roles"
+        styleClass="w-full"
+        [options]="roles"
+        optionLabel="name"
+        placeholder="Select Roles"
+        [filter]="false" />
+    </div>
 
-  <!-- TODO: permissions -->
-  <div class="field">
-    <p-button
-      label="Save"
-      type="submit"
-      [disabled]="!form.valid" />
-  </div>
-</form>
+    <div class="field">
+      <p-checkbox
+        inputId="isLocked"
+        formControlName="isLocked"
+        [binary]="true"
+        label="Is Locked" />
+    </div>
+
+    <!-- TODO: permissions -->
+    <div class="field">
+      <p-button
+        label="Save"
+        type="submit"
+        [disabled]="!form.valid" />
+    </div>
+  </form>
+</div>

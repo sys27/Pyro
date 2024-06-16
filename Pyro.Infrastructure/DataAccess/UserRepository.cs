@@ -17,7 +17,9 @@ public class UserRepository : IUserRepository
     public async Task<IReadOnlyList<User>> GetUsers(
         CancellationToken cancellationToken = default)
     {
-        var users = await Users.ToListAsync(cancellationToken);
+        var users = await Users
+            .OrderBy(x => x.Email)
+            .ToListAsync(cancellationToken);
 
         return users;
     }

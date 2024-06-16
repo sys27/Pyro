@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, input } from '@angular/core';
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { InputTextModule } from 'primeng/inputtext';
@@ -38,7 +38,7 @@ export class UserNewComponent implements OnInit {
 
     public constructor(
         private readonly formBuilder: FormBuilder,
-        private readonly route: ActivatedRoute,
+        private readonly router: Router,
         private readonly userService: UserService,
     ) {}
 
@@ -51,6 +51,8 @@ export class UserNewComponent implements OnInit {
             return;
         }
 
-        this.userService.createUser(this.form.value as CreateUser).subscribe(() => {});
+        this.userService
+            .createUser(this.form.value as CreateUser)
+            .subscribe(() => this.router.navigate(['/users']));
     }
 }

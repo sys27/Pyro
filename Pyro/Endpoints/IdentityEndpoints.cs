@@ -36,6 +36,8 @@ public static class IdentityEndpoints
                 return Results.Ok(result);
             })
             .Produces<IReadOnlyCollection<UserResponse>>()
+            .Produces(401)
+            .Produces(403)
             .WithName("Get Users")
             .WithOpenApi();
 
@@ -70,6 +72,9 @@ public static class IdentityEndpoints
                 return Results.Created($"/users/{request.Email}", new { request.Email });
             })
             .Produces(201)
+            .Produces(400)
+            .Produces(401)
+            .Produces(403)
             .WithName("Create User")
             .WithOpenApi();
 

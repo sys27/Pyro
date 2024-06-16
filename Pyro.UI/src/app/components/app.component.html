@@ -36,13 +36,16 @@
         placeholder="Search" />
     </p-iconField>
 
-    <p-button
+    <p-splitButton
       *ngIf="authService.currentUser | async as user; else showLogin"
-      icon="pi pi-user" />
+      icon="pi pi-user"
+      [outlined]="true"
+      [model]="loginMenuItems" />
     <ng-template #showLogin>
       <p-button
         icon="pi pi-sign-in"
-        routerLink="/login" />
+        routerLink="/login"
+        [outlined]="true" />
     </ng-template>
   </div>
 </p-toolbar>
