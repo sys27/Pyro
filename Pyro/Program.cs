@@ -9,7 +9,6 @@ using JWT.Algorithms;
 using JWT.Extensions.AspNetCore;
 using JWT.Extensions.AspNetCore.Factories;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.EntityFrameworkCore;
 using Pyro;
@@ -35,11 +34,17 @@ builder.Services.AddProblemDetails(options =>
 {
     options.IncludeExceptionDetails = (_, _) => builder.Environment.IsDevelopment();
 
-    options.Map<ValidationException>(ex => new ProblemDetails
+    options.Map<ValidationException>(ex =>
     {
-        Status = StatusCodes.Status400BadRequest,
-        Title = "A validation error occurred.",
-        Detail = string.Join(" ", ex.Errors.Select(x => x.ErrorMessage)),
+        var errors = ex.Errors
+            .GroupBy(x => x.PropertyName, x => x.ErrorMessage)
+            .ToDictionary(x => x.Key, x => x.ToArray());
+
+        return new HttpValidationProblemDetails(errors)
+        {
+            Status = StatusCodes.Status400BadRequest,
+            Type = "https://httpstatuses.io/400",
+        };
     });
 
     options.MapToStatusCode<Exception>(StatusCodes.Status500InternalServerError);
@@ -132,6 +137,7 @@ app.UseOutputCache();
 app.MapGroup("/api")
     .RequireAuthorization()
     .MapIdentityEndpoints()
+    .MapProfileEndpoints()
     .MapGitRepositoryEndpoints();
 
 app.Run();

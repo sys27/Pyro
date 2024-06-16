@@ -5,5 +5,7 @@ namespace Pyro.Domain.UserProfiles;
 
 public interface IUserProfileRepository
 {
+    Task<UserProfile?> GetUserProfile(Guid userId, CancellationToken cancellationToken);
+
     Task AddUserProfile(UserProfile userProfile, CancellationToken cancellationToken);
 }

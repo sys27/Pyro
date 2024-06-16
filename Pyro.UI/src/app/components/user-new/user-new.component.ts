@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, input } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
@@ -25,13 +25,11 @@ import { CreateUser, Role, User, UserService } from '../../services/user.service
     styleUrl: './user-new.component.css',
 })
 export class UserNewComponent implements OnInit {
-    public email = input.required<string>();
-
     public user: User | undefined;
     public roles: Role[] | undefined;
 
     public form = this.formBuilder.nonNullable.group({
-        email: ['', [Validators.required, Validators.email]],
+        login: ['', [Validators.required, Validators.email]],
         password: ['', Validators.required],
         roles: new FormControl<Role[]>([]),
     });

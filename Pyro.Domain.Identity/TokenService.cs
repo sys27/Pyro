@@ -42,7 +42,7 @@ public class TokenService
             { "iat", currentDate.ToUnixTimeSeconds() },
             { "exp", accessTokenExpiration.ToUnixTimeSeconds() },
             { "sub", user.Id.ToString() },
-            { "email", user.Email },
+            { "login", user.Login },
             { "roles", roles },
             { "permissions", permissions },
         };
@@ -64,7 +64,7 @@ public class TokenService
             { "iat", currentDate.ToUnixTimeSeconds() },
             { "exp", refreshTokenExpiration.ToUnixTimeSeconds() },
             { "sub", user.Id.ToString() },
-            { "email", user.Email },
+            { "login", user.Login },
         };
 
         // TODO:

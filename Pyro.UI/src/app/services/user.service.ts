@@ -13,8 +13,8 @@ export class UserService {
         return this.httpClient.get<UserItem[]>(Endpoints.Users);
     }
 
-    public getUser(email: string): Observable<User> {
-        return this.httpClient.get<User>(`${Endpoints.Users}/${email}`);
+    public getUser(login: string): Observable<User> {
+        return this.httpClient.get<User>(`${Endpoints.Users}/${login}`);
     }
 
     public getRoles(): Observable<Role[]> {
@@ -27,7 +27,7 @@ export class UserService {
 
     public createUser(user: CreateUser): Observable<void> {
         let request = {
-            email: user.email,
+            login: user.login,
             password: user.password,
             roles: user.roles.map(role => role.name),
         };
@@ -35,12 +35,12 @@ export class UserService {
         return this.httpClient.post<void>(Endpoints.Users, request);
     }
 
-    public updateUser(email: string, user: UpdateUser): Observable<void> {
+    public updateUser(login: string, user: UpdateUser): Observable<void> {
         let request = {
             roles: user.roles.map(role => role.name),
         };
 
-        return this.httpClient.put<void>(`${Endpoints.Users}/${email}`, request);
+        return this.httpClient.put<void>(`${Endpoints.Users}/${login}`, request);
     }
 }
 
@@ -54,7 +54,7 @@ export interface Role {
 }
 
 export interface User {
-    get email(): string;
+    get login(): string;
 
     get isLocked(): boolean;
 
@@ -62,11 +62,11 @@ export interface User {
 }
 
 export interface UserItem {
-    get email(): string;
+    get login(): string;
 }
 
 export interface CreateUser {
-    email: string;
+    login: string;
 
     password: string;
 

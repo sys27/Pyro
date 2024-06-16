@@ -152,14 +152,14 @@ namespace Pyro.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("BLOB");
 
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<bool>("IsLocked")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER")
                         .HasDefaultValue(false);
+
+                    b.Property<string>("Login")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<byte[]>("Password")
                         .IsRequired()
@@ -173,9 +173,9 @@ namespace Pyro.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Email")
+                    b.HasIndex("Login")
                         .IsUnique()
-                        .HasDatabaseName("IX_Users_Email");
+                        .HasDatabaseName("IX_Users_Login");
 
                     b.ToTable("Users", (string)null);
 
@@ -183,8 +183,8 @@ namespace Pyro.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("f9ba057a-35b0-4d10-8326-702d8f7ec966"),
-                            Email = "pyro@localhost.local",
                             IsLocked = false,
+                            Login = "pyro@localhost.local",
                             Password = new byte[] { 239, 163, 54, 78, 41, 129, 181, 60, 27, 181, 100, 116, 243, 128, 253, 209, 87, 147, 27, 73, 138, 190, 50, 65, 18, 253, 153, 127, 194, 97, 240, 29, 179, 58, 68, 117, 170, 97, 172, 236, 70, 27, 167, 168, 87, 3, 66, 53, 11, 34, 206, 209, 211, 150, 81, 227, 19, 161, 249, 24, 45, 138, 206, 197 },
                             Salt = new byte[] { 109, 28, 230, 18, 208, 250, 67, 218, 171, 6, 152, 200, 162, 109, 186, 132 }
                         });

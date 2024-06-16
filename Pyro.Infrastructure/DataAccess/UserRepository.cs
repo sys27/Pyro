@@ -18,7 +18,7 @@ public class UserRepository : IUserRepository
         CancellationToken cancellationToken = default)
     {
         var users = await Users
-            .OrderBy(x => x.Email)
+            .OrderBy(x => x.Login)
             .ToListAsync(cancellationToken);
 
         return users;
@@ -33,11 +33,11 @@ public class UserRepository : IUserRepository
         return user;
     }
 
-    public async Task<User?> GetUserByEmail(
-        string email,
+    public async Task<User?> GetUserByLogin(
+        string login,
         CancellationToken cancellationToken = default)
     {
-        var user = await Users.FirstOrDefaultAsync(x => x.Email == email, cancellationToken);
+        var user = await Users.FirstOrDefaultAsync(x => x.Login == login, cancellationToken);
 
         return user;
     }

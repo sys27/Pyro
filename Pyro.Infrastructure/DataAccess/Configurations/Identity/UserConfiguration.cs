@@ -20,7 +20,7 @@ internal class UserConfiguration : IEntityTypeConfiguration<User>
             .IsRequired()
             .ValueGeneratedOnAdd();
 
-        builder.Property(x => x.Email)
+        builder.Property(x => x.Login)
             .IsRequired()
             .UsePropertyAccessMode(PropertyAccessMode.Field);
 
@@ -74,9 +74,9 @@ internal class UserConfiguration : IEntityTypeConfiguration<User>
             .WithOne(x => x.User)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasIndex(x => x.Email)
+        builder.HasIndex(x => x.Login)
             .IsUnique()
-            .HasDatabaseName("IX_Users_Email");
+            .HasDatabaseName("IX_Users_Login");
 
         builder.HasData(SeedData.Users);
     }

@@ -3,6 +3,7 @@
 
 using Pyro.Domain.GitRepositories;
 using Pyro.Domain.GitRepositories.Commands;
+using Pyro.Domain.UserProfiles;
 using Pyro.Dtos.Requests;
 using Pyro.Dtos.Responses;
 using Riok.Mapperly.Abstractions;
@@ -19,4 +20,10 @@ public static partial class DtoMapper
     public static partial IReadOnlyList<GitRepositoryResponse> ToResponse(this IReadOnlyList<GitRepository> gitRepository);
 
     public static partial CreateGitRepository ToCommand(this CreateGitRepositoryRequest request);
+
+    [MapperIgnoreSource(nameof(UserProfile.Id))]
+    [MapperIgnoreSource(nameof(UserProfile.Avatar))]
+    public static partial UserProfileResponse ToResponse(this UserProfile request);
+
+    public static partial UpdateProfile ToCommand(this UpdateUserProfileRequest request);
 }

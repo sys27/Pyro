@@ -8,19 +8,21 @@ namespace Pyro.Domain.Identity.Models;
 
 public class User : DomainEntity
 {
+    public static readonly Guid PyroUser = Guid.Parse("F9BA057A-35B0-4D10-8326-702D8F7EC966");
+
     private readonly List<Role> roles = [];
     private readonly List<AuthenticationToken> tokens = [];
 
-    private string email;
+    private string login;
     private byte[] password;
     private byte[] salt;
 
-    public static User Create(string email, byte[] password, byte[] salt)
+    public static User Create(string login, byte[] password, byte[] salt)
     {
         var user = new User
         {
             Id = Guid.NewGuid(),
-            Email = email,
+            Login = login,
             Password = password,
             Salt = salt,
         };
@@ -31,17 +33,17 @@ public class User : DomainEntity
 
     public Guid Id { get; init; }
 
-    public required string Email
+    public required string Login
     {
-        get => email;
-        [MemberNotNull(nameof(email))]
+        get => login;
+        [MemberNotNull(nameof(login))]
         init
         {
             if (string.IsNullOrWhiteSpace(value))
-                throw new ArgumentException("Email cannot be null or empty.", nameof(value));
+                throw new ArgumentException("Login cannot be null or empty.", nameof(value));
 
             // TODO: Add email validation
-            email = value;
+            login = value;
         }
     }
 

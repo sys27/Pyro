@@ -14,7 +14,7 @@ namespace Pyro.Endpoints;
 /// <summary>
 /// Contains mappings for repository endpoints.
 /// </summary>
-public static class GitRepositoryEndpoints
+internal static class GitRepositoryEndpoints
 {
     public static IEndpointRouteBuilder MapGitRepositoryEndpoints(this IEndpointRouteBuilder app)
     {
@@ -36,10 +36,11 @@ public static class GitRepositoryEndpoints
             })
             .RequirePermission(RepositoryView)
             .Produces<GitRepositoryResponse>()
-            .Produces(400)
+            .ProducesProblem(400)
             .Produces(401)
             .Produces(403)
             .Produces(404)
+            .ProducesProblem(500)
             .WithName("Get Repository")
             .WithOpenApi();
 
@@ -57,6 +58,7 @@ public static class GitRepositoryEndpoints
             .Produces<IReadOnlyList<GitRepositoryResponse>>()
             .Produces(401)
             .Produces(403)
+            .ProducesProblem(500)
             .WithName("Get Repositories")
             .WithOpenApi();
 
@@ -76,9 +78,10 @@ public static class GitRepositoryEndpoints
             })
             .RequirePermission(RepositoryEdit)
             .Produces<GitRepositoryResponse>(201)
-            .Produces(400)
+            .ProducesProblem(400)
             .Produces(401)
             .Produces(403)
+            .ProducesProblem(500)
             .WithName("Create Repository")
             .WithOpenApi();
 

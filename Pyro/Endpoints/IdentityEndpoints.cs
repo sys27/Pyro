@@ -1,6 +1,7 @@
 // Copyright (c) Dmytro Kyshchenko. All rights reserved.
 // Licensed under the GPL-3.0 license. See LICENSE file in the project root for full license information.
 
+using System.Net.Mime;
 using MediatR;
 using Pyro.Domain.Identity.Commands;
 using Pyro.Domain.Identity.Queries;
@@ -11,7 +12,7 @@ using Pyro.Infrastructure.DataAccess;
 
 namespace Pyro.Endpoints;
 
-public static class IdentityEndpoints
+internal static class IdentityEndpoints
 {
     public static IEndpointRouteBuilder MapIdentityEndpoints(this IEndpointRouteBuilder app)
         => app
@@ -38,15 +39,16 @@ public static class IdentityEndpoints
             .Produces<IReadOnlyCollection<UserResponse>>()
             .Produces(401)
             .Produces(403)
+            .ProducesProblem(500, MediaTypeNames.Application.Json)
             .WithName("Get Users")
             .WithOpenApi();
 
-        usersBuilder.MapGet("/{email}", async (
+        usersBuilder.MapGet("/{login}", async (
                 IMediator mediator,
-                string email,
+                string login,
                 CancellationToken cancellationToken) =>
             {
-                var request = new GetUser(email);
+                var request = new GetUser(login);
                 var user = await mediator.Send(request, cancellationToken);
                 var result = user?.ToResponse();
 
@@ -56,7 +58,8 @@ public static class IdentityEndpoints
             })
             .Produces<UserResponse>()
             .Produces(404)
-            .WithName("Get User By Email")
+            .ProducesProblem(500, MediaTypeNames.Application.Json)
+            .WithName("Get User By Login")
             .WithOpenApi();
 
         usersBuilder.MapPost("/", async (
@@ -69,23 +72,24 @@ public static class IdentityEndpoints
                 await mediator.Send(command, cancellationToken);
                 await dbContext.SaveChangesAsync(cancellationToken);
 
-                return Results.Created($"/users/{request.Email}", new { request.Email });
+                return Results.Created($"/users/{request.Login}", null);
             })
             .Produces(201)
-            .Produces(400)
+            .ProducesProblem(400)
             .Produces(401)
             .Produces(403)
+            .ProducesProblem(500)
             .WithName("Create User")
             .WithOpenApi();
 
-        usersBuilder.MapPut("/{email}", async (
+        usersBuilder.MapPut("/{login}", async (
                 IMediator mediator,
                 PyroDbContext dbContext,
-                string email,
+                string login,
                 UpdateUserRequest request,
                 CancellationToken cancellationToken) =>
             {
-                var user = await mediator.Send(new GetUser(email), cancellationToken);
+                var user = await mediator.Send(new GetUser(login), cancellationToken);
                 if (user is null)
                     return Results.NotFound();
 
@@ -96,10 +100,11 @@ public static class IdentityEndpoints
                 return Results.Ok(user.ToResponse());
             })
             .Produces<UserResponse>()
-            .Produces(400)
+            .ProducesProblem(400)
             .Produces(401)
             .Produces(403)
             .Produces(404)
+            .ProducesProblem(500)
             .WithName("Update User")
             .WithOpenApi();
 
@@ -126,6 +131,7 @@ public static class IdentityEndpoints
             .Produces<IReadOnlyList<RoleResponse>>()
             .Produces(401)
             .Produces(403)
+            .ProducesProblem(500)
             .WithName("Get Roles")
             .WithOpenApi();
 
@@ -152,6 +158,7 @@ public static class IdentityEndpoints
             .Produces<IReadOnlyList<PermissionResponse>>()
             .Produces(401)
             .Produces(403)
+            .ProducesProblem(500)
             .WithName("Get Permissions")
             .WithOpenApi();
 
@@ -169,7 +176,7 @@ public static class IdentityEndpoints
                 LoginRequest request,
                 CancellationToken cancellationToken = default) =>
             {
-                var command = new Login(request.Email, request.Password);
+                var command = new LoginCommand(request.Login, request.Password);
                 var result = await mediator.Send(command, cancellationToken);
                 await dbContext.SaveChangesAsync(cancellationToken);
 
@@ -178,8 +185,9 @@ public static class IdentityEndpoints
                     : Results.Unauthorized();
             })
             .Produces<TokenPairResponse>()
-            .Produces(400)
+            .ProducesProblem(400)
             .Produces(401)
+            .ProducesProblem(500)
             .WithName("Login")
             .AllowAnonymous()
             .WithOpenApi();
@@ -196,6 +204,7 @@ public static class IdentityEndpoints
                 return Results.NoContent();
             })
             .Produces(204)
+            .ProducesProblem(500)
             .WithName("Logout")
             .WithOpenApi();
 
@@ -212,8 +221,9 @@ public static class IdentityEndpoints
                     : Results.Unauthorized();
             })
             .Produces<TokenResponse>()
-            .Produces(400)
+            .ProducesProblem(400)
             .Produces(401)
+            .ProducesProblem(500)
             .WithName("Refresh Token")
             .AllowAnonymous()
             .WithOpenApi();

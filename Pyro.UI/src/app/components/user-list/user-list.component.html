@@ -7,7 +7,7 @@
       styleClass="p-datatable-striped">
       <ng-template pTemplate="header">
         <tr>
-          <th>Email</th>
+          <th>Login</th>
           <th class="w-5rem"></th>
         </tr>
       </ng-template>
@@ -17,12 +17,12 @@
         let-user>
         <tr>
           <td>
-            <span>{{ user.email }}</span>
+            <span>{{ user.login }}</span>
           </td>
           <td>
             <p-button
               icon="pi pi-pencil"
-              [routerLink]="['/users', user.email]"
+              [routerLink]="['/users', user.login]"
               [outlined]="true" />
           </td>
         </tr>

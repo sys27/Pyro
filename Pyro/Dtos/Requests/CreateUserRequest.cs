@@ -4,6 +4,6 @@
 namespace Pyro.Dtos.Requests;
 
 public record CreateUserRequest(
-    string Email,
+    string Login,
     string Password,
     IEnumerable<string> Roles);

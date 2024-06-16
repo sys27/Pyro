@@ -41,8 +41,8 @@ public static class SeedData
         [
             new User
             {
-                Id = Guid.Parse("F9BA057A-35B0-4D10-8326-702D8F7EC966"),
-                Email = "pyro@localhost.local",
+                Id = User.PyroUser,
+                Login = "pyro@localhost.local",
                 Password = [239, 163, 54, 78, 41, 129, 181, 60, 27, 181, 100, 116, 243, 128, 253, 209, 87, 147, 27, 73, 138, 190, 50, 65, 18, 253, 153, 127, 194, 97, 240, 29, 179, 58, 68, 117, 170, 97, 172, 236, 70, 27, 167, 168, 87, 3, 66, 53, 11, 34, 206, 209, 211, 150, 81, 227, 19, 161, 249, 24, 45, 138, 206, 197],
                 Salt = [109, 28, 230, 18, 208, 250, 67, 218, 171, 6, 152, 200, 162, 109, 186, 132],
             }
@@ -83,6 +83,6 @@ public static class SeedData
     public static Role GetRole(string name)
         => Roles.Single(x => x.Name == name);
 
-    public static User GetUser(string email)
-        => Users.Single(x => x.Email == email);
+    public static User GetUser(string login)
+        => Users.Single(x => x.Login == login);
 }

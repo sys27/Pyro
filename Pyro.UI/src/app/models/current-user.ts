@@ -3,7 +3,7 @@ export class CurrentUser {
         private readonly _accessToken: string,
         private readonly _expiresIn: Date,
         private readonly _id: number,
-        private readonly _email: string,
+        private readonly _login: string,
         private readonly _roles: string[],
         private readonly _permissions: string[],
     ) {}
@@ -20,7 +20,7 @@ export class CurrentUser {
         return this._id;
     }
 
-    public get email(): string {
-        return this._email;
+    public get login(): string {
+        return this._login;
     }
 }

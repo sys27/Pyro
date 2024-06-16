@@ -3,4 +3,4 @@
 
 namespace Pyro.Dtos.Responses;
 
-public record UserResponse(Guid Id, string Email, bool IsLocked, IEnumerable<RoleResponse> Roles);
+public record UserResponse(Guid Id, string Login, bool IsLocked, IEnumerable<RoleResponse> Roles);

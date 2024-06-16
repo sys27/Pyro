@@ -20,6 +20,6 @@ public class JwtToken
     [JsonPropertyName("sub")]
     public required Guid UserId { get; init; }
 
-    [JsonPropertyName("email")]
-    public required string Email { get; init; }
+    [JsonPropertyName("login")]
+    public required string Login { get; init; }
 }

@@ -22,11 +22,11 @@ public class CurrentUserProvider : ICurrentUserProvider
 
         var user = httpContext.User;
         var userId = Guid.Parse(GetClaim(user, "sub"));
-        var email = GetClaim(user, "email");
+        var login = GetClaim(user, "login");
         var roles = GetClaims(user, "roles").ToList();
         var permissions = GetClaims(user, "permissions").ToList();
 
-        var currentUser = new CurrentUser(userId, email, roles, permissions);
+        var currentUser = new CurrentUser(userId, login, roles, permissions);
 
         return currentUser;
     }

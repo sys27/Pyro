@@ -13,7 +13,7 @@ export const routes: Routes = [
     { path: 'repositories/:name', component: RepositoryComponent, canActivate: [authGuard] },
     { path: 'users', component: UserListComponent, canActivate: [authGuard] },
     { path: 'users/new', component: UserNewComponent, canActivate: [authGuard] },
-    { path: 'users/:email', component: UserEditComponent, canActivate: [authGuard] },
+    { path: 'users/:login', component: UserEditComponent, canActivate: [authGuard] },
     { path: 'login', component: LoginComponent },
     { path: '', redirectTo: 'repositories', pathMatch: 'full' },
     { path: '**', component: NotFoundComponent },

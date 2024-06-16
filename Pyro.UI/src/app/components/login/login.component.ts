@@ -15,7 +15,7 @@ import { AuthService } from '../../services/auth.service';
 })
 export class LoginComponent {
     public formGroup = this.formBuilder.nonNullable.group({
-        email: ['', [Validators.required, Validators.email]],
+        login: ['', [Validators.required, Validators.email]],
         password: ['', Validators.required],
     });
 
@@ -28,16 +28,13 @@ export class LoginComponent {
     public onSubmit(): void {
         if (this.formGroup.invalid) return;
 
-        let email = this.formGroup.value.email!;
+        let login = this.formGroup.value.login!;
         let password = this.formGroup.value.password!;
 
-        this.authService.login(email, password).subscribe({
-            next: currentUser => {
-                if (!currentUser) return;
+        this.authService.login(login, password).subscribe(currentUser => {
+            if (!currentUser) return;
 
-                this.location.back();
-            },
-            error: error => {},
+            this.location.back();
         });
     }
 }

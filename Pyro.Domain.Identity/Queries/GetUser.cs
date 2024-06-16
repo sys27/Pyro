@@ -7,13 +7,13 @@ using Pyro.Domain.Identity.Models;
 
 namespace Pyro.Domain.Identity.Queries;
 
-public record GetUser(string Email) : IRequest<User?>;
+public record GetUser(string Login) : IRequest<User?>;
 
 public class GetUserValidator : AbstractValidator<GetUser>
 {
     public GetUserValidator()
     {
-        RuleFor(x => x.Email)
+        RuleFor(x => x.Login)
             .NotEmpty()
             .MaximumLength(50)
             .EmailAddress();
@@ -31,7 +31,7 @@ public class GetUserHandler : IRequestHandler<GetUser, User?>
 
     public async Task<User?> Handle(GetUser request, CancellationToken cancellationToken)
     {
-        var user = await repository.GetUserByEmail(request.Email, cancellationToken);
+        var user = await repository.GetUserByLogin(request.Login, cancellationToken);
 
         return user;
     }

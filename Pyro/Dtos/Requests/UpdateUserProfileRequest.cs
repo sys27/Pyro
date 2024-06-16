@@ -3,4 +3,4 @@
 
 namespace Pyro.Dtos.Requests;
 
-public record LoginRequest(string Login, string Password);
+public record UpdateUserProfileRequest(string? Name, string Status);

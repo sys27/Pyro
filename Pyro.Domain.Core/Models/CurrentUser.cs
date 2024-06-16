@@ -5,7 +5,7 @@ namespace Pyro.Domain.Core.Models;
 
 public record CurrentUser(
     Guid Id,
-    string Email,
+    string Login,
     IEnumerable<string> Roles,
     IEnumerable<string> Permissions)
 {

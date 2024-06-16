@@ -9,7 +9,7 @@ using Pyro.Domain.Identity.Models;
 
 namespace Pyro.Domain.Identity.Commands;
 
-public record Login(string Email, string Password) : IRequest<LoginResult>;
+public record LoginCommand(string Login, string Password) : IRequest<LoginResult>;
 
 public readonly struct LoginResult : IEquatable<LoginResult>
 {
@@ -46,11 +46,11 @@ public readonly struct LoginResult : IEquatable<LoginResult>
     public TokenPair? TokenPair { get; }
 }
 
-public class LoginValidator : AbstractValidator<Login>
+public class LoginValidator : AbstractValidator<LoginCommand>
 {
     public LoginValidator()
     {
-        RuleFor(x => x.Email)
+        RuleFor(x => x.Login)
             .NotEmpty()
             .MaximumLength(50)
             .EmailAddress();
@@ -62,7 +62,7 @@ public class LoginValidator : AbstractValidator<Login>
     }
 }
 
-public class LoginHandler : IRequestHandler<Login, LoginResult>
+public class LoginHandler : IRequestHandler<LoginCommand, LoginResult>
 {
     private readonly ILogger<LoginHandler> logger;
     private readonly IUserRepository repository;
@@ -81,26 +81,26 @@ public class LoginHandler : IRequestHandler<Login, LoginResult>
         this.tokenService = tokenService;
     }
 
-    public async Task<LoginResult> Handle(Login request, CancellationToken cancellationToken)
+    public async Task<LoginResult> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
-        var user = await repository.GetUserByEmail(request.Email, cancellationToken);
+        var user = await repository.GetUserByLogin(request.Login, cancellationToken);
         if (user is null)
         {
-            logger.LogWarning("Login attempt. User with email '{Email}' not found", request.Email);
+            logger.LogWarning("Login attempt. User with login '{Login}' not found", request.Login);
 
             return LoginResult.Fail();
         }
 
         if (user.IsLocked)
         {
-            logger.LogWarning("Login attempt. User with email '{Email}' is locked", request.Email);
+            logger.LogWarning("Login attempt. User with login '{Login}' is locked", request.Login);
 
             return LoginResult.Fail();
         }
 
         if (!passwordService.VerifyPassword(request.Password, user.Password, user.Salt))
         {
-            logger.LogWarning("Login attempt. User with email '{Email}' provided invalid password", request.Email);
+            logger.LogWarning("Login attempt. User with login '{Login}' provided invalid password", request.Login);
 
             return LoginResult.Fail();
         }

@@ -25,13 +25,13 @@ import { Role, UpdateUser, User, UserService } from '../../services/user.service
     styleUrl: './user-edit.component.css',
 })
 export class UserEditComponent implements OnInit {
-    public email = input.required<string>();
+    public login = input.required<string>();
 
     public user: User | undefined;
     public roles: Role[] | undefined;
 
     public form = this.formBuilder.nonNullable.group({
-        email: ['', [Validators.required, Validators.email]],
+        login: ['', [Validators.required, Validators.email]],
         isLocked: [false, Validators.required],
         roles: new FormControl<Role[]>([]),
     });
@@ -43,15 +43,15 @@ export class UserEditComponent implements OnInit {
     ) {}
 
     public ngOnInit(): void {
-        this.form.get('email')?.disable();
+        this.form.get('login')?.disable();
 
         this.userService.getRoles().subscribe(roles => (this.roles = roles));
 
-        this.userService.getUser(this.email()).subscribe(user => {
+        this.userService.getUser(this.login()).subscribe(user => {
             this.user = user;
 
             this.form.setValue({
-                email: user.email,
+                login: user.login,
                 isLocked: user.isLocked,
                 roles: user.roles,
             });
@@ -64,7 +64,7 @@ export class UserEditComponent implements OnInit {
         }
 
         this.userService
-            .updateUser(this.email(), this.form.value as UpdateUser)
+            .updateUser(this.login(), this.form.value as UpdateUser)
             .subscribe(() => {});
     }
 }

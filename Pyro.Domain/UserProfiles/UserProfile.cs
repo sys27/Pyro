@@ -5,15 +5,15 @@ namespace Pyro.Domain.UserProfiles;
 
 public class UserProfile
 {
-    private readonly string? name;
-    private readonly string? status;
+    private string? name;
+    private string? status;
 
     public Guid Id { get; init; }
 
     public string? Name
     {
         get => name;
-        init
+        set
         {
             if (value?.Length > 50)
                 throw new ArgumentOutOfRangeException(nameof(Name), "Name cannot be longer than 50 characters.");
@@ -25,7 +25,7 @@ public class UserProfile
     public string? Status
     {
         get => status;
-        init
+        set
         {
             if (value?.Length > 150)
                 throw new ArgumentOutOfRangeException(nameof(Status), "Status cannot be longer than 50 characters.");

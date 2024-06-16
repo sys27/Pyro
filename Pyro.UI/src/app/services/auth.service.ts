@@ -27,9 +27,9 @@ export class AuthService {
         return 'accessToken' in object;
     }
 
-    public login(email: string, password: string): Observable<CurrentUser | null> {
+    public login(login: string, password: string): Observable<CurrentUser | null> {
         return this.httpClient
-            .post<Response<LoginResponse>>(Endpoints.Login, { email, password })
+            .post<Response<LoginResponse>>(Endpoints.Login, { login, password })
             .pipe(
                 switchMap(response => {
                     if (this.isLoginResponse(response)) {
@@ -87,7 +87,7 @@ export class AuthService {
             jwt,
             new Date(parsedPayload.exp * 1000),
             parsedPayload.sub,
-            parsedPayload.email,
+            parsedPayload.login,
             parsedPayload.roles,
             parsedPayload.permissions,
         );
