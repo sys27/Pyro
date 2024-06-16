@@ -2,8 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { Observable } from 'rxjs';
-import { UserItem } from '../../models/user-item';
-import { UserService } from '../../services/user.service';
+import { UserItem, UserService } from '../../services/user.service';
 
 @Component({
     selector: 'user-list',

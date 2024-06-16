@@ -11,6 +11,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         take(1),
         switchMap(currentUser => {
             if (
+                req.url !== Endpoints.Login &&
                 req.url !== Endpoints.Refresh &&
                 currentUser &&
                 currentUser.expiresIn <= new Date()
