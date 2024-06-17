@@ -1,0 +1,20 @@
+version: 2
+updates:
+  - package-ecosystem: "nuget"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    target-branch: "master"
+    assignees:
+      - "sys27"
+    reviewers:
+      - "sys27"
+
+  - package-ecosystem: "npm"
+    directory: "Pyro.UI/"
+    schedule:
+      interval: "daily"
+    assignees:
+      - "sys27"
+    reviewers:
+      - "sys27"
