@@ -7,4 +7,5 @@ export class Endpoints {
     public static readonly Permissions: string = '/api/permissions';
 
     public static readonly Repositories: string = '/api/repositories';
+    public static readonly Profile: string = '/api/profile';
 }

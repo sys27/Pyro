@@ -75,5 +75,6 @@ public class UserRepository : IUserRepository
             .Set<User>()
             .Include(x => x.Roles)
             .ThenInclude(x => x.Permissions)
-            .Include(x => x.Tokens);
+            .Include(x => x.Tokens)
+            .AsSplitQuery();
 }

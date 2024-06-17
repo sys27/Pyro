@@ -75,7 +75,7 @@ internal static class IdentityEndpoints
                 return Results.Created($"/users/{request.Login}", null);
             })
             .Produces(201)
-            .ProducesProblem(400)
+            .ProducesValidationProblem()
             .Produces(401)
             .Produces(403)
             .ProducesProblem(500)
@@ -100,7 +100,7 @@ internal static class IdentityEndpoints
                 return Results.Ok(user.ToResponse());
             })
             .Produces<UserResponse>()
-            .ProducesProblem(400)
+            .ProducesValidationProblem()
             .Produces(401)
             .Produces(403)
             .Produces(404)
@@ -185,7 +185,7 @@ internal static class IdentityEndpoints
                     : Results.Unauthorized();
             })
             .Produces<TokenPairResponse>()
-            .ProducesProblem(400)
+            .ProducesValidationProblem()
             .Produces(401)
             .ProducesProblem(500)
             .WithName("Login")
@@ -221,7 +221,7 @@ internal static class IdentityEndpoints
                     : Results.Unauthorized();
             })
             .Produces<TokenResponse>()
-            .ProducesProblem(400)
+            .ProducesValidationProblem()
             .Produces(401)
             .ProducesProblem(500)
             .WithName("Refresh Token")
