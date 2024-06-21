@@ -10,17 +10,38 @@ public class OutboxMessageProcessing : BackgroundService
 {
     private readonly ILogger<OutboxMessageProcessing> logger;
     private readonly IServiceProvider serviceProvider;
+    private readonly IHostApplicationLifetime applicationLifetime;
 
     public OutboxMessageProcessing(
         ILogger<OutboxMessageProcessing> logger,
-        IServiceProvider serviceProvider)
+        IServiceProvider serviceProvider,
+        IHostApplicationLifetime applicationLifetime)
     {
         this.logger = logger;
         this.serviceProvider = serviceProvider;
+        this.applicationLifetime = applicationLifetime;
+    }
+
+    private async Task<bool> WaitForApplicationStarted(CancellationToken stoppingToken)
+    {
+        var taskCompletionSource = new TaskCompletionSource<bool>();
+        await using var r1 = applicationLifetime.ApplicationStarted
+            .Register(() => taskCompletionSource.SetResult(true));
+
+        await using var registration = stoppingToken
+            .Register(() => taskCompletionSource.SetResult(false));
+
+        return await taskCompletionSource.Task;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        if (!await WaitForApplicationStarted(stoppingToken))
+        {
+            return;
+        }
+
+        // TODO: configuration
         const int batchSize = 10;
         var delay = TimeSpan.FromSeconds(3);
 

@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <PackageReference Include="LibGit2Sharp" />
+    <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" />
     <PackageReference Include="Microsoft.EntityFrameworkCore"/>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite"/>
   </ItemGroup>

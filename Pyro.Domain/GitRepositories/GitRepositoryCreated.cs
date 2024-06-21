@@ -27,6 +27,7 @@ public class GitRepositoryCreatedHandler : INotificationHandler<GitRepositoryCre
 
     public async Task Handle(GitRepositoryCreated notification, CancellationToken cancellationToken)
     {
+        // TODO: remove?
         logger.LogInformation("Handling GitRepositoryCreated event");
 
         var gitRepository = await repository.GetGitRepository(notification.GitRepositoryId, cancellationToken);

@@ -13,23 +13,29 @@ public class TokenService
     private readonly TimeProvider timeProvider;
     private readonly IJwtEncoder jwtEncoder;
     private readonly IJwtDecoder jwtDecoder;
+    private readonly ISigningKeyService signingKeyService;
 
-    public TokenService(TimeProvider timeProvider, IJwtEncoder jwtEncoder, IJwtDecoder jwtDecoder)
+    public TokenService(
+        TimeProvider timeProvider,
+        IJwtEncoder jwtEncoder,
+        IJwtDecoder jwtDecoder,
+        ISigningKeyService signingKeyService)
     {
         this.timeProvider = timeProvider;
         this.jwtEncoder = jwtEncoder;
         this.jwtDecoder = jwtDecoder;
+        this.signingKeyService = signingKeyService;
     }
 
-    public TokenPair GenerateTokenPair(User user)
+    public async Task<TokenPair> GenerateTokenPair(User user)
     {
-        var accessToken = GenerateAccessToken(user);
-        var refreshToken = GenerateRefreshToken(user);
+        var accessToken = await GenerateAccessToken(user);
+        var refreshToken = await GenerateRefreshToken(user);
 
         return new TokenPair(accessToken, refreshToken);
     }
 
-    public Token GenerateAccessToken(User user)
+    public async Task<Token> GenerateAccessToken(User user)
     {
         var tokenId = Guid.NewGuid();
         var currentDate = timeProvider.GetUtcNow();
@@ -47,32 +53,37 @@ public class TokenService
             { "permissions", permissions },
         };
 
-        // TODO:
-        var token = jwtEncoder.Encode(headers, claims, "secret");
+        var keys = await signingKeyService.GetKeys();
+        var token = jwtEncoder.Encode(headers, claims, keys.First());
 
         return new Token(tokenId, token, accessTokenExpiration);
     }
 
-    private Token GenerateRefreshToken(User user)
+    private async Task<Token> GenerateRefreshToken(User user)
     {
         var tokenId = Guid.NewGuid();
         var currentDate = timeProvider.GetUtcNow();
         var refreshTokenExpiration = currentDate.AddMonths(6);
-        var claims = new Dictionary<string, object>
+        var jwtToken = new JwtToken
         {
-            { "jti", tokenId.ToString() },
-            { "iat", currentDate.ToUnixTimeSeconds() },
-            { "exp", refreshTokenExpiration.ToUnixTimeSeconds() },
-            { "sub", user.Id.ToString() },
-            { "login", user.Login },
+            TokenId = tokenId,
+            IssuedAt = currentDate.ToUnixTimeSeconds(),
+            ExpiresAt = refreshTokenExpiration.ToUnixTimeSeconds(),
+            UserId = user.Id,
+            Login = user.Login,
         };
 
-        // TODO:
-        var refreshToken = jwtEncoder.Encode(headers, claims, "secret");
+        var keys = await signingKeyService.GetKeys();
+        var refreshToken = jwtEncoder.Encode(headers, jwtToken, keys.First());
 
         return new Token(tokenId, refreshToken, refreshTokenExpiration);
     }
 
-    public JwtToken DecodeTokenId(string token)
-        => jwtDecoder.DecodeToObject<JwtToken>(token, "secret");
+    public async Task<JwtToken> DecodeTokenId(string token)
+    {
+        var keys = await signingKeyService.GetKeys();
+        var jwtToken = jwtDecoder.DecodeToObject<JwtToken>(token, keys.First());
+
+        return jwtToken;
+    }
 }

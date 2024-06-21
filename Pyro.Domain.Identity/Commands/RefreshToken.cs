@@ -45,8 +45,7 @@ public class RefreshTokenHandler : IRequestHandler<RefreshToken, RefreshTokenRes
 
     public async Task<RefreshTokenResult> Handle(RefreshToken request, CancellationToken cancellationToken)
     {
-        // TODO: check expiration date and signature
-        var jwtToken = tokenService.DecodeTokenId(request.Token);
+        var jwtToken = await tokenService.DecodeTokenId(request.Token);
         var user = await userRepository.GetUserById(jwtToken.UserId, cancellationToken);
         if (user is null)
         {
@@ -63,7 +62,7 @@ public class RefreshTokenHandler : IRequestHandler<RefreshToken, RefreshTokenRes
             return RefreshTokenResult.Fail();
         }
 
-        var newToken = tokenService.GenerateAccessToken(user);
+        var newToken = await tokenService.GenerateAccessToken(user);
 
         return RefreshTokenResult.Success(newToken.Value);
     }

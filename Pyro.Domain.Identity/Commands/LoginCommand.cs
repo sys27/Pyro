@@ -105,7 +105,7 @@ public class LoginHandler : IRequestHandler<LoginCommand, LoginResult>
             return LoginResult.Fail();
         }
 
-        var tokenPair = tokenService.GenerateTokenPair(user);
+        var tokenPair = await tokenService.GenerateTokenPair(user);
         var token = new AuthenticationToken
         {
             TokenId = tokenPair.RefreshToken.Id,

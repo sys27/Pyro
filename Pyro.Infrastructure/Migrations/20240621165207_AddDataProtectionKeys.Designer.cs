@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Pyro.Infrastructure.DataAccess;
 
@@ -10,9 +11,11 @@ using Pyro.Infrastructure.DataAccess;
 namespace Pyro.Infrastructure.Migrations
 {
     [DbContext(typeof(PyroDbContext))]
-    partial class PyroDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240621165207_AddDataProtectionKeys")]
+    partial class AddDataProtectionKeys
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.6");
@@ -161,24 +164,6 @@ namespace Pyro.Infrastructure.Migrations
                             Id = new Guid("36b9e20e-9b6b-461b-b129-d6a49fe4f4f8"),
                             Name = "User"
                         });
-                });
-
-            modelBuilder.Entity("Pyro.Domain.Identity.Models.SigningKey", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("BLOB");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Key")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("SigningKeys", (string)null);
                 });
 
             modelBuilder.Entity("Pyro.Domain.Identity.Models.User", b =>

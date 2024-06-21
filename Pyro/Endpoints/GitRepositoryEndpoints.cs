@@ -50,7 +50,7 @@ internal static class GitRepositoryEndpoints
             {
                 var command = new GetGitRepositories();
                 var gitRepository = await mediator.Send(command, cancellationToken);
-                var result = DtoMapper.ToResponse(gitRepository);
+                var result = gitRepository.ToResponse();
 
                 return Results.Ok(result);
             })
@@ -68,11 +68,11 @@ internal static class GitRepositoryEndpoints
                 CreateGitRepositoryRequest request,
                 CancellationToken cancellationToken) =>
             {
-                var command = DtoMapper.ToCommand(request);
+                var command = request.ToCommand();
                 var gitRepository = await mediator.Send(command, cancellationToken);
                 await dbContext.SaveChangesAsync(cancellationToken);
 
-                var result = DtoMapper.ToResponse(gitRepository);
+                var result = gitRepository.ToResponse();
 
                 return Results.Created($"/repositories/{command.Name}", result);
             })
