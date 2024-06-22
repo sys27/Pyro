@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, input } from '@angular/core';
-import { Repository } from '../../models/repository';
-import { RepositoryService } from '../../services/repository.service';
+import { Repository, RepositoryService } from '../../services/repository.service';
 
 @Component({
     selector: 'repo-list',

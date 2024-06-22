@@ -1,0 +1,25 @@
+<div class="flex align-items-center justify-content-center">
+  <form
+    class="w-6"
+    [formGroup]="form"
+    (ngSubmit)="onSubmit()">
+    <h1>New User</h1>
+
+    <div class="field">
+      <label for="name">Name:</label>
+      <input
+        id="name"
+        type="text"
+        class="w-full"
+        pInputText
+        formControlName="name" />
+    </div>
+
+    <div class="field">
+      <p-button
+        label="Create"
+        type="submit"
+        [disabled]="!form.valid" />
+    </div>
+  </form>
+</div>

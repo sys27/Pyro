@@ -2,7 +2,6 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Endpoints } from '../endpoints';
-import { Repository } from '../models/repository';
 import { RepositoryItem } from '../models/repository-item';
 
 @Injectable({
@@ -18,4 +17,20 @@ export class RepositoryService {
     public getRepository(name: string): Observable<Repository> {
         return this.httpClient.get<Repository>(`${Endpoints.Repositories}/${name}`);
     }
+
+    public createRepository(repository: CreateRepository): Observable<void> {
+        let request = {
+            name: repository.name,
+        };
+
+        return this.httpClient.post<void>(Endpoints.Repositories, request);
+    }
+}
+
+export interface Repository {
+    get name(): string;
+}
+
+export interface CreateRepository {
+    name: string;
 }

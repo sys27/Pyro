@@ -77,8 +77,8 @@ internal class GitService : IGitService
 
     public class Options
     {
-        public const string Section = "GitService";
+        public const string Section = "Git";
 
-        public required string BasePath { get; set; }
+        public required string BasePath { get; init; }
     }
 }
