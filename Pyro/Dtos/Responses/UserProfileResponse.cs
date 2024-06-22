@@ -3,4 +3,4 @@
 
 namespace Pyro.Dtos.Responses;
 
-public record UserProfileResponse(string? Name, string? Status);
+public record UserProfileResponse(string Email, string? Name, string? Status);

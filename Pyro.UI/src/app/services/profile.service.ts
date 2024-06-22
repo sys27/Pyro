@@ -24,11 +24,12 @@ export class ProfileService {
 }
 
 export interface Profile {
-    get name(): string;
-    get status(): string;
+    get email(): string;
+    get name(): string | null;
+    get status(): string | null;
 }
 
 export interface UpdateProfile {
-    name: string;
-    status: string;
+    name: string | null;
+    status: string | null;
 }

@@ -72,6 +72,7 @@ public static class SeedData
             new UserProfile
             {
                 Id = GetUser("pyro@localhost.local").Id,
+                Email = "pyro@localhost.local",
                 Name = "Pyro",
             }
         ];

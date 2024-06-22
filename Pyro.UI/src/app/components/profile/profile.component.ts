@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { ProfileService, UpdateProfile } from '../../services/profile.service';
@@ -13,6 +13,7 @@ import { ProfileService, UpdateProfile } from '../../services/profile.service';
 })
 export class ProfileComponent implements OnInit {
     public form = this.formBuilder.group({
+        email: ['', Validators.required, Validators.email],
         name: [''],
         status: [''],
     });
@@ -23,8 +24,11 @@ export class ProfileComponent implements OnInit {
     ) {}
 
     public ngOnInit(): void {
+        this.form.get('email')!.disable();
+
         this.profileService.getProfile().subscribe(profile => {
             this.form.patchValue({
+                email: profile.email,
                 name: profile.name,
                 status: profile.status,
             });

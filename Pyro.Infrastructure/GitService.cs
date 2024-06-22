@@ -6,6 +6,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Pyro.Domain;
 using Pyro.Domain.GitRepositories;
+using Pyro.Domain.Identity.Models;
+using Pyro.Domain.UserProfiles;
 
 namespace Pyro.Infrastructure;
 
@@ -16,15 +18,18 @@ internal class GitService : IGitService
     private readonly Options options;
     private readonly ILogger<GitService> logger;
     private readonly TimeProvider timeProvider;
+    private readonly IUserProfileRepository profileRepository;
 
     public GitService(
         IOptions<Options> options,
         ILogger<GitService> logger,
-        TimeProvider timeProvider)
+        TimeProvider timeProvider,
+        IUserProfileRepository profileRepository)
     {
         this.options = options.Value;
         this.logger = logger;
         this.timeProvider = timeProvider;
+        this.profileRepository = profileRepository;
     }
 
     private string GetGitPath(GitRepository repository)
@@ -34,13 +39,8 @@ internal class GitService : IGitService
         GitRepository repository,
         CancellationToken cancellationToken = default)
     {
-        // TODO:
-        // var pyroUser = await userRepository.GetUserById(User.PyroUser, cancellationToken);
-        // if (pyroUser is null)
-        // {
-        //     throw new InvalidOperationException("Pyro user not found");
-        // }
-        var pyroUser = new { Name = "pyro", Email = "pyro@localhost.local" };
+        var pyroUser = await profileRepository.GetUserProfile(User.PyroUser, cancellationToken) ??
+                       throw new InvalidOperationException("Pyro user not found");
 
         var gitPath = GetGitPath(repository);
         gitPath = Repository.Init(gitPath, true);

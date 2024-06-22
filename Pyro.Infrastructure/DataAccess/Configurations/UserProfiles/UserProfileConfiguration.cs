@@ -22,6 +22,9 @@ internal class UserProfileConfiguration : IEntityTypeConfiguration<UserProfile>
             .IsRequired()
             .ValueGeneratedOnAdd();
 
+        builder.Property(x => x.Email)
+            .IsRequired();
+
         builder.Property(x => x.Name)
             .HasMaxLength(50);
 
