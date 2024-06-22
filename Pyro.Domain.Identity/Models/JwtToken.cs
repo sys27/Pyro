@@ -5,7 +5,6 @@ using System.Text.Json.Serialization;
 
 namespace Pyro.Domain.Identity.Models;
 
-// TODO: on token creation
 public class JwtToken
 {
     [JsonPropertyName("jti")]
@@ -22,4 +21,8 @@ public class JwtToken
 
     [JsonPropertyName("login")]
     public required string Login { get; init; }
+
+    public IEnumerable<string>? Roles { get; init; }
+
+    public IEnumerable<string>? Permissions { get; init; }
 }

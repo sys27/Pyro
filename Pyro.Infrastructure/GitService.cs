@@ -3,6 +3,7 @@
 
 using LibGit2Sharp;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Pyro.Domain;
 using Pyro.Domain.GitRepositories;
 
@@ -10,23 +11,24 @@ namespace Pyro.Infrastructure;
 
 internal class GitService : IGitService
 {
-    // TODO: config?
-    private const string BasePath = "/Users/dmytrokyshchenko/Downloads/";
     private const string ReadmeFile = "README.md";
 
+    private readonly Options options;
     private readonly ILogger<GitService> logger;
     private readonly TimeProvider timeProvider;
 
     public GitService(
+        IOptions<Options> options,
         ILogger<GitService> logger,
         TimeProvider timeProvider)
     {
+        this.options = options.Value;
         this.logger = logger;
         this.timeProvider = timeProvider;
     }
 
-    private static string GetGitPath(GitRepository repository)
-        => Path.Combine(BasePath, $"{repository.Name}.git");
+    private string GetGitPath(GitRepository repository)
+        => Path.Combine(options.BasePath, $"{repository.Name}.git");
 
     public async Task InitializeRepository(
         GitRepository repository,
@@ -71,5 +73,12 @@ internal class GitService : IGitService
         Directory.Delete(clonePath, true);
 
         logger.LogInformation("Repository {Name} initialized", repository.Name);
+    }
+
+    public class Options
+    {
+        public const string Section = "GitService";
+
+        public required string BasePath { get; set; }
     }
 }

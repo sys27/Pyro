@@ -40,21 +40,21 @@ public class TokenService
         var tokenId = Guid.NewGuid();
         var currentDate = timeProvider.GetUtcNow();
         var accessTokenExpiration = currentDate.AddMinutes(5);
-        var roles = user.Roles.Select(x => x.Name).ToArray();
-        var permissions = user.Roles.SelectMany(x => x.Permissions).Select(x => x.Name).Distinct().ToArray();
-        var claims = new Dictionary<string, object>
+        var roles = user.Roles.Select(x => x.Name);
+        var permissions = user.Roles.SelectMany(x => x.Permissions).Select(x => x.Name).Distinct();
+        var jwtToken = new JwtToken
         {
-            { "jti", tokenId.ToString() },
-            { "iat", currentDate.ToUnixTimeSeconds() },
-            { "exp", accessTokenExpiration.ToUnixTimeSeconds() },
-            { "sub", user.Id.ToString() },
-            { "login", user.Login },
-            { "roles", roles },
-            { "permissions", permissions },
+            TokenId = tokenId,
+            IssuedAt = currentDate.ToUnixTimeSeconds(),
+            ExpiresAt = accessTokenExpiration.ToUnixTimeSeconds(),
+            UserId = user.Id,
+            Login = user.Login,
+            Roles = roles,
+            Permissions = permissions,
         };
 
         var keys = await signingKeyService.GetKeys();
-        var token = jwtEncoder.Encode(headers, claims, keys.First());
+        var token = jwtEncoder.Encode(headers, jwtToken, keys.First());
 
         return new Token(tokenId, token, accessTokenExpiration);
     }
