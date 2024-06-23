@@ -1,6 +1,7 @@
 <p-toolbar styleClass="toolbar">
   <div class="p-toolbar-group-start gap-2">
     <p-button
+      styleClass="text-2xl"
       label="Pyro"
       icon="pi pi-server"
       routerLink="/"
@@ -42,7 +43,7 @@
       icon="pi pi-user"
       [outlined]="true"
       [model]="loginMenuItems"
-      routerLink="/profile" />
+      (onClick)="profileOnClick()" />
     <ng-template #showLogin>
       <p-button
         icon="pi pi-sign-in"

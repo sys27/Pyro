@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { MenuItem, PrimeNGConfig } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { ButtonGroupModule } from 'primeng/buttongroup';
@@ -39,10 +39,15 @@ export class AppComponent implements OnInit {
 
     public constructor(
         private readonly primeNg: PrimeNGConfig,
+        private readonly router: Router,
         public readonly authService: AuthService,
     ) {}
 
     public ngOnInit(): void {
         this.primeNg.ripple = true;
+    }
+
+    public profileOnClick(): void {
+        this.router.navigate(['profile']);
     }
 }
