@@ -1,24 +1,16 @@
 // Copyright (c) Dmytro Kyshchenko. All rights reserved.
 // Licensed under the GPL-3.0 license. See LICENSE file in the project root for full license information.
 
-using System.Diagnostics.CodeAnalysis;
-
 namespace Pyro.Domain.UserProfiles;
 
 public class UserProfile
 {
-    private readonly string email;
     private string? name;
     private string? status;
 
     public Guid Id { get; init; }
 
-    public required string Email
-    {
-        get => email;
-        [MemberNotNull(nameof(email))]
-        init => email = value ?? throw new ArgumentNullException(nameof(Email));
-    }
+    public string? Email { get; init; }
 
     public string? Name
     {

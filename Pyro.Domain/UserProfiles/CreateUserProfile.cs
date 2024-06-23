@@ -6,7 +6,7 @@ using MediatR;
 
 namespace Pyro.Domain.UserProfiles;
 
-public record CreateUserProfile(Guid UserId, string Email) : IRequest;
+public record CreateUserProfile(Guid UserId) : IRequest;
 
 public class CreateUserProfileValidator : AbstractValidator<CreateUserProfile>
 {
@@ -29,7 +29,6 @@ public class CreateUserProfileHandler : IRequestHandler<CreateUserProfile>
         var userProfile = new UserProfile
         {
             Id = request.UserId,
-            Email = request.Email,
         };
         await repository.AddUserProfile(userProfile, cancellationToken);
     }

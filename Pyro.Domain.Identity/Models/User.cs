@@ -26,7 +26,7 @@ public class User : DomainEntity
             Password = password,
             Salt = salt,
         };
-        user.PublishEvent(new UserCreated(user.Id, login));
+        user.PublishEvent(new UserCreated(user.Id));
 
         return user;
     }
@@ -42,7 +42,7 @@ public class User : DomainEntity
             if (string.IsNullOrWhiteSpace(value))
                 throw new ArgumentException("Login cannot be null or empty.", nameof(value));
 
-            // TODO: Add email validation
+            // TODO: Add validation
             login = value;
         }
     }

@@ -29,7 +29,7 @@ export class UserNewComponent implements OnInit {
     public roles: Role[] | undefined;
 
     public form = this.formBuilder.nonNullable.group({
-        login: ['', [Validators.required, Validators.email]],
+        login: ['', [Validators.required]],
         password: ['', Validators.required],
         roles: new FormControl<Role[]>([]),
     });

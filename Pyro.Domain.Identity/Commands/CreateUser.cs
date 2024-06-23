@@ -17,8 +17,7 @@ public class CreateUserValidator : AbstractValidator<CreateUser>
     public CreateUserValidator()
     {
         RuleFor(x => x.Login)
-            .NotEmpty()
-            .EmailAddress();
+            .NotEmpty();
 
         RuleFor(x => x.Password)
             .NotEmpty()
