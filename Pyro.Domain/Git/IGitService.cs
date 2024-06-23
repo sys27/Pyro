@@ -3,11 +3,13 @@
 
 using Pyro.Domain.GitRepositories;
 
-namespace Pyro.Domain;
+namespace Pyro.Domain.Git;
 
 public interface IGitService
 {
     Task InitializeRepository(
         GitRepository repository,
         CancellationToken cancellationToken = default);
+
+    DirectoryView GetDirectoryView(GitRepository repository);
 }

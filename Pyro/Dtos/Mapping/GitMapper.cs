@@ -1,0 +1,31 @@
+// Copyright (c) Dmytro Kyshchenko. All rights reserved.
+// Licensed under the GPL-3.0 license. See LICENSE file in the project root for full license information.
+
+using Pyro.Domain.Git;
+using Pyro.Domain.GitRepositories;
+using Pyro.Domain.GitRepositories.Commands;
+using Pyro.Dtos.Requests;
+using Pyro.Dtos.Responses;
+using Riok.Mapperly.Abstractions;
+
+namespace Pyro.Dtos.Mapping;
+
+[Mapper]
+public static partial class GitMapper
+{
+    [MapperIgnoreSource(nameof(GitRepository.Id))]
+    [MapperIgnoreSource(nameof(GitRepository.DomainEvents))]
+    public static partial GitRepositoryResponse ToResponse(this GitRepository gitRepository);
+
+    public static partial IReadOnlyList<GitRepositoryResponse> ToResponse(this IReadOnlyList<GitRepository> gitRepository);
+
+    public static partial CreateGitRepository ToCommand(this CreateGitRepositoryRequest request);
+
+    public static partial CommitUserResponse ToResponse(this CommitUser user);
+
+    public static partial CommitInfoResponse ToResponse(this CommitInfo info);
+
+    public static partial DirectoryViewItemResponse ToResponse(this DirectoryViewItem user);
+
+    public static partial DirectoryViewResponse ToResponse(this DirectoryView user);
+}

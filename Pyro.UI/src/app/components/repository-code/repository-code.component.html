@@ -1,1 +1,42 @@
-<h1>Code</h1>
+<div *ngIf="directoryView | async as view">
+  <div class="grid">
+    <div class="col">
+      <p-card>
+        <p-toolbar>
+          <span>{{ view.commit.author.name }}</span>
+          <span class="text-400">{{ view.commit.message }}</span>
+          <span class="text-400">{{ view.commit.hash | slice: 0 : 6 }}</span>
+          <span class="text-400">{{ view.commit.date | date: 'shortDate' }}</span>
+          <span><span class="pi pi-history"></span> {{ view.commitsCount }} commits</span>
+        </p-toolbar>
+
+        <p-table
+          [value]="view.items"
+          selectionMode="single"
+          styleClass="p-datatable-striped">
+          <ng-template
+            pTemplate="body"
+            let-item>
+            <tr>
+              <td>
+                <span
+                  *ngIf="item.isDirectory"
+                  class="pi pi-folder"></span>
+                <span
+                  *ngIf="!item.isDirectory"
+                  class="pi pi-file"></span>
+              </td>
+              <td>{{ item.name }}</td>
+              <td class="text-400">{{ item.message }}</td>
+              <td class="text-400">{{ item.date | date: 'shortDate' }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </p-card>
+    </div>
+
+    <div class="col-2">
+      <span class="text-2xl">{{ name() }}</span>
+    </div>
+  </div>
+</div>

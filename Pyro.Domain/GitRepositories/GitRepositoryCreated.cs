@@ -4,6 +4,7 @@
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Pyro.Domain.Core.Models;
+using Pyro.Domain.Git;
 
 namespace Pyro.Domain.GitRepositories;
 

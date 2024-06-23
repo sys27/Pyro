@@ -4,8 +4,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Pyro.Domain;
 using Pyro.Domain.Core;
+using Pyro.Domain.Git;
 using Pyro.Domain.GitRepositories;
 using Pyro.Domain.Identity;
 using Pyro.Domain.UserProfiles;

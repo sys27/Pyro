@@ -25,6 +25,12 @@ export class RepositoryService {
 
         return this.httpClient.post<void>(Endpoints.Repositories, request);
     }
+
+    public getDirectoryView(name: string): Observable<DirectoryView> {
+        return this.httpClient.get<DirectoryView>(
+            `${Endpoints.Repositories}/${name}/directory-view`,
+        );
+    }
 }
 
 export interface Repository {
@@ -33,4 +39,29 @@ export interface Repository {
 
 export interface CreateRepository {
     name: string;
+}
+
+export interface DirectoryView {
+    get commit(): CommitInfo;
+    get items(): DirectoryViewItem[];
+    get commitsCount(): number;
+}
+
+export interface DirectoryViewItem {
+    get name(): string;
+    get isDirectory(): boolean;
+    get message(): string;
+    get date(): Date;
+}
+
+export interface CommitInfo {
+    get hash(): string;
+    get author(): CommitUser;
+    get message(): string;
+    get date(): Date;
+}
+
+export interface CommitUser {
+    get name(): string;
+    get email(): string;
 }

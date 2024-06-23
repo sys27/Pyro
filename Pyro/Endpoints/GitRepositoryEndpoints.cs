@@ -85,6 +85,28 @@ internal static class GitRepositoryEndpoints
             .WithName("Create Repository")
             .WithOpenApi();
 
+        repositories.MapGet("/{name}/directory-view", async (
+                IMediator mediator,
+                string name,
+                CancellationToken cancellationToken) =>
+            {
+                var request = new GetDirectoryView(name);
+                var directoryView = await mediator.Send(request, cancellationToken);
+
+                return directoryView is not null
+                    ? Results.Ok(directoryView.ToResponse())
+                    : Results.NotFound();
+            })
+            .RequirePermission(RepositoryView)
+            .Produces<DirectoryViewResponse>()
+            .ProducesValidationProblem()
+            .Produces(401)
+            .Produces(403)
+            .Produces(404)
+            .ProducesProblem(500)
+            .WithName("Get Directory View")
+            .WithOpenApi();
+
         return app;
     }
 }

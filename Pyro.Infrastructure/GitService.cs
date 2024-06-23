@@ -4,7 +4,7 @@
 using LibGit2Sharp;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Pyro.Domain;
+using Pyro.Domain.Git;
 using Pyro.Domain.GitRepositories;
 using Pyro.Domain.Identity.Models;
 using Pyro.Domain.UserProfiles;
@@ -45,14 +45,14 @@ internal class GitService : IGitService
         var gitPath = GetGitPath(repository);
         gitPath = Repository.Init(gitPath, true);
 
-        var postUpdateHookPath = Path.Combine(gitPath, "hooks", "post-update");
-        const string postUpdateContent =
-            """
-            #!/bin/sh
-            exec git update-server-info
-            """;
-        await File.WriteAllTextAsync(postUpdateHookPath, postUpdateContent, cancellationToken);
-
+        // TODO:
+        // var postUpdateHookPath = Path.Combine(gitPath, "hooks", "post-update");
+        // const string postUpdateContent =
+        //     """
+        //     #!/bin/sh
+        //     exec git update-server-info
+        //     """;
+        // await File.WriteAllTextAsync(postUpdateHookPath, postUpdateContent, cancellationToken);
         var clonePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
         clonePath = Repository.Clone(gitPath, clonePath);
 
@@ -73,6 +73,57 @@ internal class GitService : IGitService
         Directory.Delete(clonePath, true);
 
         logger.LogInformation("Repository {Name} initialized", repository.Name);
+    }
+
+    public DirectoryView GetDirectoryView(GitRepository repository)
+    {
+        var gitPath = GetGitPath(repository);
+        using var gitRepo = new Repository(gitPath);
+        var branch = gitRepo.Head;
+        var lastCommit = branch.Tip;
+        var lastCommitAuthor = lastCommit.Author;
+
+        var commit = new CommitInfo(
+            lastCommit.Sha,
+            new CommitUser(lastCommitAuthor.Name, lastCommitAuthor.Email),
+            lastCommit.Message,
+            lastCommitAuthor.When);
+
+        var items = lastCommit.Tree
+            .Select(x =>
+            {
+                var associatedCommit = GetLastCommitWhereBlobChanged(branch, x);
+
+                return new DirectoryViewItem(
+                    x.Name,
+                    x.Mode == Mode.Directory,
+                    associatedCommit.Message,
+                    associatedCommit.Author.When);
+            })
+            .OrderBy(x => !x.IsDirectory)
+            .ThenBy(x => x.Name)
+            .ToArray();
+
+        return new DirectoryView(
+            commit,
+            items,
+            branch.Commits.Count());
+    }
+
+    private Commit GetLastCommitWhereBlobChanged(Branch branch, TreeEntry treeEntry)
+    {
+        var lastCommit = branch.Tip;
+
+        foreach (var commit in branch.Commits.Skip(1))
+        {
+            var existingTreeEntry = commit.Tree.FirstOrDefault(x => x.Name == treeEntry.Name);
+            if (existingTreeEntry is null || existingTreeEntry.Target.Id != treeEntry.Target.Id)
+                return lastCommit;
+
+            lastCommit = commit;
+        }
+
+        return lastCommit;
     }
 
     public class Options
