@@ -27,7 +27,17 @@
               }
             ],
             "styles": [
-              "src/styles.css"
+              "src/styles.css",
+              {
+                "input": "src/dark.css",
+                "bundleName": "dark",
+                "inject": false
+              },
+              {
+                "input": "src/light.css",
+                "bundleName": "light",
+                "inject": false
+              }
             ],
             "scripts": []
           },

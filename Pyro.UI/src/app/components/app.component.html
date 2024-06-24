@@ -38,6 +38,11 @@
         placeholder="Search" />
     </p-iconField>
 
+    <p-button
+      [icon]="themeIcon"
+      [outlined]="true"
+      (onClick)="toggleThemeClick()" />
+
     <p-splitButton
       *ngIf="authService.currentUser | async as user; else showLogin"
       icon="pi pi-user"

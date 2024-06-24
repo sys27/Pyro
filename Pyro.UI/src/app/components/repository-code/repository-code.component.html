@@ -3,11 +3,13 @@
     <div class="col">
       <p-card>
         <p-toolbar>
-          <span>{{ view.commit.author.name }}</span>
+          <span class="font-medium">{{ view.commit.author.name }}</span>
           <span class="text-400">{{ view.commit.message }}</span>
-          <span class="text-400">{{ view.commit.hash | slice: 0 : 6 }}</span>
-          <span class="text-400">{{ view.commit.date | date: 'shortDate' }}</span>
-          <span><span class="pi pi-history"></span> {{ view.commitsCount }} commits</span>
+          <div class="p-toolbar-group-end gap-2">
+            <span class="text-400">{{ view.commit.hash | slice: 0 : 6 }}</span>
+            <span class="text-400">{{ view.commit.date | date: 'shortDate' }}</span>
+            <span><span class="pi pi-history"></span> {{ view.commitsCount }} commits</span>
+          </div>
         </p-toolbar>
 
         <p-table
