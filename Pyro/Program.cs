@@ -19,7 +19,8 @@ using Pyro.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSingleton(JsonSerializerOptions.Default);
+builder.Services.Configure<JsonSerializerOptions>(options =>
+    options.TypeInfoResolver = PyroJsonContext.Default);
 builder.Services.AddProblemDetails(builder.Environment);
 
 builder.Services.AddHttpContextAccessor();

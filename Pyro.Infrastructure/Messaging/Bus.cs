@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Pyro.Domain.Core;
 using Pyro.Domain.Core.Models;
 using Pyro.Infrastructure.DataAccess;
@@ -20,12 +21,12 @@ public class Bus : IBus
 
     public Bus(
         PyroDbContext dbContext,
-        JsonSerializerOptions jsonSerializerOptions,
+        IOptions<JsonSerializerOptions> jsonSerializerOptions,
         TimeProvider timeProvider,
         ILogger<Bus> logger)
     {
         this.dbContext = dbContext;
-        this.jsonSerializerOptions = jsonSerializerOptions;
+        this.jsonSerializerOptions = jsonSerializerOptions.Value;
         this.timeProvider = timeProvider;
         this.logger = logger;
     }
