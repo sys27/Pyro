@@ -7,7 +7,10 @@ using Pyro.Domain.Core;
 
 namespace Pyro.Domain.GitRepositories.Commands;
 
-public record CreateGitRepository(string Name) : IRequest<GitRepository>;
+public record CreateGitRepository(
+    string Name,
+    string? Description,
+    string DefaultBranch) : IRequest<GitRepository>;
 
 public class CreateGitRepositoryValidator : AbstractValidator<CreateGitRepository>
 {
@@ -37,6 +40,8 @@ public class CreateGitRepositoryHandler : IRequestHandler<CreateGitRepository, G
         {
             Id = Guid.NewGuid(),
             Name = request.Name,
+            Description = request.Description,
+            DefaultBranch = request.DefaultBranch,
         };
         gitRepository = await repository.AddGitRepository(gitRepository, cancellationToken);
 

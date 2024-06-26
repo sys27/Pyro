@@ -3,8 +3,7 @@
 
 namespace Pyro.Dtos.Responses;
 
-public record DirectoryViewItemResponse(
-    string Name,
-    bool IsDirectory,
-    string Message,
-    DateTimeOffset Date);
+public record TreeViewResponse(
+    CommitInfoResponse Commit,
+    IReadOnlyList<TreeViewItemResponse> Items,
+    int CommitsCount);

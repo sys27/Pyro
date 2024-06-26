@@ -21,33 +21,53 @@ export class RepositoryService {
     public createRepository(repository: CreateRepository): Observable<void> {
         let request = {
             name: repository.name,
+            description: repository.description,
+            defaultBranch: repository.defaultBranch,
         };
 
         return this.httpClient.post<void>(Endpoints.Repositories, request);
     }
 
-    public getDirectoryView(name: string): Observable<DirectoryView> {
-        return this.httpClient.get<DirectoryView>(
-            `${Endpoints.Repositories}/${name}/directory-view`,
-        );
+    public getBranches(name: string): Observable<BranchItem[]> {
+        return this.httpClient.get<BranchItem[]>(`${Endpoints.Repositories}/${name}/branches`);
+    }
+
+    public getTreeView(name: string, branchOrHash?: string, path?: string): Observable<TreeView> {
+        if (branchOrHash && path) {
+            return this.httpClient.get<TreeView>(
+                `${Endpoints.Repositories}/${name}/tree/${branchOrHash}/${path}`,
+            );
+        }
+
+        if (branchOrHash) {
+            return this.httpClient.get<TreeView>(
+                `${Endpoints.Repositories}/${name}/tree/${branchOrHash}`,
+            );
+        }
+
+        return this.httpClient.get<TreeView>(`${Endpoints.Repositories}/${name}/tree`);
     }
 }
 
 export interface Repository {
     get name(): string;
+    get description(): string | undefined;
+    get defaultBranch(): string;
 }
 
 export interface CreateRepository {
     name: string;
+    description?: string;
+    defaultBranch: string;
 }
 
-export interface DirectoryView {
+export interface TreeView {
     get commit(): CommitInfo;
-    get items(): DirectoryViewItem[];
+    get items(): TreeViewItem[];
     get commitsCount(): number;
 }
 
-export interface DirectoryViewItem {
+export interface TreeViewItem {
     get name(): string;
     get isDirectory(): boolean;
     get message(): string;
@@ -64,4 +84,9 @@ export interface CommitInfo {
 export interface CommitUser {
     get name(): string;
     get email(): string;
+}
+
+export interface BranchItem {
+    get name(): string;
+    get lastCommit(): CommitInfo;
 }

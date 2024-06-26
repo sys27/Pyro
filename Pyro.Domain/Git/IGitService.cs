@@ -11,5 +11,10 @@ public interface IGitService
         GitRepository repository,
         CancellationToken cancellationToken = default);
 
-    DirectoryView GetDirectoryView(GitRepository repository);
+    IReadOnlyList<BranchItem> GetBranches(GitRepository repository);
+
+    TreeView GetTreeView(
+        GitRepository repository,
+        string? branchOrHash = null,
+        string? path = null);
 }

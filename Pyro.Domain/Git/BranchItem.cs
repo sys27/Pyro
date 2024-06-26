@@ -3,7 +3,4 @@
 
 namespace Pyro.Domain.Git;
 
-public record DirectoryView(
-    CommitInfo Commit,
-    IReadOnlyList<DirectoryViewItem> Items,
-    int CommitsCount);
+public record BranchItem(string Name, CommitInfo LastCommit);

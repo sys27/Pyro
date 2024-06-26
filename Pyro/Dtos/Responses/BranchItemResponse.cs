@@ -3,7 +3,4 @@
 
 namespace Pyro.Dtos.Responses;
 
-public record DirectoryViewResponse(
-    CommitInfoResponse Commit,
-    IReadOnlyList<DirectoryViewItemResponse> Items,
-    int CommitsCount);
+public record BranchItemResponse(string Name, CommitInfoResponse LastCommit);

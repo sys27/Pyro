@@ -3,7 +3,7 @@
 
 namespace Pyro.Domain.Git;
 
-public record DirectoryViewItem(
+public record TreeViewItem(
     string Name,
     bool IsDirectory,
     string Message,

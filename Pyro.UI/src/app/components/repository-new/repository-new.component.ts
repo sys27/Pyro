@@ -15,6 +15,8 @@ import { CreateRepository, RepositoryService } from '../../services/repository.s
 export class RepositoryNewComponent {
     public form = this.formBuilder.nonNullable.group({
         name: ['', Validators.required],
+        description: [''],
+        defaultBranch: ['', Validators.required],
     });
 
     public constructor(

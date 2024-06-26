@@ -45,14 +45,6 @@ internal class GitService : IGitService
         var gitPath = GetGitPath(repository);
         gitPath = Repository.Init(gitPath, true);
 
-        // TODO:
-        // var postUpdateHookPath = Path.Combine(gitPath, "hooks", "post-update");
-        // const string postUpdateContent =
-        //     """
-        //     #!/bin/sh
-        //     exec git update-server-info
-        //     """;
-        // await File.WriteAllTextAsync(postUpdateHookPath, postUpdateContent, cancellationToken);
         var clonePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
         clonePath = Repository.Clone(gitPath, clonePath);
 
@@ -66,57 +58,101 @@ internal class GitService : IGitService
 
         Commands.Stage(repo, ReadmeFile);
         repo.Commit("Initial commit", signature, signature);
+        var branch = repo.Branches.Rename(repo.Head, repository.DefaultBranch);
 
         var origin = repo.Network.Remotes["origin"];
-        repo.Network.Push(origin, "refs/heads/master");
+        repo.Network.Push(origin, branch.CanonicalName);
 
         Directory.Delete(clonePath, true);
 
         logger.LogInformation("Repository {Name} initialized", repository.Name);
     }
 
-    public DirectoryView GetDirectoryView(GitRepository repository)
+    public IReadOnlyList<BranchItem> GetBranches(GitRepository repository)
     {
         var gitPath = GetGitPath(repository);
         using var gitRepo = new Repository(gitPath);
-        var branch = gitRepo.Head;
-        var lastCommit = branch.Tip;
-        var lastCommitAuthor = lastCommit.Author;
+        var branches = gitRepo.Branches
+            .Select(x => new BranchItem(x.FriendlyName, GetCommitInfo(x.Tip)))
+            .OrderBy(x => x.Name != repository.DefaultBranch)
+            .ThenBy(x => x.Name)
+            .ToArray();
 
-        var commit = new CommitInfo(
-            lastCommit.Sha,
-            new CommitUser(lastCommitAuthor.Name, lastCommitAuthor.Email),
-            lastCommit.Message,
-            lastCommitAuthor.When);
+        return branches;
+    }
 
-        var items = lastCommit.Tree
+    private CommitInfo GetCommitInfo(Commit commit)
+    {
+        var author = commit.Author;
+
+        return new CommitInfo(
+            commit.Sha,
+            new CommitUser(author.Name, author.Email),
+            commit.MessageShort,
+            author.When);
+    }
+
+    public TreeView GetTreeView(GitRepository repository, string? branchOrHash = null, string? path = null)
+    {
+        var gitPath = GetGitPath(repository);
+        using var gitRepo = new Repository(gitPath);
+        var lastCommit = GetCommitByBranchOrHash(gitRepo, branchOrHash ?? repository.DefaultBranch);
+        var commits = gitRepo.Commits.QueryBy(new CommitFilter { IncludeReachableFrom = lastCommit });
+        var commitInfo = GetCommitInfo(lastCommit);
+
+        var tree = GetTreeByPath(lastCommit, path);
+        var items = tree
             .Select(x =>
             {
-                var associatedCommit = GetLastCommitWhereBlobChanged(branch, x);
+                var associatedCommit = GetLastCommitWhereBlobChanged(commits, path, x);
 
-                return new DirectoryViewItem(
+                return new TreeViewItem(
                     x.Name,
                     x.Mode == Mode.Directory,
-                    associatedCommit.Message,
+                    associatedCommit.MessageShort,
                     associatedCommit.Author.When);
             })
             .OrderBy(x => !x.IsDirectory)
             .ThenBy(x => x.Name)
             .ToArray();
 
-        return new DirectoryView(
-            commit,
+        return new TreeView(
+            commitInfo,
             items,
-            branch.Commits.Count());
+            commits.Count());
     }
 
-    private Commit GetLastCommitWhereBlobChanged(Branch branch, TreeEntry treeEntry)
+    private Commit GetCommitByBranchOrHash(Repository gitRepo, string? branchOrHash)
     {
-        var lastCommit = branch.Tip;
+        if (string.IsNullOrWhiteSpace(branchOrHash))
+            return gitRepo.Head.Tip;
 
-        foreach (var commit in branch.Commits.Skip(1))
+        var branch = gitRepo.Branches[branchOrHash];
+        if (branch is not null)
+            return branch.Tip;
+
+        return gitRepo.Lookup<Commit>(branchOrHash);
+    }
+
+    private Tree GetTreeByPath(Commit commit, string? path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+            return commit.Tree;
+
+        var treeEntry = commit[path];
+        if (treeEntry?.Target is not Tree tree)
+            throw new InvalidOperationException("Path not found");
+
+        return tree;
+    }
+
+    private Commit GetLastCommitWhereBlobChanged(ICommitLog commits, string? path, TreeEntry treeEntry)
+    {
+        var lastCommit = commits.First();
+        foreach (var commit in commits.Skip(1))
         {
-            var existingTreeEntry = commit.Tree.FirstOrDefault(x => x.Name == treeEntry.Name);
+            var tree = GetTreeByPath(commit, path);
+            var existingTreeEntry = tree.FirstOrDefault(x => x.Name == treeEntry.Name);
             if (existingTreeEntry is null || existingTreeEntry.Target.Id != treeEntry.Target.Id)
                 return lastCommit;
 

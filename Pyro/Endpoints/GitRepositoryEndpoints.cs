@@ -85,26 +85,47 @@ internal static class GitRepositoryEndpoints
             .WithName("Create Repository")
             .WithOpenApi();
 
-        repositories.MapGet("/{name}/directory-view", async (
+        repositories.MapGet("/{name}/branches", async (
                 IMediator mediator,
                 string name,
                 CancellationToken cancellationToken) =>
             {
-                var request = new GetDirectoryView(name);
-                var directoryView = await mediator.Send(request, cancellationToken);
+                var request = new GetBranches(name);
+                var branches = await mediator.Send(request, cancellationToken);
 
-                return directoryView is not null
-                    ? Results.Ok(directoryView.ToResponse())
+                return Results.Ok(branches.ToResponse());
+            })
+            .RequirePermission(RepositoryView)
+            .Produces<IReadOnlyList<BranchItemResponse>>()
+            .ProducesValidationProblem()
+            .Produces(401)
+            .Produces(403)
+            .ProducesProblem(500)
+            .WithName("Get Branches")
+            .WithOpenApi();
+
+        repositories.MapGet("/{name}/tree/{branchOrHash?}/{**path}", async (
+                IMediator mediator,
+                string name,
+                string? branchOrHash,
+                string? path,
+                CancellationToken cancellationToken) =>
+            {
+                var request = new GetTreeView(name, branchOrHash, path);
+                var treeView = await mediator.Send(request, cancellationToken);
+
+                return treeView is not null
+                    ? Results.Ok(treeView.ToResponse())
                     : Results.NotFound();
             })
             .RequirePermission(RepositoryView)
-            .Produces<DirectoryViewResponse>()
+            .Produces<TreeViewResponse>()
             .ProducesValidationProblem()
             .Produces(401)
             .Produces(403)
             .Produces(404)
             .ProducesProblem(500)
-            .WithName("Get Directory View")
+            .WithName("Get Tree")
             .WithOpenApi();
 
         return app;

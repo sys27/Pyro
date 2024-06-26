@@ -40,6 +40,15 @@ namespace Pyro.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("BLOB");
 
+                    b.Property<string>("DefaultBranch")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(250)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)

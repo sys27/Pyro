@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, input } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { TabMenuModule } from 'primeng/tabmenu';
-import { Repository, RepositoryService } from '../../services/repository.service';
+import { RepositoryService } from '../../services/repository.service';
 
 @Component({
     selector: 'repo-list',
@@ -13,24 +14,25 @@ import { Repository, RepositoryService } from '../../services/repository.service
 })
 export class RepositoryComponent implements OnInit {
     public readonly repositoryName = input.required<string>({ alias: 'name' });
-    public readonly menu: MenuItem[] = [
-        { label: 'Code', icon: 'pi pi-code', routerLink: 'code' },
-        { label: 'Issues', icon: 'pi pi-ticket', routerLink: 'issues' },
-        { label: 'Pull Requests', icon: 'pi pi-file-import', routerLink: 'pull-requests' },
-        { label: 'Settings', icon: 'pi pi-cog', routerLink: 'settings' },
-    ];
 
-    private _repository: Repository | undefined;
+    public menu: MenuItem[] | undefined;
 
-    public constructor(private repoService: RepositoryService) {}
+    public constructor(
+        private readonly router: Router,
+        private readonly route: ActivatedRoute,
+        private readonly repoService: RepositoryService,
+    ) {}
 
     public ngOnInit(): void {
-        this.repoService
-            .getRepository(this.repositoryName())
-            .subscribe(repo => (this._repository = repo));
-    }
+        this.repoService.getRepository(this.repositoryName()).subscribe(repo => {
+            this.menu = [
+                { label: 'Code', icon: 'pi pi-code', routerLink: ['code', repo.defaultBranch] },
+                { label: 'Issues', icon: 'pi pi-ticket', routerLink: 'issues' },
+                { label: 'Pull Requests', icon: 'pi pi-file-import', routerLink: 'pull-requests' },
+                { label: 'Settings', icon: 'pi pi-cog', routerLink: 'settings' },
+            ];
 
-    public get repository(): Repository | undefined {
-        return this._repository;
+            this.router.navigate(['code', repo.defaultBranch], { relativeTo: this.route });
+        });
     }
 }

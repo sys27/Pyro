@@ -6,15 +6,15 @@ using Pyro.Domain.Git;
 
 namespace Pyro.Domain.GitRepositories.Queries;
 
-// TODO: add validator
-public record GetDirectoryView(string Name) : IRequest<DirectoryView?>;
+// TODO: validator
+public record GetBranches(string RepositoryName) : IRequest<IReadOnlyList<BranchItem>>;
 
-public class GetDirectoryViewHandler : IRequestHandler<GetDirectoryView, DirectoryView?>
+public class GetBranchesHandler : IRequestHandler<GetBranches, IReadOnlyList<BranchItem>>
 {
     private readonly IGitRepositoryRepository gitRepository;
     private readonly IGitService gitService;
 
-    public GetDirectoryViewHandler(
+    public GetBranchesHandler(
         IGitRepositoryRepository gitRepository,
         IGitService gitService)
     {
@@ -22,14 +22,14 @@ public class GetDirectoryViewHandler : IRequestHandler<GetDirectoryView, Directo
         this.gitService = gitService;
     }
 
-    public async Task<DirectoryView?> Handle(GetDirectoryView request, CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<BranchItem>> Handle(GetBranches request, CancellationToken cancellationToken)
     {
-        var repository = await gitRepository.GetGitRepository(request.Name, cancellationToken);
+        var repository = await gitRepository.GetGitRepository(request.RepositoryName, cancellationToken);
         if (repository is null)
-            return null;
+            return [];
 
-        var directoryView = gitService.GetDirectoryView(repository);
+        var branches = gitService.GetBranches(repository);
 
-        return directoryView;
+        return branches;
     }
 }

@@ -1,9 +1,9 @@
 // Copyright (c) Dmytro Kyshchenko. All rights reserved.
 // Licensed under the GPL-3.0 license. See LICENSE file in the project root for full license information.
 
-namespace Pyro.Dtos.Requests;
+namespace Pyro.Domain.Git;
 
-public record CreateGitRepositoryRequest(
-    string Name,
-    string? Description,
-    string DefaultBranch);
+public record TreeView(
+    CommitInfo Commit,
+    IReadOnlyList<TreeViewItem> Items,
+    int CommitsCount);

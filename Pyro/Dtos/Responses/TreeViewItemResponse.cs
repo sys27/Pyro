@@ -1,9 +1,10 @@
 // Copyright (c) Dmytro Kyshchenko. All rights reserved.
 // Licensed under the GPL-3.0 license. See LICENSE file in the project root for full license information.
 
-namespace Pyro.Dtos.Requests;
+namespace Pyro.Dtos.Responses;
 
-public record CreateGitRepositoryRequest(
+public record TreeViewItemResponse(
     string Name,
-    string? Description,
-    string DefaultBranch);
+    bool IsDirectory,
+    string Message,
+    DateTimeOffset Date);

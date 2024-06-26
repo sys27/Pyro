@@ -23,7 +23,7 @@ export const routes: Routes = [
         canActivate: [authGuard],
         children: [
             {
-                path: 'code',
+                path: 'code/:branchOrHash',
                 component: RepositoryCodeComponent,
                 canActivate: [authGuard],
             },
@@ -42,7 +42,6 @@ export const routes: Routes = [
                 component: RepositorySettingsComponent,
                 canActivate: [authGuard],
             },
-            { path: '', redirectTo: 'code', pathMatch: 'full' },
         ],
     },
 

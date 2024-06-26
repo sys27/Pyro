@@ -25,7 +25,11 @@ public static partial class GitMapper
 
     public static partial CommitInfoResponse ToResponse(this CommitInfo info);
 
-    public static partial DirectoryViewItemResponse ToResponse(this DirectoryViewItem user);
+    public static partial TreeViewItemResponse ToResponse(this TreeViewItem user);
 
-    public static partial DirectoryViewResponse ToResponse(this DirectoryView user);
+    public static partial TreeViewResponse ToResponse(this TreeView user);
+
+    public static partial BranchItemResponse ToResponse(this BranchItem user);
+
+    public static partial IReadOnlyList<BranchItemResponse> ToResponse(this IReadOnlyList<BranchItem> user);
 }

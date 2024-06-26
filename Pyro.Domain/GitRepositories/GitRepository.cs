@@ -40,4 +40,8 @@ public class GitRepository : DomainEntity
             name = value;
         }
     }
+
+    public string? Description { get; init; }
+
+    public required string DefaultBranch { get; init; }
 }
