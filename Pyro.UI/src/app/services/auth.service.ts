@@ -1,8 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, switchMap, take } from 'rxjs';
+import { BehaviorSubject, Observable, catchError, of, switchMap } from 'rxjs';
 import { Endpoints } from '../endpoints';
 import { CurrentUser } from '../models/current-user';
+import { ResponseError } from '../models/response';
 
 @Injectable({
     providedIn: 'root',
@@ -18,30 +19,26 @@ export class AuthService {
         this.updateCurrentUser();
     }
 
-    private isLoginResponse(object: any): object is LoginResponse {
-        return 'accessToken' in object && 'refreshToken' in object;
-    }
-
-    private isRefreshResponse(object: any): object is RefreshResponse {
-        return 'accessToken' in object;
-    }
-
     public login(login: string, password: string): Observable<CurrentUser | null> {
         return this.httpClient.post<LoginResponse>(Endpoints.Login, { login, password }).pipe(
+            catchError((error: ResponseError) => {
+                localStorage.removeItem(AuthService.accessTokenKey);
+                localStorage.removeItem(AuthService.refreshTokenKey);
+                this.updateCurrentUser();
+
+                return of(error);
+            }),
             switchMap(response => {
-                if (this.isLoginResponse(response)) {
-                    localStorage.setItem(AuthService.accessTokenKey, response.accessToken);
-                    localStorage.setItem(AuthService.refreshTokenKey, response.refreshToken);
-                } else {
-                    localStorage.removeItem(AuthService.accessTokenKey);
-                    localStorage.removeItem(AuthService.refreshTokenKey);
+                if (response instanceof ResponseError) {
+                    return this.currentUser;
                 }
 
+                localStorage.setItem(AuthService.accessTokenKey, response.accessToken);
+                localStorage.setItem(AuthService.refreshTokenKey, response.refreshToken);
                 this.updateCurrentUser();
 
                 return this.currentUser;
             }),
-            take(1),
         );
     }
 
@@ -52,19 +49,23 @@ export class AuthService {
         }
 
         return this.httpClient.post<RefreshResponse>(Endpoints.Refresh, { refreshToken }).pipe(
+            catchError((error: ResponseError) => {
+                localStorage.removeItem(AuthService.accessTokenKey);
+                localStorage.removeItem(AuthService.refreshTokenKey);
+                this.updateCurrentUser();
+
+                return of(error);
+            }),
             switchMap(response => {
-                if (this.isRefreshResponse(response)) {
-                    localStorage.setItem(AuthService.accessTokenKey, response.accessToken);
-                } else {
-                    localStorage.removeItem(AuthService.accessTokenKey);
-                    localStorage.removeItem(AuthService.refreshTokenKey);
+                if (response instanceof ResponseError) {
+                    return this.currentUser;
                 }
 
+                localStorage.setItem(AuthService.accessTokenKey, response.accessToken);
                 this.updateCurrentUser();
 
                 return this.currentUser;
             }),
-            take(1),
         );
     }
 

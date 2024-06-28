@@ -8,6 +8,7 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { SplitButtonModule } from 'primeng/splitbutton';
+import { ToastModule } from 'primeng/toast';
 import { ToolbarModule } from 'primeng/toolbar';
 import { AuthService } from '../services/auth.service';
 import { ThemeService } from '../services/theme.service';
@@ -17,16 +18,17 @@ import { ThemeService } from '../services/theme.service';
     standalone: true,
     imports: [
         CommonModule,
-        RouterOutlet,
-        RouterLink,
-        RouterLinkActive,
-        ToolbarModule,
         ButtonModule,
         ButtonGroupModule,
         InputTextModule,
         IconFieldModule,
         InputIconModule,
+        RouterOutlet,
         SplitButtonModule,
+        RouterLink,
+        RouterLinkActive,
+        ToolbarModule,
+        ToastModule,
     ],
     templateUrl: './app.component.html',
     styleUrl: './app.component.css',
