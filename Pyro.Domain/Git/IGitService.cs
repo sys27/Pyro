@@ -13,8 +13,5 @@ public interface IGitService
 
     IReadOnlyList<BranchItem> GetBranches(GitRepository repository);
 
-    TreeView GetTreeView(
-        GitRepository repository,
-        string? branchOrHash = null,
-        string? path = null);
+    TreeView GetTreeView(GitRepository repository, string? branchOrPath = null);
 }

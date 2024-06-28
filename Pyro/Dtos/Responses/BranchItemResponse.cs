@@ -3,4 +3,4 @@
 
 namespace Pyro.Dtos.Responses;
 
-public record BranchItemResponse(string Name, CommitInfoResponse LastCommit);
+public record BranchItemResponse(string Name, CommitInfoResponse LastCommit, bool IsDefault);

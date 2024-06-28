@@ -1,7 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, catchError, of } from 'rxjs';
 import { Endpoints } from '../endpoints';
+import { PyroResponse, ResponseError } from '../models/response';
 
 @Injectable({
     providedIn: 'root',
@@ -9,20 +10,28 @@ import { Endpoints } from '../endpoints';
 export class UserService {
     public constructor(private readonly httpClient: HttpClient) {}
 
-    public getUsers(): Observable<UserItem[]> {
-        return this.httpClient.get<UserItem[]>(Endpoints.Users);
+    public getUsers(): Observable<PyroResponse<UserItem[]>> {
+        return this.httpClient
+            .get<UserItem[]>(Endpoints.Users)
+            .pipe(catchError((error: ResponseError) => of(error)));
     }
 
-    public getUser(login: string): Observable<User> {
-        return this.httpClient.get<User>(`${Endpoints.Users}/${login}`);
+    public getUser(login: string): Observable<PyroResponse<User>> {
+        return this.httpClient
+            .get<User>(`${Endpoints.Users}/${login}`)
+            .pipe(catchError((error: ResponseError) => of(error)));
     }
 
-    public getRoles(): Observable<Role[]> {
-        return this.httpClient.get<Role[]>(Endpoints.Roles);
+    public getRoles(): Observable<PyroResponse<Role[]>> {
+        return this.httpClient
+            .get<Role[]>(Endpoints.Roles)
+            .pipe(catchError((error: ResponseError) => of(error)));
     }
 
-    public getPermissions(): Observable<Permission[]> {
-        return this.httpClient.get<Permission[]>(Endpoints.Permissions);
+    public getPermissions(): Observable<PyroResponse<Permission[]>> {
+        return this.httpClient
+            .get<Permission[]>(Endpoints.Permissions)
+            .pipe(catchError((error: ResponseError) => of(error)));
     }
 
     public createUser(user: CreateUser): Observable<void> {

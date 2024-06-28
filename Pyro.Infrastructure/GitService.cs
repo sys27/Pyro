@@ -73,7 +73,10 @@ internal class GitService : IGitService
         var gitPath = GetGitPath(repository);
         using var gitRepo = new Repository(gitPath);
         var branches = gitRepo.Branches
-            .Select(x => new BranchItem(x.FriendlyName, GetCommitInfo(x.Tip)))
+            .Select(x => new BranchItem(
+                x.FriendlyName,
+                GetCommitInfo(x.Tip),
+                x.FriendlyName == repository.DefaultBranch))
             .OrderBy(x => x.Name != repository.DefaultBranch)
             .ThenBy(x => x.Name)
             .ToArray();
@@ -92,15 +95,18 @@ internal class GitService : IGitService
             author.When);
     }
 
-    public TreeView GetTreeView(GitRepository repository, string? branchOrHash = null, string? path = null)
+    public TreeView GetTreeView(GitRepository repository, string? branchOrPath = null)
     {
         var gitPath = GetGitPath(repository);
         using var gitRepo = new Repository(gitPath);
-        var lastCommit = GetCommitByBranchOrHash(gitRepo, branchOrHash ?? repository.DefaultBranch);
+        var (lastCommit, path) = GetCommitAndPath(gitRepo, repository.DefaultBranch, branchOrPath);
         var commits = gitRepo.Commits.QueryBy(new CommitFilter { IncludeReachableFrom = lastCommit });
         var commitInfo = GetCommitInfo(lastCommit);
 
         var tree = GetTreeByPath(lastCommit, path);
+        if (tree is null)
+            throw new InvalidOperationException("Path not found");
+
         var items = tree
             .Select(x =>
             {
@@ -122,28 +128,50 @@ internal class GitService : IGitService
             commits.Count());
     }
 
-    private Commit GetCommitByBranchOrHash(Repository gitRepo, string? branchOrHash)
+    private (Commit Commit, string? Path) GetCommitAndPath(
+        Repository gitRepo,
+        string defaultBranch,
+        string? branchOrPath)
     {
-        if (string.IsNullOrWhiteSpace(branchOrHash))
-            return gitRepo.Head.Tip;
+        if (string.IsNullOrWhiteSpace(branchOrPath))
+            return (gitRepo.Branches[defaultBranch].Tip, null);
 
-        var branch = gitRepo.Branches[branchOrHash];
-        if (branch is not null)
-            return branch.Tip;
+        if (!branchOrPath.Contains('/'))
+            return (gitRepo.Branches[branchOrPath].Tip, null);
 
-        return gitRepo.Lookup<Commit>(branchOrHash);
+        var end = -1;
+
+        while (end < branchOrPath.Length)
+        {
+            end = branchOrPath.IndexOf('/', end + 1);
+            if (end == -1)
+                end = branchOrPath.Length;
+
+            var branchName = branchOrPath[..end];
+            var branch = gitRepo.Branches[branchName];
+            if (branch is not null)
+            {
+                var pathStart = Math.Min(end + 1, branchOrPath.Length);
+                return (branch.Tip, branchOrPath[pathStart..]);
+            }
+        }
+
+        return (gitRepo.Head.Tip, null);
     }
 
-    private Tree GetTreeByPath(Commit commit, string? path)
+    private Tree? GetTreeByPath(Commit commit, string? path)
     {
         if (string.IsNullOrWhiteSpace(path))
             return commit.Tree;
 
         var treeEntry = commit[path];
-        if (treeEntry?.Target is not Tree tree)
-            throw new InvalidOperationException("Path not found");
+        if (treeEntry is null)
+            return null;
 
-        return tree;
+        if (treeEntry.Target is Tree tree)
+            return tree;
+
+        throw new InvalidOperationException("Tree entry is not a tree");
     }
 
     private Commit GetLastCommitWhereBlobChanged(ICommitLog commits, string? path, TreeEntry treeEntry)
@@ -152,6 +180,9 @@ internal class GitService : IGitService
         foreach (var commit in commits.Skip(1))
         {
             var tree = GetTreeByPath(commit, path);
+            if (tree is null)
+                return lastCommit;
+
             var existingTreeEntry = tree.FirstOrDefault(x => x.Name == treeEntry.Name);
             if (existingTreeEntry is null || existingTreeEntry.Target.Id != treeEntry.Target.Id)
                 return lastCommit;

@@ -7,7 +7,7 @@ using Pyro.Domain.Git;
 namespace Pyro.Domain.GitRepositories.Queries;
 
 // TODO: add validator
-public record GetTreeView(string RepositoryName, string? BranchOrHash, string? Path) : IRequest<TreeView?>;
+public record GetTreeView(string RepositoryName, string? BranchOrPath) : IRequest<TreeView?>;
 
 public class GetTreeViewHandler : IRequestHandler<GetTreeView, TreeView?>
 {
@@ -28,7 +28,7 @@ public class GetTreeViewHandler : IRequestHandler<GetTreeView, TreeView?>
         if (repository is null)
             return null;
 
-        var treeView = gitService.GetTreeView(repository, request.BranchOrHash, request.Path);
+        var treeView = gitService.GetTreeView(repository, request.BranchOrPath);
 
         return treeView;
     }

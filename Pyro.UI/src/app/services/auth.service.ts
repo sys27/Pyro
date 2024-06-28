@@ -3,7 +3,6 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, switchMap, take } from 'rxjs';
 import { Endpoints } from '../endpoints';
 import { CurrentUser } from '../models/current-user';
-import { Response } from '../models/response';
 
 @Injectable({
     providedIn: 'root',
@@ -28,24 +27,22 @@ export class AuthService {
     }
 
     public login(login: string, password: string): Observable<CurrentUser | null> {
-        return this.httpClient
-            .post<Response<LoginResponse>>(Endpoints.Login, { login, password })
-            .pipe(
-                switchMap(response => {
-                    if (this.isLoginResponse(response)) {
-                        localStorage.setItem(AuthService.accessTokenKey, response.accessToken);
-                        localStorage.setItem(AuthService.refreshTokenKey, response.refreshToken);
-                    } else {
-                        localStorage.removeItem(AuthService.accessTokenKey);
-                        localStorage.removeItem(AuthService.refreshTokenKey);
-                    }
+        return this.httpClient.post<LoginResponse>(Endpoints.Login, { login, password }).pipe(
+            switchMap(response => {
+                if (this.isLoginResponse(response)) {
+                    localStorage.setItem(AuthService.accessTokenKey, response.accessToken);
+                    localStorage.setItem(AuthService.refreshTokenKey, response.refreshToken);
+                } else {
+                    localStorage.removeItem(AuthService.accessTokenKey);
+                    localStorage.removeItem(AuthService.refreshTokenKey);
+                }
 
-                    this.updateCurrentUser();
+                this.updateCurrentUser();
 
-                    return this.currentUser;
-                }),
-                take(1),
-            );
+                return this.currentUser;
+            }),
+            take(1),
+        );
     }
 
     public refresh(): Observable<CurrentUser | null> {
@@ -54,23 +51,21 @@ export class AuthService {
             throw new Error('No refresh token');
         }
 
-        return this.httpClient
-            .post<Response<RefreshResponse>>(Endpoints.Refresh, { refreshToken })
-            .pipe(
-                switchMap(response => {
-                    if (this.isRefreshResponse(response)) {
-                        localStorage.setItem(AuthService.accessTokenKey, response.accessToken);
-                    } else {
-                        localStorage.removeItem(AuthService.accessTokenKey);
-                        localStorage.removeItem(AuthService.refreshTokenKey);
-                    }
+        return this.httpClient.post<RefreshResponse>(Endpoints.Refresh, { refreshToken }).pipe(
+            switchMap(response => {
+                if (this.isRefreshResponse(response)) {
+                    localStorage.setItem(AuthService.accessTokenKey, response.accessToken);
+                } else {
+                    localStorage.removeItem(AuthService.accessTokenKey);
+                    localStorage.removeItem(AuthService.refreshTokenKey);
+                }
 
-                    this.updateCurrentUser();
+                this.updateCurrentUser();
 
-                    return this.currentUser;
-                }),
-                take(1),
-            );
+                return this.currentUser;
+            }),
+            take(1),
+        );
     }
 
     private getUserFromJwt(jwt: string): CurrentUser {

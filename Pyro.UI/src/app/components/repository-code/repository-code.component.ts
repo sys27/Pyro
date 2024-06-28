@@ -1,22 +1,41 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, input } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { ButtonModule } from 'primeng/button';
 import { DropdownModule } from 'primeng/dropdown';
+import { SkeletonModule } from 'primeng/skeleton';
 import { TableModule } from 'primeng/table';
 import { TabViewModule } from 'primeng/tabview';
 import { ToolbarModule } from 'primeng/toolbar';
-import { BehaviorSubject, Observable, combineLatest, map, shareReplay, switchMap } from 'rxjs';
-import { BranchItem, RepositoryService, TreeView } from '../../services/repository.service';
+import {
+    BehaviorSubject,
+    Observable,
+    combineLatest,
+    distinctUntilChanged,
+    filter,
+    map,
+    shareReplay,
+    switchMap,
+} from 'rxjs';
+import { mapErrorToEmpty, mapErrorToNull } from '../../services/operators';
+import {
+    BranchItem,
+    Repository,
+    RepositoryService,
+    TreeView,
+} from '../../services/repository.service';
 
 @Component({
     selector: 'repo-code',
     standalone: true,
     imports: [
+        ButtonModule,
         CommonModule,
         DropdownModule,
         FormsModule,
         RouterModule,
+        SkeletonModule,
         TableModule,
         TabViewModule,
         ToolbarModule,
@@ -25,12 +44,12 @@ import { BranchItem, RepositoryService, TreeView } from '../../services/reposito
     styleUrls: ['./repository-code.component.css'],
 })
 export class RepositoryCodeComponent implements OnInit {
-    public branchOrHash = input.required<string>({ alias: 'branchOrHash' });
-
-    public repositoryName: Observable<string> | undefined;
+    public branchOrPath: Observable<string[]> | undefined;
+    public repository: Observable<Repository | null> | undefined;
     public selectedBranch = new BehaviorSubject<BranchItem | undefined>(undefined);
-    public directoryView: Observable<TreeView> | undefined;
+    public directoryView: Observable<TreeView | null> | undefined;
     public branches: Observable<BranchItem[]> | undefined;
+    public directoryViewPlaceholder: any[] = Array.from({ length: 10 }).map(() => ({}));
 
     public constructor(
         private readonly router: Router,
@@ -39,42 +58,70 @@ export class RepositoryCodeComponent implements OnInit {
     ) {}
 
     public ngOnInit(): void {
-        this.repositoryName = this.route.parent?.params.pipe(map(params => params['name']));
-        this.branches = this.repositoryName?.pipe(
-            switchMap(repositoryName => this.repositoryService.getBranches(repositoryName)),
-            shareReplay(1), // TODO:
+        this.branchOrPath = this.route.params.pipe(map(params => Object.values(params)));
+        this.repository = this.route.parent?.params.pipe(
+            map(params => params['name']),
+            switchMap(repositoryName => this.repositoryService.getRepository(repositoryName)),
+            mapErrorToNull,
+            shareReplay(1),
+        );
+        this.branches = this.repository?.pipe(
+            filter(repository => repository != null),
+            switchMap(repository => this.repositoryService.getBranches(repository!.name)),
+            mapErrorToEmpty,
+            shareReplay(1),
         );
 
-        this.branches?.subscribe(branches => {
-            let branch = branches.filter(b => b.name === this.branchOrHash());
-            if (branch.length === 0) {
-                return;
-            }
+        combineLatest([this.branches!, this.branchOrPath!]).subscribe(
+            ([branches, branchOrPath]) => {
+                let branch = this.findBestBranch(branches, branchOrPath);
 
-            this.selectBranch(branch[0]);
-        });
+                this.selectedBranch.next(branch);
+            },
+        );
 
-        // TODO: fix cancelation
-        this.directoryView = combineLatest([this.repositoryName!, this.selectedBranch]).pipe(
-            switchMap(([repositoryName, branch]) =>
-                this.repositoryService.getTreeView(repositoryName, branch?.name),
+        this.directoryView = combineLatest([
+            this.repository!.pipe(filter(repository => repository != null)),
+            this.branchOrPath!,
+        ]).pipe(
+            distinctUntilChanged((prev, curr) => prev[0] === curr[0] && prev[1] === curr[1]),
+            switchMap(([repository, branchOrPath]) =>
+                this.repositoryService.getTreeView(repository!.name, branchOrPath.join('/')),
             ),
+            mapErrorToNull,
             shareReplay(1),
         );
     }
 
+    private findBestBranch(branches: BranchItem[], branchOrPath: string[]): BranchItem {
+        let end = 0;
+        while (end < branchOrPath.length) {
+            let branchName = branchOrPath.slice(0, end + 1).join('/');
+            let branch = branches.find(b => b.name === branchName);
+            if (branch != null) {
+                return branch;
+            }
+
+            end++;
+        }
+
+        let defaultBranch = branches.find(b => b.isDefault);
+
+        return defaultBranch ?? branches[0];
+    }
+
     public selectBranch(branch: BranchItem): void {
         this.selectedBranch.next(branch);
-        this.router.navigate(['../', branch.name], {
-            relativeTo: this.route,
-            queryParamsHandling: 'merge',
-            replaceUrl: true,
+        this.repository?.subscribe(repository => {
+            this.router.navigate(['repositories', repository?.name, 'code', branch.name], {
+                replaceUrl: true,
+            });
         });
     }
 
     private hasFile(files: string[]): Observable<boolean> | undefined {
         return this.directoryView?.pipe(
-            map(dv => dv.items.some(i => files.includes(i.name.toLowerCase()))),
+            map(dv => dv != null && dv.items.some(i => files.includes(i.name.toLowerCase()))),
         );
     }
 

@@ -104,14 +104,13 @@ internal static class GitRepositoryEndpoints
             .WithName("Get Branches")
             .WithOpenApi();
 
-        repositories.MapGet("/{name}/tree/{branchOrHash?}/{**path}", async (
+        repositories.MapGet("/{name}/tree/{**branchOrPath}", async (
                 IMediator mediator,
                 string name,
-                string? branchOrHash,
-                string? path,
+                string? branchOrPath,
                 CancellationToken cancellationToken) =>
             {
-                var request = new GetTreeView(name, branchOrHash, path);
+                var request = new GetTreeView(name, branchOrPath);
                 var treeView = await mediator.Send(request, cancellationToken);
 
                 return treeView is not null

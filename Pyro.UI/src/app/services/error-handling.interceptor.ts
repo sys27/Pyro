@@ -17,11 +17,11 @@ export const errorHandlingInterceptor: HttpInterceptorFn = (req, next) => {
                 error.status >= HttpStatusCode.BadRequest &&
                 error.status <= HttpStatusCode.NetworkAuthenticationRequired
             ) {
-                // TODO:
+                // TODO: notifications
                 console.error(error);
             }
 
-            return throwError(() => error as ResponseError);
+            return throwError(() => new ResponseError(error.message));
         }),
     );
 };

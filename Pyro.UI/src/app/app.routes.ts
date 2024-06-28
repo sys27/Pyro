@@ -13,6 +13,7 @@ import { RepositoryComponent } from './components/repository/repository.componen
 import { UserEditComponent } from './components/user-edit/user-edit.component';
 import { UserListComponent } from './components/user-list/user-list.component';
 import { UserNewComponent } from './components/user-new/user-new.component';
+import { urlMatcher } from './url.matcher';
 
 export const routes: Routes = [
     { path: 'repositories', component: RepositoryListComponent, canActivate: [authGuard] },
@@ -23,7 +24,7 @@ export const routes: Routes = [
         canActivate: [authGuard],
         children: [
             {
-                path: 'code/:branchOrHash',
+                matcher: urlMatcher('code'),
                 component: RepositoryCodeComponent,
                 canActivate: [authGuard],
             },
@@ -42,6 +43,7 @@ export const routes: Routes = [
                 component: RepositorySettingsComponent,
                 canActivate: [authGuard],
             },
+            { path: '', redirectTo: 'code', pathMatch: 'full' },
         ],
     },
 

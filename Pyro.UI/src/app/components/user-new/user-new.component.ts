@@ -7,6 +7,7 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { InputTextModule } from 'primeng/inputtext';
 import { ListboxModule } from 'primeng/listbox';
 import { MultiSelectModule } from 'primeng/multiselect';
+import { mapErrorToEmpty } from '../../services/operators';
 import { CreateUser, Role, User, UserService } from '../../services/user.service';
 
 @Component({
@@ -41,7 +42,10 @@ export class UserNewComponent implements OnInit {
     ) {}
 
     public ngOnInit(): void {
-        this.userService.getRoles().subscribe(roles => (this.roles = roles));
+        this.userService
+            .getRoles()
+            .pipe(mapErrorToEmpty)
+            .subscribe(roles => (this.roles = roles));
     }
 
     public onSubmit(): void {

@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { Observable } from 'rxjs';
 import { RepositoryItem } from '../../models/repository-item';
+import { mapErrorToEmpty } from '../../services/operators';
 import { RepositoryService } from '../../services/repository.service';
 
 @Component({
@@ -13,11 +14,11 @@ import { RepositoryService } from '../../services/repository.service';
     styleUrl: './repository-list.component.css',
 })
 export class RepositoryListComponent implements OnInit {
-    public repositories$: Observable<RepositoryItem[]> | undefined;
+    public repositories: Observable<RepositoryItem[]> | undefined;
 
     public constructor(private readonly repoService: RepositoryService) {}
 
     public ngOnInit(): void {
-        this.repositories$ = this.repoService.getRepositories();
+        this.repositories = this.repoService.getRepositories().pipe(mapErrorToEmpty);
     }
 }

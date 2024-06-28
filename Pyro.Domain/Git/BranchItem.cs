@@ -3,4 +3,4 @@
 
 namespace Pyro.Domain.Git;
 
-public record BranchItem(string Name, CommitInfo LastCommit);
+public record BranchItem(string Name, CommitInfo LastCommit, bool IsDefault);

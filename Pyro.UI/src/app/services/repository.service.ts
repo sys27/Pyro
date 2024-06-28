@@ -1,8 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, catchError, of } from 'rxjs';
 import { Endpoints } from '../endpoints';
 import { RepositoryItem } from '../models/repository-item';
+import { PyroResponse, ResponseError } from '../models/response';
 
 @Injectable({
     providedIn: 'root',
@@ -10,12 +11,16 @@ import { RepositoryItem } from '../models/repository-item';
 export class RepositoryService {
     public constructor(private readonly httpClient: HttpClient) {}
 
-    public getRepositories(): Observable<RepositoryItem[]> {
-        return this.httpClient.get<RepositoryItem[]>(Endpoints.Repositories);
+    public getRepositories(): Observable<PyroResponse<RepositoryItem[]>> {
+        return this.httpClient
+            .get<RepositoryItem[]>(Endpoints.Repositories)
+            .pipe(catchError((error: ResponseError) => of(error)));
     }
 
-    public getRepository(name: string): Observable<Repository> {
-        return this.httpClient.get<Repository>(`${Endpoints.Repositories}/${name}`);
+    public getRepository(name: string): Observable<PyroResponse<Repository>> {
+        return this.httpClient
+            .get<Repository>(`${Endpoints.Repositories}/${name}`)
+            .pipe(catchError((error: ResponseError) => of(error)));
     }
 
     public createRepository(repository: CreateRepository): Observable<void> {
@@ -28,24 +33,24 @@ export class RepositoryService {
         return this.httpClient.post<void>(Endpoints.Repositories, request);
     }
 
-    public getBranches(name: string): Observable<BranchItem[]> {
-        return this.httpClient.get<BranchItem[]>(`${Endpoints.Repositories}/${name}/branches`);
+    public getBranches(name: string): Observable<PyroResponse<BranchItem[]>> {
+        return this.httpClient
+            .get<BranchItem[]>(`${Endpoints.Repositories}/${name}/branches`)
+            .pipe(catchError((error: ResponseError) => of(error)));
     }
 
-    public getTreeView(name: string, branchOrHash?: string, path?: string): Observable<TreeView> {
-        if (branchOrHash && path) {
-            return this.httpClient.get<TreeView>(
-                `${Endpoints.Repositories}/${name}/tree/${branchOrHash}/${path}`,
+    public getTreeView(name: string, branchOrPath?: string): Observable<PyroResponse<TreeView>> {
+        let observable: Observable<TreeView>;
+
+        if (branchOrPath) {
+            observable = this.httpClient.get<TreeView>(
+                `${Endpoints.Repositories}/${name}/tree/${branchOrPath}`,
             );
+        } else {
+            observable = this.httpClient.get<TreeView>(`${Endpoints.Repositories}/${name}/tree`);
         }
 
-        if (branchOrHash) {
-            return this.httpClient.get<TreeView>(
-                `${Endpoints.Repositories}/${name}/tree/${branchOrHash}`,
-            );
-        }
-
-        return this.httpClient.get<TreeView>(`${Endpoints.Repositories}/${name}/tree`);
+        return observable.pipe(catchError((error: ResponseError) => of(error)));
     }
 }
 
@@ -89,4 +94,5 @@ export interface CommitUser {
 export interface BranchItem {
     get name(): string;
     get lastCommit(): CommitInfo;
+    get isDefault(): boolean;
 }

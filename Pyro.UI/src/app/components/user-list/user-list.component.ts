@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { Observable } from 'rxjs';
+import { mapErrorToEmpty } from '../../services/operators';
 import { UserItem, UserService } from '../../services/user.service';
-import { ButtonModule } from 'primeng/button';
 
 @Component({
     selector: 'user-list',
@@ -19,6 +20,6 @@ export class UserListComponent implements OnInit {
     public constructor(private readonly userService: UserService) {}
 
     public ngOnInit(): void {
-        this.users = this.userService.getUsers();
+        this.users = this.userService.getUsers().pipe(mapErrorToEmpty);
     }
 }

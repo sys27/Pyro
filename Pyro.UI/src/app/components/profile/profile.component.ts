@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
+import { mapErrorToNull } from '../../services/operators';
 import { ProfileService, UpdateProfile } from '../../services/profile.service';
 
 @Component({
@@ -26,13 +27,16 @@ export class ProfileComponent implements OnInit {
     public ngOnInit(): void {
         this.form.get('email')!.disable();
 
-        this.profileService.getProfile().subscribe(profile => {
-            this.form.patchValue({
-                email: profile.email,
-                name: profile.name,
-                status: profile.status,
+        this.profileService
+            .getProfile()
+            .pipe(mapErrorToNull)
+            .subscribe(profile => {
+                this.form.patchValue({
+                    email: profile?.email,
+                    name: profile?.name,
+                    status: profile?.status,
+                });
             });
-        });
     }
 
     public onSubmit(): void {
