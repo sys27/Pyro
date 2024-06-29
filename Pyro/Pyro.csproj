@@ -21,12 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="..\.dockerignore">
-      <Link>.dockerignore</Link>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Pyro.Infrastructure\Pyro.Infrastructure.csproj"/>
   </ItemGroup>
 

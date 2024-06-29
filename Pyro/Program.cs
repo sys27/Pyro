@@ -6,6 +6,7 @@ using FluentValidation;
 using Hellang.Middleware.ProblemDetails;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Extensions.FileProviders;
 using Pyro;
 using Pyro.BackgroundServices;
 using Pyro.Domain.Core;
@@ -43,9 +44,6 @@ builder.Services.AddHostedService<OutboxMessageProcessing>();
 
 builder.Services.AddAuth();
 
-builder.Services.AddSpaStaticFiles(options =>
-    options.RootPath = Path.Combine(Directory.GetCurrentDirectory(), "../Pyro.UI/dist/browser"));
-
 builder.Services.AddOutputCache(options =>
 {
     options.AddBasePolicy(p => p.Expire(TimeSpan.FromHours(1)).Tag("permissions"));
@@ -66,7 +64,16 @@ if (!app.Environment.IsDevelopment())
 
 if (!app.Environment.IsDevelopment())
 {
-    app.UseSpaStaticFiles();
+    app.UseFileServer(new FileServerOptions
+    {
+        EnableDefaultFiles = true,
+        EnableDirectoryBrowsing = false,
+        FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")),
+        DefaultFilesOptions =
+        {
+            DefaultFileNames = ["index.html"],
+        },
+    });
 }
 else
 {

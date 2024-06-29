@@ -11,6 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.stylecop.json = .stylecop.json
 		Rules.ruleset = Rules.ruleset
 		Directory.Build.targets = Directory.Build.targets
+		Dockerfile = Dockerfile
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pyro.Domain", "Pyro.Domain\Pyro.Domain.csproj", "{1F0DF9CE-F557-406F-86CD-8CFC045DB403}"

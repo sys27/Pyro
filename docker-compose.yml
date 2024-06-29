@@ -3,4 +3,4 @@
     image: pyro
     build:
       context: .
-      dockerfile: Pyro/Dockerfile
+      dockerfile: ./Dockerfile
