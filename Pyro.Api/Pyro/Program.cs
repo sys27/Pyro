@@ -84,7 +84,7 @@ else
             // TODO: release
             const int port = 4200;
 
-            spa.Options.SourcePath = Path.Combine(Directory.GetCurrentDirectory(), "../Pyro.UI");
+            spa.Options.SourcePath = Path.Combine(Directory.GetCurrentDirectory(), "../../Pyro.UI");
             spa.Options.DevServerPort = port;
             spa.Options.PackageManagerCommand = "npm";
 

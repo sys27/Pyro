@@ -4,14 +4,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pyro", "Pyro\Pyro.csproj", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7C907764-1677-4C52-89CC-409E082E841C}"
 	ProjectSection(SolutionItems) = preProject
-		docker-compose.yml = docker-compose.yml
-		.gitignore = .gitignore
 		Directory.Packages.props = Directory.Packages.props
-		.editorconfig = .editorconfig
 		.stylecop.json = .stylecop.json
 		Rules.ruleset = Rules.ruleset
 		Directory.Build.targets = Directory.Build.targets
-		Dockerfile = Dockerfile
+		..\.dockerignore = ..\.dockerignore
+		..\.editorconfig = ..\.editorconfig
+		..\.gitignore = ..\.gitignore
+		..\Dockerfile = ..\Dockerfile
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pyro.Domain", "Pyro.Domain\Pyro.Domain.csproj", "{1F0DF9CE-F557-406F-86CD-8CFC045DB403}"
