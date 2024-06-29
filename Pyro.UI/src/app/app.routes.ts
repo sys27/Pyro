@@ -4,6 +4,7 @@ import { LoginComponent } from './components/login/login.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { ProfileComponent } from './components/profile/profile.component';
 import { RepositoryCodeComponent } from './components/repository-code/repository-code.component';
+import { RepositoryFileComponent } from './components/repository-file/repository-file.component';
 import { RepositoryIssuesComponent } from './components/repository-issues/repository-issues.component';
 import { RepositoryListComponent } from './components/repository-list/repository-list.component';
 import { RepositoryNewComponent } from './components/repository-new/repository-new.component';
@@ -26,6 +27,11 @@ export const routes: Routes = [
             {
                 matcher: urlMatcher('code'),
                 component: RepositoryCodeComponent,
+                canActivate: [authGuard],
+            },
+            {
+                matcher: urlMatcher('file'),
+                component: RepositoryFileComponent,
                 canActivate: [authGuard],
             },
             {

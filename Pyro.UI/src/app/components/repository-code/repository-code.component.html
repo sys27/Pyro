@@ -37,26 +37,45 @@
       [value]="view.items"
       selectionMode="single"
       styleClass="p-datatable-striped">
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 1%"></th>
+          <th style="width: 19%"></th>
+          <th style="width: 75%"></th>
+          <th style="width: 5%"></th>
+        </tr>
+      </ng-template>
       <ng-template
         pTemplate="body"
         let-item>
         <tr>
           <td>
             <span
-              *ngIf="item.isDirectory"
+              *ngIf="item.isDirectory; else fileIcon"
               class="pi pi-folder"></span>
-            <span
-              *ngIf="!item.isDirectory"
-              class="pi pi-file"></span>
+            <ng-template #fileIcon>
+              <span class="pi pi-file"></span>
+            </ng-template>
           </td>
           <td>
             <a
+              class="grid-item-link"
               *ngIf="item.isDirectory; else file"
               [routerLink]="item.name">
               {{ item.name }}
             </a>
             <ng-template #file>
-              <span> {{ item.name }} </span>
+              <a
+                class="grid-item-link"
+                [routerLink]="[
+                  '/repositories',
+                  (repository | async)?.name,
+                  'file',
+                  (branchOrPath | async)?.join('/'),
+                  item.name,
+                ]">
+                {{ item.name }}
+              </a>
             </ng-template>
           </td>
           <td class="text-400">{{ item.message }}</td>
@@ -73,12 +92,12 @@
           <p-tabPanel
             *ngIf="readmeName | async"
             header="README">
-            <pre style="white-space: pre-wrap">{{ readmeFile | async }}</pre>
+            <div [innerHTML]="readmeFile | async"></div>
           </p-tabPanel>
           <p-tabPanel
             *ngIf="licenseName | async"
             header="LICENSE">
-            <pre style="white-space: pre-wrap">{{ licenseFile | async }}</pre>
+            <div [innerHTML]="licenseFile | async"></div>
           </p-tabPanel>
         </p-tabView>
       </ng-template>

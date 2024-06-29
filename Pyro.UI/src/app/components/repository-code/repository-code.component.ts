@@ -24,6 +24,7 @@ import {
     takeUntil,
     withLatestFrom,
 } from 'rxjs';
+import { MarkdownService } from '../../services/markdown.service';
 import { mapErrorToEmpty, mapErrorToNull } from '../../services/operators';
 import {
     BranchItem,
@@ -70,6 +71,7 @@ export class RepositoryCodeComponent implements OnInit, OnDestroy {
         private readonly router: Router,
         private readonly route: ActivatedRoute,
         private readonly repositoryService: RepositoryService,
+        private readonly markdownService: MarkdownService,
     ) {}
 
     public ngOnInit(): void {
@@ -108,9 +110,9 @@ export class RepositoryCodeComponent implements OnInit, OnDestroy {
         );
 
         this.readmeName = this.hasFile(['readme.md', 'readme.txt', 'readme']);
-        this.readmeFile = this.getFile(this.readmeName!);
+        this.readmeFile = this.getMarkdownFile(this.readmeName!);
         this.licenseName = this.hasFile(['license.md', 'license.txt', 'license']);
-        this.licenseFile = this.getFile(this.licenseName!);
+        this.licenseFile = this.getMarkdownFile(this.licenseName!);
 
         this.displayTabView = combineLatest([this.readmeName!, this.licenseName!]).pipe(
             map(([readmeName, licenseName]) => readmeName != null || licenseName != null),
@@ -165,7 +167,7 @@ export class RepositoryCodeComponent implements OnInit, OnDestroy {
         );
     }
 
-    private getFile(file: Observable<string | null>): Observable<string | null> {
+    private getMarkdownFile(file: Observable<string | null>): Observable<string | null> {
         return file.pipe(
             withLatestFrom(this.repository!, this.branchOrPath!),
             switchMap(([fileName, repository, branchOrPath]) => {
@@ -180,6 +182,7 @@ export class RepositoryCodeComponent implements OnInit, OnDestroy {
             }),
             mapErrorToNull,
             switchMap(blob => (blob != null ? from(blob.text()) : of(null))),
+            switchMap(content => this.markdownService.parse(content ?? '')),
             shareReplay(1),
         );
     }

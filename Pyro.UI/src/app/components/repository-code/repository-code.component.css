@@ -1,0 +1,8 @@
+.grid-item-link {
+  text-decoration: none;
+  color: var(--text-color);
+}
+
+.grid-item-link:hover {
+  text-decoration: underline;
+}
