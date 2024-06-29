@@ -2,6 +2,8 @@
 // Licensed under the GPL-3.0 license. See LICENSE file in the project root for full license information.
 
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.StaticFiles;
 using Pyro.Domain.GitRepositories.Queries;
 using Pyro.Dtos.Mapping;
 using Pyro.Dtos.Requests;
@@ -125,6 +127,33 @@ internal static class GitRepositoryEndpoints
             .Produces(404)
             .ProducesProblem(500)
             .WithName("Get Tree")
+            .WithOpenApi();
+
+        repositories.MapGet("/{name}/file/{**branchAndPath}", async (
+                IMediator mediator,
+                [FromServices] IContentTypeProvider contentTypeProvider,
+                string name,
+                string branchAndPath,
+                CancellationToken cancellationToken) =>
+            {
+                var request = new GetFile(name, branchAndPath);
+                var gitFile = await mediator.Send(request, cancellationToken);
+                if (gitFile is null)
+                    return Results.NotFound();
+
+                contentTypeProvider.TryGetContentType(gitFile.Name, out var contentType);
+                contentType ??= "application/octet-stream";
+
+                return Results.Stream(gitFile.Content, contentType, gitFile.Name);
+            })
+            .RequirePermission(RepositoryView)
+            .Produces(200)
+            .ProducesValidationProblem()
+            .Produces(401)
+            .Produces(403)
+            .Produces(404)
+            .ProducesProblem(500)
+            .WithName("Get File")
             .WithOpenApi();
 
         return app;

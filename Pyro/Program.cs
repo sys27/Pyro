@@ -5,6 +5,7 @@ using System.Text.Json;
 using FluentValidation;
 using Hellang.Middleware.ProblemDetails;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
+using Microsoft.AspNetCore.StaticFiles;
 using Pyro;
 using Pyro.BackgroundServices;
 using Pyro.Domain.Core;
@@ -25,6 +26,7 @@ builder.Services.AddProblemDetails(builder.Environment);
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddSingleton<IContentTypeProvider, FileExtensionContentTypeProvider>();
 
 builder.Services.AddIdentityDomain();
 builder.Services.AddInfrastructure(builder.Configuration);

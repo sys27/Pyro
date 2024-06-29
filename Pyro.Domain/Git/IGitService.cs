@@ -8,10 +8,12 @@ namespace Pyro.Domain.Git;
 public interface IGitService
 {
     Task InitializeRepository(
-        GitRepository repository,
+        GitRepository gitRepo,
         CancellationToken cancellationToken = default);
 
-    IReadOnlyList<BranchItem> GetBranches(GitRepository repository);
+    IReadOnlyList<BranchItem> GetBranches(GitRepository gitRepo);
 
-    TreeView GetTreeView(GitRepository repository, string? branchOrPath = null);
+    TreeView GetTreeView(GitRepository gitRepo, string? branchOrPath = null);
+
+    GitFile GetFile(GitRepository gitRepo, string branchAndPath);
 }

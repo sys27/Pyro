@@ -2,7 +2,6 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, catchError, of } from 'rxjs';
 import { Endpoints } from '../endpoints';
-import { RepositoryItem } from '../models/repository-item';
 import { PyroResponse, ResponseError } from '../models/response';
 
 @Injectable({
@@ -52,9 +51,23 @@ export class RepositoryService {
 
         return observable.pipe(catchError((error: ResponseError) => of(error)));
     }
+
+    public getFile(name: string, branchAndPath: string): Observable<PyroResponse<Blob>> {
+        return this.httpClient
+            .get(`${Endpoints.Repositories}/${name}/file/${branchAndPath}`, {
+                responseType: 'blob',
+            })
+            .pipe(catchError((error: ResponseError) => of(error)));
+    }
 }
 
 export interface Repository {
+    get name(): string;
+    get description(): string | undefined;
+    get defaultBranch(): string;
+}
+
+export interface RepositoryItem {
     get name(): string;
     get description(): string | undefined;
     get defaultBranch(): string;

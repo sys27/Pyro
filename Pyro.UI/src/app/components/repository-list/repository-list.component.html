@@ -1,6 +1,6 @@
 <h1>Repositories</h1>
 <ul>
   <li *ngFor="let repo of repositories | async">
-    <a [routerLink]="['/repositories', repo.name]">{{ repo.name }}</a>
+    <a [routerLink]="['/repositories', repo.name, 'code', repo.defaultBranch]">{{ repo.name }}</a>
   </li>
 </ul>

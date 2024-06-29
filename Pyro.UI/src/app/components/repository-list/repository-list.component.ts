@@ -2,9 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { Observable } from 'rxjs';
-import { RepositoryItem } from '../../models/repository-item';
 import { mapErrorToEmpty } from '../../services/operators';
-import { RepositoryService } from '../../services/repository.service';
+import { RepositoryItem, RepositoryService } from '../../services/repository.service';
 
 @Component({
     selector: 'repo-list',

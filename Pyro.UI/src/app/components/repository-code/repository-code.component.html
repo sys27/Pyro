@@ -65,18 +65,24 @@
       </ng-template>
     </p-table>
 
-    <p-tabView>
-      <p-tabPanel
-        *ngIf="hasReadmeFile() | async"
-        header="README">
-        <pre>{{ 'xxx' }}</pre>
-      </p-tabPanel>
-      <p-tabPanel
-        *ngIf="hasLicenseFile() | async"
-        header="LICENSE">
-        <pre>{{ 'xxx' }}</pre>
-      </p-tabPanel>
-    </p-tabView>
+    <div
+      pDefer
+      *ngIf="displayTabView | async">
+      <ng-template>
+        <p-tabView>
+          <p-tabPanel
+            *ngIf="readmeName | async"
+            header="README">
+            <pre style="white-space: pre-wrap">{{ readmeFile | async }}</pre>
+          </p-tabPanel>
+          <p-tabPanel
+            *ngIf="licenseName | async"
+            header="LICENSE">
+            <pre style="white-space: pre-wrap">{{ licenseFile | async }}</pre>
+          </p-tabPanel>
+        </p-tabView>
+      </ng-template>
+    </div>
   </div>
 
   <ng-template #empty>

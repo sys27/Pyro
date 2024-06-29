@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
+import { DeferModule } from 'primeng/defer';
 import { DropdownModule } from 'primeng/dropdown';
 import { SkeletonModule } from 'primeng/skeleton';
 import { TableModule } from 'primeng/table';
@@ -11,12 +12,17 @@ import { ToolbarModule } from 'primeng/toolbar';
 import {
     BehaviorSubject,
     Observable,
+    Subject,
     combineLatest,
     distinctUntilChanged,
     filter,
+    from,
     map,
+    of,
     shareReplay,
     switchMap,
+    takeUntil,
+    withLatestFrom,
 } from 'rxjs';
 import { mapErrorToEmpty, mapErrorToNull } from '../../services/operators';
 import {
@@ -32,6 +38,7 @@ import {
     imports: [
         ButtonModule,
         CommonModule,
+        DeferModule,
         DropdownModule,
         FormsModule,
         RouterModule,
@@ -43,13 +50,21 @@ import {
     templateUrl: './repository-code.component.html',
     styleUrls: ['./repository-code.component.css'],
 })
-export class RepositoryCodeComponent implements OnInit {
+export class RepositoryCodeComponent implements OnInit, OnDestroy {
     public branchOrPath: Observable<string[]> | undefined;
     public repository: Observable<Repository | null> | undefined;
     public selectedBranch = new BehaviorSubject<BranchItem | undefined>(undefined);
     public directoryView: Observable<TreeView | null> | undefined;
     public branches: Observable<BranchItem[]> | undefined;
+    public readmeName: Observable<string | null> | undefined;
+    public readmeFile: Observable<string | null> | undefined;
+    public licenseName: Observable<string | null> | undefined;
+    public licenseFile: Observable<string | null> | undefined;
+    public displayTabView: Observable<boolean> | undefined;
+
     public directoryViewPlaceholder: any[] = Array.from({ length: 10 }).map(() => ({}));
+
+    private readonly destroy = new Subject<void>();
 
     public constructor(
         private readonly router: Router,
@@ -72,13 +87,13 @@ export class RepositoryCodeComponent implements OnInit {
             shareReplay(1),
         );
 
-        combineLatest([this.branches!, this.branchOrPath!]).subscribe(
-            ([branches, branchOrPath]) => {
+        combineLatest([this.branches!, this.branchOrPath!])
+            .pipe(takeUntil(this.destroy))
+            .subscribe(([branches, branchOrPath]) => {
                 let branch = this.findBestBranch(branches, branchOrPath);
 
                 this.selectedBranch.next(branch);
-            },
-        );
+            });
 
         this.directoryView = combineLatest([
             this.repository!.pipe(filter(repository => repository != null)),
@@ -91,6 +106,20 @@ export class RepositoryCodeComponent implements OnInit {
             mapErrorToNull,
             shareReplay(1),
         );
+
+        this.readmeName = this.hasFile(['readme.md', 'readme.txt', 'readme']);
+        this.readmeFile = this.getFile(this.readmeName!);
+        this.licenseName = this.hasFile(['license.md', 'license.txt', 'license']);
+        this.licenseFile = this.getFile(this.licenseName!);
+
+        this.displayTabView = combineLatest([this.readmeName!, this.licenseName!]).pipe(
+            map(([readmeName, licenseName]) => readmeName != null || licenseName != null),
+        );
+    }
+
+    public ngOnDestroy(): void {
+        this.destroy.next();
+        this.destroy.complete();
     }
 
     private findBestBranch(branches: BranchItem[], branchOrPath: string[]): BranchItem {
@@ -119,17 +148,39 @@ export class RepositoryCodeComponent implements OnInit {
         });
     }
 
-    private hasFile(files: string[]): Observable<boolean> | undefined {
+    private hasFile(files: string[]): Observable<string | null> | undefined {
         return this.directoryView?.pipe(
-            map(dv => dv != null && dv.items.some(i => files.includes(i.name.toLowerCase()))),
+            map(dv => {
+                if (dv == null) {
+                    return null;
+                }
+
+                let file = dv.items.find(f => files.includes(f.name.toLowerCase()));
+                if (file == null) {
+                    return null;
+                }
+
+                return file.name;
+            }),
         );
     }
 
-    public hasReadmeFile(): Observable<boolean> | undefined {
-        return this.hasFile(['readme.md', 'readme.txt', 'readme']);
-    }
+    private getFile(file: Observable<string | null>): Observable<string | null> {
+        return file.pipe(
+            withLatestFrom(this.repository!, this.branchOrPath!),
+            switchMap(([fileName, repository, branchOrPath]) => {
+                if (fileName == null) {
+                    return of(null);
+                }
 
-    public hasLicenseFile(): Observable<boolean> | undefined {
-        return this.hasFile(['license.md', 'license.txt', 'license']);
+                return this.repositoryService.getFile(
+                    repository!.name,
+                    branchOrPath.concat(fileName).join('/'),
+                );
+            }),
+            mapErrorToNull,
+            switchMap(blob => (blob != null ? from(blob.text()) : of(null))),
+            shareReplay(1),
+        );
     }
 }

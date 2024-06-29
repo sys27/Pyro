@@ -36,13 +36,13 @@ internal class GitService : IGitService
         => Path.Combine(options.BasePath, $"{repository.Name}.git");
 
     public async Task InitializeRepository(
-        GitRepository repository,
+        GitRepository gitRepo,
         CancellationToken cancellationToken = default)
     {
         var pyroUser = await profileRepository.GetUserProfile(User.PyroUser, cancellationToken) ??
                        throw new InvalidOperationException("Pyro user not found");
 
-        var gitPath = GetGitPath(repository);
+        var gitPath = GetGitPath(gitRepo);
         gitPath = Repository.Init(gitPath, true);
 
         var clonePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
@@ -52,32 +52,32 @@ internal class GitService : IGitService
         var signature = new Signature(identity, timeProvider.GetUtcNow());
         using var repo = new Repository(clonePath, new RepositoryOptions { Identity = identity });
 
-        var content = $"# {repository.Name}";
+        var content = $"# {gitRepo.Name}";
         var readmePath = Path.Combine(repo.Info.WorkingDirectory, ReadmeFile);
         await File.WriteAllTextAsync(readmePath, content, cancellationToken);
 
         Commands.Stage(repo, ReadmeFile);
         repo.Commit("Initial commit", signature, signature);
-        var branch = repo.Branches.Rename(repo.Head, repository.DefaultBranch);
+        var branch = repo.Branches.Rename(repo.Head, gitRepo.DefaultBranch);
 
         var origin = repo.Network.Remotes["origin"];
         repo.Network.Push(origin, branch.CanonicalName);
 
         Directory.Delete(clonePath, true);
 
-        logger.LogInformation("Repository {Name} initialized", repository.Name);
+        logger.LogInformation("Repository {Name} initialized", gitRepo.Name);
     }
 
-    public IReadOnlyList<BranchItem> GetBranches(GitRepository repository)
+    public IReadOnlyList<BranchItem> GetBranches(GitRepository gitRepo)
     {
-        var gitPath = GetGitPath(repository);
-        using var gitRepo = new Repository(gitPath);
-        var branches = gitRepo.Branches
+        var gitPath = GetGitPath(gitRepo);
+        using var repository = new Repository(gitPath);
+        var branches = repository.Branches
             .Select(x => new BranchItem(
                 x.FriendlyName,
                 GetCommitInfo(x.Tip),
-                x.FriendlyName == repository.DefaultBranch))
-            .OrderBy(x => x.Name != repository.DefaultBranch)
+                x.FriendlyName == gitRepo.DefaultBranch))
+            .OrderBy(x => x.Name != gitRepo.DefaultBranch)
             .ThenBy(x => x.Name)
             .ToArray();
 
@@ -95,12 +95,12 @@ internal class GitService : IGitService
             author.When);
     }
 
-    public TreeView GetTreeView(GitRepository repository, string? branchOrPath = null)
+    public TreeView GetTreeView(GitRepository gitRepo, string? branchOrPath = null)
     {
-        var gitPath = GetGitPath(repository);
-        using var gitRepo = new Repository(gitPath);
-        var (lastCommit, path) = GetCommitAndPath(gitRepo, repository.DefaultBranch, branchOrPath);
-        var commits = gitRepo.Commits.QueryBy(new CommitFilter { IncludeReachableFrom = lastCommit });
+        var gitPath = GetGitPath(gitRepo);
+        using var repository = new Repository(gitPath);
+        var (lastCommit, path) = GetCommitAndPath(repository, gitRepo.DefaultBranch, branchOrPath);
+        var commits = repository.Commits.QueryBy(new CommitFilter { IncludeReachableFrom = lastCommit });
         var commitInfo = GetCommitInfo(lastCommit);
 
         var tree = GetTreeByPath(lastCommit, path);
@@ -129,15 +129,15 @@ internal class GitService : IGitService
     }
 
     private (Commit Commit, string? Path) GetCommitAndPath(
-        Repository gitRepo,
+        Repository repository,
         string defaultBranch,
         string? branchOrPath)
     {
         if (string.IsNullOrWhiteSpace(branchOrPath))
-            return (gitRepo.Branches[defaultBranch].Tip, null);
+            return (repository.Branches[defaultBranch].Tip, null);
 
         if (!branchOrPath.Contains('/'))
-            return (gitRepo.Branches[branchOrPath].Tip, null);
+            return (repository.Branches[branchOrPath].Tip, null);
 
         var end = -1;
 
@@ -148,7 +148,7 @@ internal class GitService : IGitService
                 end = branchOrPath.Length;
 
             var branchName = branchOrPath[..end];
-            var branch = gitRepo.Branches[branchName];
+            var branch = repository.Branches[branchName];
             if (branch is not null)
             {
                 var pathStart = Math.Min(end + 1, branchOrPath.Length);
@@ -156,7 +156,7 @@ internal class GitService : IGitService
             }
         }
 
-        return (gitRepo.Head.Tip, null);
+        return (repository.Head.Tip, null);
     }
 
     private Tree? GetTreeByPath(Commit commit, string? path)
@@ -191,6 +191,53 @@ internal class GitService : IGitService
         }
 
         return lastCommit;
+    }
+
+    public GitFile GetFile(GitRepository gitRepo, string branchAndPath)
+    {
+        var gitPath = GetGitPath(gitRepo);
+        using var repository = new Repository(gitPath);
+        var (lastCommit, path) = GetCommitAndFile(repository, gitRepo.DefaultBranch, branchAndPath);
+        var treeEntry = lastCommit[path];
+        if (treeEntry is null)
+            throw new InvalidOperationException("Path not found");
+
+        if (treeEntry.Target is not Blob blob)
+            throw new InvalidOperationException("Tree entry is not a blob");
+
+        return new GitFile(
+            treeEntry.Name,
+            blob.GetContentStream(),
+            blob.Size,
+            blob.IsBinary);
+    }
+
+    private (Commit Commit, string? Path) GetCommitAndFile(
+        Repository repository,
+        string defaultBranch,
+        string branchOrPath)
+    {
+        if (!branchOrPath.Contains('/'))
+            return (repository.Branches[defaultBranch].Tip, branchOrPath);
+
+        var end = -1;
+
+        while (end < branchOrPath.Length)
+        {
+            end = branchOrPath.IndexOf('/', end + 1);
+            if (end == -1)
+                end = branchOrPath.Length;
+
+            var branchName = branchOrPath[..end];
+            var branch = repository.Branches[branchName];
+            if (branch is not null)
+            {
+                var pathStart = Math.Min(end + 1, branchOrPath.Length);
+                return (branch.Tip, branchOrPath[pathStart..]);
+            }
+        }
+
+        return (repository.Head.Tip, null);
     }
 
     public class Options
