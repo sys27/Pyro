@@ -3,7 +3,8 @@
     <h1>Users</h1>
 
     <p-table
-      [value]="(users | async)!"
+      *ngIf="users$ | async as users"
+      [value]="users"
       styleClass="p-datatable-striped">
       <ng-template pTemplate="header">
         <tr>

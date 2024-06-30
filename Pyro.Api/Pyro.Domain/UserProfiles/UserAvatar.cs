@@ -7,5 +7,5 @@ public class UserAvatar
 {
     public Guid Id { get; init; }
 
-    public required byte[] Image { get; init; }
+    public required IReadOnlyList<byte> Image { get; init; }
 }

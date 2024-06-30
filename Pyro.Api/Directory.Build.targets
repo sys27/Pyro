@@ -1,21 +1,25 @@
 <Project>
-    <PropertyGroup>
-        <Nullable>enable</Nullable>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <EnableNETAnalyzers>true</EnableNETAnalyzers>
-        <AnalysisLevel>latest</AnalysisLevel>
-        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-        <EnablePackageValidation>true</EnablePackageValidation>
-        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-        <CodeAnalysisRuleSet>..\Rules.ruleset</CodeAnalysisRuleSet>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <!-- TODO: -->
-        <NoWarn>$(NoWarn),1573,1591,1712</NoWarn>
-    </PropertyGroup>
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <EnablePackageValidation>true</EnablePackageValidation>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <CodeAnalysisRuleSet>..\Rules.ruleset</CodeAnalysisRuleSet>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!-- TODO: -->
+    <NoWarn>$(NoWarn),1573,1591,1712</NoWarn>
+  </PropertyGroup>
 
-    <ItemGroup>
-        <PackageReference Include="StyleCop.Analyzers" PrivateAssets="All" />
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
 
-        <AdditionalFiles Include="..\.stylecop.json" Link=".stylecop.json" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="StyleCop.Analyzers" PrivateAssets="All"/>
+
+    <AdditionalFiles Include="..\.stylecop.json" Link=".stylecop.json"/>
+  </ItemGroup>
 </Project>

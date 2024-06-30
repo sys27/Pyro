@@ -32,10 +32,10 @@ public class PasswordService
         return (passwordHash, salt);
     }
 
-    public bool VerifyPassword(string password, byte[] passwordHash, byte[] salt)
+    public bool VerifyPassword(string password, IReadOnlyList<byte> passwordHash, IReadOnlyList<byte> salt)
     {
-        var passwordHashToVerify = GetPasswordHash(password, salt);
+        var passwordHashToVerify = GetPasswordHash(password, [.. salt]);
 
-        return passwordHashToVerify.AsSpan().SequenceEqual(passwordHash);
+        return passwordHashToVerify.AsSpan().SequenceEqual([..passwordHash]);
     }
 }

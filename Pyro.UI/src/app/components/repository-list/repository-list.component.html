@@ -1,6 +1,29 @@
-<h1>Repositories</h1>
-<ul>
-  <li *ngFor="let repo of repositories | async">
-    <a [routerLink]="['/repositories', repo.name, 'code', repo.defaultBranch]">{{ repo.name }}</a>
-  </li>
-</ul>
+<div class="flex align-items-center justify-content-center">
+  <div class="w-8">
+    <h1>Repositories</h1>
+
+    <div *ngIf="repositories$ | async as repositories">
+      <p-table
+        [value]="repositories"
+        selectionMode="single"
+        styleClass="p-datatable-striped">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Name</th>
+          </tr>
+        </ng-template>
+        <ng-template
+          pTemplate="body"
+          let-repo>
+          <tr>
+            <td>
+              <a [routerLink]="['/repositories', repo.name, 'code', repo.defaultBranch]">{{
+                repo.name
+              }}</a>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>

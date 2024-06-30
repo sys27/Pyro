@@ -15,11 +15,11 @@ import { UserItem, UserService } from '../../services/user.service';
     styleUrl: './user-list.component.css',
 })
 export class UserListComponent implements OnInit {
-    public users!: Observable<UserItem[]>;
+    public users$: Observable<UserItem[]> | undefined;
 
     public constructor(private readonly userService: UserService) {}
 
     public ngOnInit(): void {
-        this.users = this.userService.getUsers().pipe(mapErrorToEmpty);
+        this.users$ = this.userService.getUsers().pipe(mapErrorToEmpty);
     }
 }

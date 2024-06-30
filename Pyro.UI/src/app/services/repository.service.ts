@@ -39,17 +39,17 @@ export class RepositoryService {
     }
 
     public getTreeView(name: string, branchOrPath?: string): Observable<PyroResponse<TreeView>> {
-        let observable: Observable<TreeView>;
+        let observable$: Observable<TreeView>;
 
         if (branchOrPath) {
-            observable = this.httpClient.get<TreeView>(
+            observable$ = this.httpClient.get<TreeView>(
                 `${Endpoints.Repositories}/${name}/tree/${branchOrPath}`,
             );
         } else {
-            observable = this.httpClient.get<TreeView>(`${Endpoints.Repositories}/${name}/tree`);
+            observable$ = this.httpClient.get<TreeView>(`${Endpoints.Repositories}/${name}/tree`);
         }
 
-        return observable.pipe(catchError((error: ResponseError) => of(error)));
+        return observable$.pipe(catchError((error: ResponseError) => of(error)));
     }
 
     public getFile(name: string, branchAndPath: string): Observable<PyroResponse<Blob>> {

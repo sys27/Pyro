@@ -14,8 +14,8 @@ public class User : DomainEntity
     private readonly List<AuthenticationToken> tokens = [];
 
     private string login;
-    private byte[] password;
-    private byte[] salt;
+    private IReadOnlyList<byte> password;
+    private IReadOnlyList<byte> salt;
 
     public static User Create(string login, byte[] password, byte[] salt)
     {
@@ -47,7 +47,7 @@ public class User : DomainEntity
         }
     }
 
-    public required byte[] Password
+    public required IReadOnlyList<byte> Password
     {
         get => password;
         [MemberNotNull(nameof(password))]
@@ -56,14 +56,14 @@ public class User : DomainEntity
             if (value is null)
                 throw new ArgumentNullException(nameof(value));
 
-            if (value.Length != 64)
+            if (value.Count != 64)
                 throw new ArgumentException("Password must be 64 bytes long.", nameof(value));
 
             password = value;
         }
     }
 
-    public required byte[] Salt
+    public required IReadOnlyList<byte> Salt
     {
         get => salt;
         [MemberNotNull(nameof(salt))]
@@ -72,7 +72,7 @@ public class User : DomainEntity
             if (value is null)
                 throw new ArgumentNullException(nameof(value));
 
-            if (value.Length != 16)
+            if (value.Count != 16)
                 throw new ArgumentException("Salt must be 16 bytes long.", nameof(value));
 
             salt = value;

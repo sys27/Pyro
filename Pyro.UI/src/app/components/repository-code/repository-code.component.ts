@@ -52,20 +52,20 @@ import {
     styleUrls: ['./repository-code.component.css'],
 })
 export class RepositoryCodeComponent implements OnInit, OnDestroy {
-    public branchOrPath: Observable<string[]> | undefined;
-    public repository: Observable<Repository | null> | undefined;
-    public selectedBranch = new BehaviorSubject<BranchItem | undefined>(undefined);
-    public directoryView: Observable<TreeView | null> | undefined;
-    public branches: Observable<BranchItem[]> | undefined;
-    public readmeName: Observable<string | null> | undefined;
-    public readmeFile: Observable<string | null> | undefined;
-    public licenseName: Observable<string | null> | undefined;
-    public licenseFile: Observable<string | null> | undefined;
-    public displayTabView: Observable<boolean> | undefined;
+    public branchOrPath$: Observable<string[]> | undefined;
+    public repository$: Observable<Repository | null> | undefined;
+    public selectedBranch$ = new BehaviorSubject<BranchItem | undefined>(undefined);
+    public directoryView$: Observable<TreeView | null> | undefined;
+    public branches$: Observable<BranchItem[]> | undefined;
+    public readmeName$: Observable<string | null> | undefined;
+    public readmeFile$: Observable<string | null> | undefined;
+    public licenseName$: Observable<string | null> | undefined;
+    public licenseFile$: Observable<string | null> | undefined;
+    public displayTabView$: Observable<boolean> | undefined;
 
     public directoryViewPlaceholder: any[] = Array.from({ length: 10 }).map(() => ({}));
 
-    private readonly destroy = new Subject<void>();
+    private readonly destroy$ = new Subject<void>();
 
     public constructor(
         private readonly router: Router,
@@ -75,31 +75,31 @@ export class RepositoryCodeComponent implements OnInit, OnDestroy {
     ) {}
 
     public ngOnInit(): void {
-        this.branchOrPath = this.route.params.pipe(map(params => Object.values(params)));
-        this.repository = this.route.parent?.params.pipe(
+        this.branchOrPath$ = this.route.params.pipe(map(params => Object.values(params)));
+        this.repository$ = this.route.parent?.params.pipe(
             map(params => params['name']),
             switchMap(repositoryName => this.repositoryService.getRepository(repositoryName)),
             mapErrorToNull,
             shareReplay(1),
         );
-        this.branches = this.repository?.pipe(
+        this.branches$ = this.repository$?.pipe(
             filter(repository => repository != null),
             switchMap(repository => this.repositoryService.getBranches(repository!.name)),
             mapErrorToEmpty,
             shareReplay(1),
         );
 
-        combineLatest([this.branches!, this.branchOrPath!])
-            .pipe(takeUntil(this.destroy))
+        combineLatest([this.branches$!, this.branchOrPath$!])
+            .pipe(takeUntil(this.destroy$))
             .subscribe(([branches, branchOrPath]) => {
                 let branch = this.findBestBranch(branches, branchOrPath);
 
-                this.selectedBranch.next(branch);
+                this.selectedBranch$.next(branch);
             });
 
-        this.directoryView = combineLatest([
-            this.repository!.pipe(filter(repository => repository != null)),
-            this.branchOrPath!,
+        this.directoryView$ = combineLatest([
+            this.repository$!.pipe(filter(repository => repository != null)),
+            this.branchOrPath$!,
         ]).pipe(
             distinctUntilChanged((prev, curr) => prev[0] === curr[0] && prev[1] === curr[1]),
             switchMap(([repository, branchOrPath]) =>
@@ -109,19 +109,19 @@ export class RepositoryCodeComponent implements OnInit, OnDestroy {
             shareReplay(1),
         );
 
-        this.readmeName = this.hasFile(['readme.md', 'readme.txt', 'readme']);
-        this.readmeFile = this.getMarkdownFile(this.readmeName!);
-        this.licenseName = this.hasFile(['license.md', 'license.txt', 'license']);
-        this.licenseFile = this.getMarkdownFile(this.licenseName!);
+        this.readmeName$ = this.hasFile(['readme.md', 'readme.txt', 'readme']);
+        this.readmeFile$ = this.getMarkdownFile(this.readmeName$!);
+        this.licenseName$ = this.hasFile(['license.md', 'license.txt', 'license']);
+        this.licenseFile$ = this.getMarkdownFile(this.licenseName$!);
 
-        this.displayTabView = combineLatest([this.readmeName!, this.licenseName!]).pipe(
+        this.displayTabView$ = combineLatest([this.readmeName$!, this.licenseName$!]).pipe(
             map(([readmeName, licenseName]) => readmeName != null || licenseName != null),
         );
     }
 
     public ngOnDestroy(): void {
-        this.destroy.next();
-        this.destroy.complete();
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     private findBestBranch(branches: BranchItem[], branchOrPath: string[]): BranchItem {
@@ -142,8 +142,8 @@ export class RepositoryCodeComponent implements OnInit, OnDestroy {
     }
 
     public selectBranch(branch: BranchItem): void {
-        this.selectedBranch.next(branch);
-        this.repository?.subscribe(repository => {
+        this.selectedBranch$.next(branch);
+        this.repository$?.subscribe(repository => {
             this.router.navigate(['repositories', repository?.name, 'code', branch.name], {
                 replaceUrl: true,
             });
@@ -151,7 +151,7 @@ export class RepositoryCodeComponent implements OnInit, OnDestroy {
     }
 
     private hasFile(files: string[]): Observable<string | null> | undefined {
-        return this.directoryView?.pipe(
+        return this.directoryView$?.pipe(
             map(dv => {
                 if (dv == null) {
                     return null;
@@ -169,7 +169,7 @@ export class RepositoryCodeComponent implements OnInit, OnDestroy {
 
     private getMarkdownFile(file: Observable<string | null>): Observable<string | null> {
         return file.pipe(
-            withLatestFrom(this.repository!, this.branchOrPath!),
+            withLatestFrom(this.repository$!, this.branchOrPath$!),
             switchMap(([fileName, repository, branchOrPath]) => {
                 if (fileName == null) {
                     return of(null);

@@ -35,14 +35,14 @@ export class MarkdownService {
             return markdown.pipe(switchMap(md => this.parse(md)));
         }
 
-        let html: Observable<string>;
+        let html$: Observable<string>;
         let result = this.parser.parse(markdown);
         if (result instanceof Promise) {
-            html = from(result);
+            html$ = from(result);
         } else {
-            html = of(result);
+            html$ = of(result);
         }
 
-        return html.pipe(map(html => DOMPurify.sanitize(html)));
+        return html$.pipe(map(html => DOMPurify.sanitize(html)));
     }
 }
