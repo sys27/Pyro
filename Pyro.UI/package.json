@@ -37,7 +37,7 @@
     "@angular/compiler-cli": "^18.0.5",
     "@types/dompurify": "^3.0.5",
     "autoprefixer": "^10.4.19",
-    "postcss": "^8.4.38",
+    "postcss": "^8.4.39",
     "prettier": "3.3.2",
     "prettier-plugin-organize-imports": "^3.2.4",
     "typescript": "~5.4.5"
