@@ -22,17 +22,24 @@ internal class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.Property(x => x.Login)
             .IsRequired()
+            .HasMaxLength(32)
             .UsePropertyAccessMode(PropertyAccessMode.Field);
 
-        builder.Property(x => x.Password)
+        builder.Property<byte[]>("password")
             .IsRequired()
             .HasMaxLength(64)
+            .HasColumnType("BLOB")
+            .HasColumnName("Password")
             .UsePropertyAccessMode(PropertyAccessMode.Field);
+        builder.Ignore(x => x.Password);
 
-        builder.Property(x => x.Salt)
+        builder.Property<byte[]>("salt")
             .IsRequired()
             .HasMaxLength(16)
+            .HasColumnType("BLOB")
+            .HasColumnName("Salt")
             .UsePropertyAccessMode(PropertyAccessMode.Field);
+        builder.Ignore(x => x.Salt);
 
         builder.Property(x => x.IsLocked)
             .HasDefaultValue(false);

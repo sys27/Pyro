@@ -7,10 +7,12 @@ COPY ["Pyro.Api/Pyro.Domain.Core/Pyro.Domain.Core.csproj", "Pyro.Domain.Core/"]
 COPY ["Pyro.Api/Pyro.Domain.Identity/Pyro.Domain.Identity.csproj", "Pyro.Domain.Identity/"]
 COPY ["Pyro.Api/Pyro.Infrastructure/Pyro.Infrastructure.csproj", "Pyro.Infrastructure/"]
 COPY ["Pyro.Api/Pyro.sln", "./"]
+COPY ["Pyro.Api/Directory.Build.targets", "./"]
+COPY ["Pyro.Api/Directory.Packages.props", "./"]
 RUN dotnet restore "Pyro.sln"
 COPY ./Pyro.Api/ .
-RUN dotnet build "Pyro.sln" -c $BUILD_CONFIGURATION -o /app/build
-RUN dotnet publish "Pyro.sln" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet build "Pyro.sln" --nologo --no-restore -c $BUILD_CONFIGURATION
+RUN dotnet publish "Pyro.sln" --nologo --no-restore --no-build -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM node:lts-alpine AS node
 WORKDIR /src

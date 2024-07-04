@@ -3,6 +3,7 @@
 
 using FluentValidation;
 using MediatR;
+using Pyro.Domain.Core.Exceptions;
 using Pyro.Domain.Identity.Models;
 
 namespace Pyro.Domain.Identity.Commands;
@@ -13,7 +14,8 @@ public class UpdateUserValidator : AbstractValidator<UpdateUser>
 {
     public UpdateUserValidator()
     {
-        RuleFor(x => x.User);
+        RuleFor(x => x.User)
+            .NotNull();
 
         RuleFor(x => x.Roles)
             .NotEmpty();
@@ -32,7 +34,7 @@ public class UpdateUserHandler : IRequestHandler<UpdateUser, User>
         var allRoles = await repository.GetRolesAsync(cancellationToken);
         var invalidRoles = request.Roles.Except(allRoles.Select(x => x.Name)).ToList();
         if (invalidRoles.Count > 0)
-            throw new InvalidOperationException($"Invalid roles provided: {string.Join(", ", invalidRoles)}.");
+            throw new DomainException($"Invalid roles provided: {string.Join(", ", invalidRoles)}.");
 
         var user = request.User;
         user.ClearRoles();

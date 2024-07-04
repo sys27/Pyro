@@ -52,7 +52,7 @@ public class LoginValidator : AbstractValidator<LoginCommand>
     {
         RuleFor(x => x.Login)
             .NotEmpty()
-            .MaximumLength(50);
+            .MaximumLength(32);
 
         RuleFor(x => x.Password)
             .NotEmpty()

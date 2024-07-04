@@ -2,6 +2,7 @@
 // Licensed under the GPL-3.0 license. See LICENSE file in the project root for full license information.
 
 using System.Diagnostics.CodeAnalysis;
+using Pyro.Domain.Core.Exceptions;
 
 namespace Pyro.Domain.Identity.Models;
 
@@ -18,16 +19,16 @@ public class Role
     public required string Name
     {
         get => name;
+
         [MemberNotNull(nameof(name))]
         init
         {
             if (string.IsNullOrWhiteSpace(value))
-                throw new ArgumentNullException(nameof(value));
+                throw new DomainValidationException("Role name cannot be null or empty.");
 
             if (value.Length > 50)
-                throw new ArgumentException("Role name must be less than 50 characters.", nameof(value));
+                throw new DomainValidationException("Role name must be less than 50 characters.");
 
-            // TODO: unique
             name = value;
         }
     }

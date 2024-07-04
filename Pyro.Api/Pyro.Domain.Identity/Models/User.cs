@@ -2,6 +2,7 @@
 // Licensed under the GPL-3.0 license. See LICENSE file in the project root for full license information.
 
 using System.Diagnostics.CodeAnalysis;
+using Pyro.Domain.Core.Exceptions;
 using Pyro.Domain.Core.Models;
 
 namespace Pyro.Domain.Identity.Models;
@@ -14,8 +15,8 @@ public class User : DomainEntity
     private readonly List<AuthenticationToken> tokens = [];
 
     private string login;
-    private IReadOnlyList<byte> password;
-    private IReadOnlyList<byte> salt;
+    private byte[] password;
+    private byte[] salt;
 
     public static User Create(string login, byte[] password, byte[] salt)
     {
@@ -36,13 +37,16 @@ public class User : DomainEntity
     public required string Login
     {
         get => login;
+
         [MemberNotNull(nameof(login))]
         init
         {
             if (string.IsNullOrWhiteSpace(value))
-                throw new ArgumentException("Login cannot be null or empty.", nameof(value));
+                throw new DomainValidationException("Login cannot be null or empty.");
 
-            // TODO: Add validation
+            if (value.Length > 32)
+                throw new DomainValidationException("Login cannot be longer than 32 characters.");
+
             login = value;
         }
     }
@@ -50,32 +54,34 @@ public class User : DomainEntity
     public required IReadOnlyList<byte> Password
     {
         get => password;
+
         [MemberNotNull(nameof(password))]
         init
         {
             if (value is null)
-                throw new ArgumentNullException(nameof(value));
+                throw new DomainValidationException("Password cannot be null.");
 
             if (value.Count != 64)
-                throw new ArgumentException("Password must be 64 bytes long.", nameof(value));
+                throw new DomainValidationException("Password must be 64 bytes long.");
 
-            password = value;
+            password = [..value];
         }
     }
 
     public required IReadOnlyList<byte> Salt
     {
         get => salt;
+
         [MemberNotNull(nameof(salt))]
         init
         {
             if (value is null)
-                throw new ArgumentNullException(nameof(value));
+                throw new DomainValidationException("Salt cannot be null.");
 
             if (value.Count != 16)
-                throw new ArgumentException("Salt must be 16 bytes long.", nameof(value));
+                throw new DomainValidationException("Salt must be 16 bytes long.");
 
-            salt = value;
+            salt = [..value];
         }
     }
 

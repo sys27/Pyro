@@ -15,7 +15,7 @@ public class GetUserValidator : AbstractValidator<GetUser>
     {
         RuleFor(x => x.Login)
             .NotEmpty()
-            .MaximumLength(50);
+            .MaximumLength(32);
     }
 }
 

@@ -3,6 +3,7 @@
 
 using FluentValidation;
 using MediatR;
+using Pyro.Domain.Core.Models;
 
 namespace Pyro.Domain.GitRepositories.Queries;
 
@@ -14,8 +15,8 @@ public class GetGitRepositoryValidator : AbstractValidator<GetGitRepository>
     {
         RuleFor(x => x.Name)
             .NotEmpty()
-            .MaximumLength(20)
-            .Matches(@"^[a-zA-Z0-9\\-\\_]+$");
+            .MaximumLength(50)
+            .Matches(Regexes.GetRepositoryNameRegex());
     }
 }
 
