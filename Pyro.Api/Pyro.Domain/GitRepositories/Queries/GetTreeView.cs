@@ -1,13 +1,25 @@
 // Copyright (c) Dmytro Kyshchenko. All rights reserved.
 // Licensed under the GPL-3.0 license. See LICENSE file in the project root for full license information.
 
+using FluentValidation;
 using MediatR;
+using Pyro.Domain.Core.Models;
 using Pyro.Domain.Git;
 
 namespace Pyro.Domain.GitRepositories.Queries;
 
-// TODO: add validator
 public record GetTreeView(string RepositoryName, string? BranchOrPath) : IRequest<TreeView?>;
+
+public class GetTreeViewValidator : AbstractValidator<GetTreeView>
+{
+    public GetTreeViewValidator()
+    {
+        RuleFor(x => x.RepositoryName)
+            .NotEmpty()
+            .MaximumLength(50)
+            .Matches(Regexes.GetRepositoryNameRegex());
+    }
+}
 
 public class GetTreeViewHandler : IRequestHandler<GetTreeView, TreeView?>
 {

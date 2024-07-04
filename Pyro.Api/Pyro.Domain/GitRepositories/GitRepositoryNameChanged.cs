@@ -3,6 +3,7 @@
 
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Pyro.Domain.Core.Exceptions;
 using Pyro.Domain.Core.Models;
 
 namespace Pyro.Domain.GitRepositories;
@@ -33,7 +34,7 @@ public class GitRepositoryNameChangedHandler : INotificationHandler<GitRepositor
         var gitRepository = await repository.GetGitRepository(notification.NewName, cancellationToken);
         if (gitRepository is not null)
         {
-            throw new InvalidOperationException($"Git repository with name '{notification.NewName}' already exists.");
+            throw new DomainException($"Git repository with name '{notification.NewName}' already exists.");
         }
     }
 }

@@ -1,13 +1,28 @@
 // Copyright (c) Dmytro Kyshchenko. All rights reserved.
 // Licensed under the GPL-3.0 license. See LICENSE file in the project root for full license information.
 
+using FluentValidation;
 using MediatR;
+using Pyro.Domain.Core.Models;
 using Pyro.Domain.Git;
 
 namespace Pyro.Domain.GitRepositories.Queries;
 
-// TODO: add validator
 public record GetFile(string RepositoryName, string Path) : IRequest<GitFile?>;
+
+public class GetFileValidator : AbstractValidator<GetFile>
+{
+    public GetFileValidator()
+    {
+        RuleFor(x => x.RepositoryName)
+            .NotEmpty()
+            .MaximumLength(50)
+            .Matches(Regexes.GetRepositoryNameRegex());
+
+        RuleFor(x => x.Path)
+            .NotEmpty();
+    }
+}
 
 public class GetFileHandler : IRequestHandler<GetFile, GitFile?>
 {

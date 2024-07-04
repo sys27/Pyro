@@ -23,7 +23,7 @@ internal class UserProfileConfiguration : IEntityTypeConfiguration<UserProfile>
             .ValueGeneratedOnAdd();
 
         builder.Property(x => x.Email)
-            .IsRequired();
+            .HasMaxLength(150);
 
         builder.Property(x => x.Name)
             .HasMaxLength(50);

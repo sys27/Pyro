@@ -3,6 +3,7 @@
 
 using FluentValidation;
 using Hellang.Middleware.ProblemDetails;
+using Pyro.Domain.Core.Exceptions;
 
 namespace Pyro.Extensions;
 
@@ -23,6 +24,20 @@ internal static class ProblemDetailsExtensions
                 var errors = ex.Errors
                     .GroupBy(x => x.PropertyName, x => x.ErrorMessage)
                     .ToDictionary(x => x.Key, x => x.ToArray());
+
+                return new HttpValidationProblemDetails(errors)
+                {
+                    Status = StatusCodes.Status400BadRequest,
+                    Type = "https://httpstatuses.io/400",
+                };
+            });
+
+            options.Map<DomainValidationException>(ex =>
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { string.Empty, [ex.Message] },
+                };
 
                 return new HttpValidationProblemDetails(errors)
                 {

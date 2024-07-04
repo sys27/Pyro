@@ -7,5 +7,7 @@ public class UserAvatar
 {
     public Guid Id { get; init; }
 
-    public required IReadOnlyList<byte> Image { get; init; }
+#pragma warning disable CA1819
+    public required byte[] Image { get; init; }
+#pragma warning restore CA1819
 }

@@ -2,7 +2,7 @@
 // Licensed under the GPL-3.0 license. See LICENSE file in the project root for full license information.
 
 using System.Diagnostics.CodeAnalysis;
-using System.Text.RegularExpressions;
+using Pyro.Domain.Core.Exceptions;
 using Pyro.Domain.Core.Models;
 
 namespace Pyro.Domain.GitRepositories;
@@ -12,9 +12,9 @@ namespace Pyro.Domain.GitRepositories;
 /// </summary>
 public class GitRepository : DomainEntity
 {
-    private static Regex regexName = new Regex("^[a-zA-Z0-9-_]+$", RegexOptions.Compiled);
-
     private readonly string name;
+    private readonly string? description;
+    private readonly string defaultBranch;
 
     public Guid Id { get; init; }
 
@@ -26,13 +26,13 @@ public class GitRepository : DomainEntity
         init
         {
             if (string.IsNullOrWhiteSpace(value))
-                throw new InvalidOperationException("Name cannot be empty.");
+                throw new DomainValidationException("Name cannot be empty.");
 
             if (value.Length > 20)
-                throw new InvalidOperationException("Name is too long.");
+                throw new DomainValidationException("Name is too long.");
 
-            if (!regexName.IsMatch(value))
-                throw new InvalidOperationException("Name can only contain letters, numbers, hyphens, and underscores.");
+            if (!Regexes.GetRepositoryNameRegex().IsMatch(value))
+                throw new DomainValidationException("Name can only contain letters, numbers, hyphens, and underscores.");
 
             if (name != value)
                 PublishEvent(new GitRepositoryNameChanged(name, value));
@@ -41,7 +41,32 @@ public class GitRepository : DomainEntity
         }
     }
 
-    public string? Description { get; init; }
+    public string? Description
+    {
+        get => description;
+        init
+        {
+            if (value?.Length > 250)
+                throw new DomainValidationException("Description is too long.");
 
-    public required string DefaultBranch { get; init; }
+            description = value;
+        }
+    }
+
+    public required string DefaultBranch
+    {
+        get => defaultBranch;
+
+        [MemberNotNull(nameof(defaultBranch))]
+        init
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                throw new DomainValidationException("Default Branch cannot be empty.");
+
+            if (value.Length > 50)
+                throw new DomainValidationException("Default Branch is too long.");
+
+            defaultBranch = value;
+        }
+    }
 }

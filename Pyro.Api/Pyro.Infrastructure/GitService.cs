@@ -4,6 +4,7 @@
 using LibGit2Sharp;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Pyro.Domain.Core.Exceptions;
 using Pyro.Domain.Git;
 using Pyro.Domain.GitRepositories;
 using Pyro.Domain.Identity.Models;
@@ -40,7 +41,7 @@ internal class GitService : IGitService
         CancellationToken cancellationToken = default)
     {
         var pyroUser = await profileRepository.GetUserProfile(User.PyroUser, cancellationToken) ??
-                       throw new InvalidOperationException("Pyro user not found");
+                       throw new DomainException("Pyro user not found");
 
         var gitPath = GetGitPath(gitRepo);
         gitPath = Repository.Init(gitPath, true);
@@ -105,7 +106,7 @@ internal class GitService : IGitService
 
         var tree = GetTreeByPath(lastCommit, path);
         if (tree is null)
-            throw new InvalidOperationException("Path not found");
+            throw new DomainException("Path not found");
 
         var items = tree
             .Select(x =>
@@ -171,7 +172,7 @@ internal class GitService : IGitService
         if (treeEntry.Target is Tree tree)
             return tree;
 
-        throw new InvalidOperationException("Tree entry is not a tree");
+        throw new DomainException("Tree entry is not a tree");
     }
 
     private Commit GetLastCommitWhereBlobChanged(ICommitLog commits, string? path, TreeEntry treeEntry)
@@ -200,10 +201,10 @@ internal class GitService : IGitService
         var (lastCommit, path) = GetCommitAndFile(repository, gitRepo.DefaultBranch, branchAndPath);
         var treeEntry = lastCommit[path];
         if (treeEntry is null)
-            throw new InvalidOperationException("Path not found");
+            throw new DomainException("Path not found");
 
         if (treeEntry.Target is not Blob blob)
-            throw new InvalidOperationException("Tree entry is not a blob");
+            throw new DomainException("Tree entry is not a blob");
 
         return new GitFile(
             treeEntry.Name,
