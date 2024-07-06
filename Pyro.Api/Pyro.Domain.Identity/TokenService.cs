@@ -27,12 +27,12 @@ public class TokenService
         this.signingKeyService = signingKeyService;
     }
 
-    public async Task<TokenPair> GenerateTokenPair(User user)
+    public async Task<JwtTokenPair> GenerateTokenPair(User user)
     {
         var accessToken = await GenerateAccessToken(user);
         var refreshToken = await GenerateRefreshToken(user);
 
-        return new TokenPair(accessToken, refreshToken);
+        return new JwtTokenPair(accessToken, refreshToken);
     }
 
     public async Task<Token> GenerateAccessToken(User user)

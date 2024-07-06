@@ -2,18 +2,23 @@ import { Routes } from '@angular/router';
 import { authGuard } from './auth.guard';
 import { LoginComponent } from './components/login/login.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
-import { ProfileComponent } from './components/profile/profile.component';
-import { RepositoryCodeComponent } from './components/repository-code/repository-code.component';
-import { RepositoryFileComponent } from './components/repository-file/repository-file.component';
-import { RepositoryIssuesComponent } from './components/repository-issues/repository-issues.component';
-import { RepositoryListComponent } from './components/repository-list/repository-list.component';
-import { RepositoryNewComponent } from './components/repository-new/repository-new.component';
-import { RepositoryPullRequqestsComponent } from './components/repository-prs/repository-prs.component';
-import { RepositorySettingsComponent } from './components/repository-settings/repository-settings.component';
-import { RepositoryComponent } from './components/repository/repository.component';
-import { UserEditComponent } from './components/user-edit/user-edit.component';
-import { UserListComponent } from './components/user-list/user-list.component';
-import { UserNewComponent } from './components/user-new/user-new.component';
+import {
+    RepositoryCodeComponent,
+    RepositoryComponent,
+    RepositoryFileComponent,
+    RepositoryIssuesComponent,
+    RepositoryListComponent,
+    RepositoryNewComponent,
+    RepositoryPullRequqestsComponent,
+    RepositorySettingsComponent,
+} from './components/repository';
+import {
+    AccessTokenListComponent,
+    AccessTokenNewComponent,
+    ProfileComponent,
+    SettingsComponent,
+} from './components/settings';
+import { UserEditComponent, UserListComponent, UserNewComponent } from './components/user';
 import { urlMatcher } from './url.matcher';
 
 export const routes: Routes = [
@@ -53,7 +58,26 @@ export const routes: Routes = [
         ],
     },
 
-    { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },
+    {
+        path: 'settings',
+        component: SettingsComponent,
+        canActivate: [authGuard],
+        children: [
+            { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },
+            {
+                path: 'access-tokens/new',
+                component: AccessTokenNewComponent,
+                canActivate: [authGuard],
+            },
+            {
+                path: 'access-tokens',
+                component: AccessTokenListComponent,
+                canActivate: [authGuard],
+                children: [],
+            },
+            { path: '', redirectTo: 'profile', pathMatch: 'full' },
+        ],
+    },
 
     { path: 'users', component: UserListComponent, canActivate: [authGuard] },
     { path: 'users/new', component: UserNewComponent, canActivate: [authGuard] },

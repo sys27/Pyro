@@ -22,7 +22,7 @@ export const errorHandlingInterceptor: HttpInterceptorFn = (req, next) => {
                 messageService.add({
                     severity: 'error',
                     summary: 'Error',
-                    detail: error.error.title,
+                    detail: error.error?.title,
                 });
             }
 

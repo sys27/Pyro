@@ -59,6 +59,6 @@ export class AppComponent implements OnInit {
     }
 
     public profileOnClick(): void {
-        this.router.navigate(['profile']);
+        this.router.navigate(['settings']);
     }
 }

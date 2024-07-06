@@ -2,6 +2,7 @@
 // Licensed under the GPL-3.0 license. See LICENSE file in the project root for full license information.
 
 using Microsoft.Extensions.Options;
+using Pyro.Extensions;
 using Pyro.Infrastructure;
 using Pyro.Services;
 
@@ -20,11 +21,15 @@ internal static class GitBackendEndpoints
 
     private static IEndpointRouteBuilder MapNativeGitBackendEndpoints(this IEndpointRouteBuilder app)
     {
-        app.Map("/{name}.git/{**path}", async (
-                GitBackend backend,
-                string name,
-                CancellationToken cancellationToken) =>
-            await backend.Handle(name, cancellationToken));
+        app
+            .Map("/{name}.git/{**path}", async (
+                    GitBackend backend,
+                    string name,
+                    CancellationToken cancellationToken) =>
+                await backend.Handle(name, cancellationToken))
+            .RequireAuthorization(pb => pb
+                .AddAuthenticationSchemes(AuthExtensions.BasicAuthenticationScheme)
+                .RequireAuthenticatedUser());
 
         return app;
     }

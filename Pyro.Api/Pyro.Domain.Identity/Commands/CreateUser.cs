@@ -33,9 +33,9 @@ public class CreateUserValidator : AbstractValidator<CreateUser>
 public class CreateUserHandler : IRequestHandler<CreateUser>
 {
     private readonly IUserRepository repository;
-    private readonly PasswordService passwordService;
+    private readonly IPasswordService passwordService;
 
-    public CreateUserHandler(IUserRepository repository, PasswordService passwordService)
+    public CreateUserHandler(IUserRepository repository, IPasswordService passwordService)
     {
         this.repository = repository;
         this.passwordService = passwordService;

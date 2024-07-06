@@ -31,7 +31,9 @@ builder.Services.AddSingleton<IContentTypeProvider, FileExtensionContentTypeProv
 builder.Services.AddIdentityDomain();
 builder.Services.AddInfrastructure(builder.Configuration);
 
-builder.Services.AddValidatorsFromAssemblyContaining<GitRepository>();
+builder.Services
+    .AddValidatorsFromAssemblyContaining<GitRepository>()
+    .AddValidatorsFromAssemblyContaining<User>();
 builder.Services.AddMediatR(c => c
     .RegisterServicesFromAssemblyContaining<GitRepository>()
     .RegisterServicesFromAssemblyContaining<User>()

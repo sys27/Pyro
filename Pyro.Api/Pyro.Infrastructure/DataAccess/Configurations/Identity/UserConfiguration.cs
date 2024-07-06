@@ -81,6 +81,10 @@ internal class UserConfiguration : IEntityTypeConfiguration<User>
             .WithOne(x => x.User)
             .OnDelete(DeleteBehavior.Cascade);
 
+        builder.HasMany(x => x.AccessTokens)
+            .WithOne()
+            .OnDelete(DeleteBehavior.Cascade);
+
         builder.HasIndex(x => x.Login)
             .IsUnique()
             .HasDatabaseName("IX_Users_Login");
