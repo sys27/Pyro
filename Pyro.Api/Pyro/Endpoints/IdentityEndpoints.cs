@@ -58,7 +58,7 @@ internal static class IdentityEndpoints
             })
             .Produces<UserResponse>()
             .Produces(404)
-            .ProducesProblem(500, MediaTypeNames.Application.Json)
+            .ProducesProblem(500)
             .WithName("Get User By Login")
             .WithOpenApi();
 
@@ -127,7 +127,6 @@ internal static class IdentityEndpoints
                 return Results.Ok(result);
             })
             .AllowAnonymous()
-            .CacheOutput(b => b.Tag("roles"))
             .Produces<IReadOnlyList<RoleResponse>>()
             .Produces(401)
             .Produces(403)
@@ -154,7 +153,6 @@ internal static class IdentityEndpoints
                 return Results.Ok(result);
             })
             .AllowAnonymous()
-            .CacheOutput(b => b.Tag("permissions"))
             .Produces<IReadOnlyList<PermissionResponse>>()
             .Produces(401)
             .Produces(403)
