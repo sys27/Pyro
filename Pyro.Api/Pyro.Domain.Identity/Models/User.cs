@@ -13,6 +13,7 @@ public class User : DomainEntity
 
     private readonly List<Role> roles = [];
     private readonly List<AuthenticationToken> tokens = [];
+    private readonly List<AccessToken> accessTokens = [];
 
     private string login;
     private byte[] password;
@@ -93,6 +94,9 @@ public class User : DomainEntity
     public IReadOnlyCollection<AuthenticationToken> Tokens
         => tokens;
 
+    public IReadOnlyCollection<AccessToken> AccessTokens
+        => accessTokens;
+
     public void Lock()
         => IsLocked = true;
 
@@ -120,4 +124,29 @@ public class User : DomainEntity
 
     public void ClearTokens()
         => tokens.Clear();
+
+    public void AddAccessToken(AccessToken token)
+    {
+        if (accessTokens.Any(x => x.Name == token.Name))
+            return;
+
+        accessTokens.Add(token);
+    }
+
+    public bool ValidateAccessToken(IPasswordService passwordService, TimeProvider timeProvider, string token)
+    {
+        var now = timeProvider.GetUtcNow();
+
+        return accessTokens.Any(accessToken =>
+            accessToken.ExpiresAt > now &&
+            passwordService.VerifyPassword(token, accessToken.Token, accessToken.Salt));
+    }
+
+    public void DeleteAccessToken(string name)
+    {
+        var accessToken = accessTokens.FirstOrDefault(x => x.Name == name) ??
+                          throw new NotFoundException("Access token not found");
+
+        accessTokens.Remove(accessToken);
+    }
 }

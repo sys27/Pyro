@@ -15,7 +15,7 @@ export class AuthService {
     private readonly currentUserSubject: BehaviorSubject<CurrentUser | null> =
         new BehaviorSubject<CurrentUser | null>(null);
 
-    public constructor(private httpClient: HttpClient) {
+    public constructor(private readonly httpClient: HttpClient) {
         this.updateCurrentUser();
     }
 

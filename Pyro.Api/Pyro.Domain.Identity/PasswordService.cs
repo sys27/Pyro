@@ -6,11 +6,12 @@ using System.Text;
 
 namespace Pyro.Domain.Identity;
 
-public class PasswordService
+public class PasswordService : IPasswordService
 {
     private const int HashSize = 64;
     private const int SaltSize = 16;
     private const int IterationsCount = 200000;
+    private const int PasswordLength = 64;
 
     private static byte[] GetPasswordHash(string password, byte[] salt)
     {
@@ -24,7 +25,7 @@ public class PasswordService
         return passwordHash;
     }
 
-    public (byte[] Password, byte[] Salt) GeneratePasswordHash(string password)
+    public (byte[] PasswordHash, byte[] Salt) GeneratePasswordHash(string password)
     {
         var salt = RandomNumberGenerator.GetBytes(SaltSize);
         var passwordHash = GetPasswordHash(password, salt);
@@ -32,9 +33,17 @@ public class PasswordService
         return (passwordHash, salt);
     }
 
+    public string GeneratePassword()
+    {
+        var bytes = RandomNumberGenerator.GetBytes(PasswordLength);
+        var base64 = Convert.ToBase64String(bytes);
+
+        return base64;
+    }
+
     public bool VerifyPassword(string password, IReadOnlyList<byte> passwordHash, IReadOnlyList<byte> salt)
     {
-        var passwordHashToVerify = GetPasswordHash(password, [.. salt]);
+        var passwordHashToVerify = GetPasswordHash(password, [..salt]);
 
         return passwordHashToVerify.AsSpan().SequenceEqual([..passwordHash]);
     }

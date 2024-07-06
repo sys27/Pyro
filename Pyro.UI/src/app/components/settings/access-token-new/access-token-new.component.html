@@ -1,0 +1,50 @@
+<div class="flex align-items-center justify-content-center">
+  <form
+    class="w-full"
+    [formGroup]="form"
+    (ngSubmit)="onSubmit()">
+    <div class="field">
+      <label for="name">Name:</label>
+      <input
+        id="name"
+        type="text"
+        class="w-full"
+        pInputText
+        formControlName="name" />
+    </div>
+
+    <div class="field">
+      <label for="expiresAt">Expires At:</label>
+      <p-calendar
+        [minDate]="minDate"
+        [showTime]="true"
+        hourFormat="24"
+        inputId="expiresAt"
+        [showIcon]="true"
+        [showOnFocus]="false"
+        formControlName="expiresAt"
+        styleClass="w-full" />
+    </div>
+
+    <div
+      *ngIf="isViewMode"
+      class="field">
+      <label for="token">Token:</label>
+      <input
+        id="token"
+        type="text"
+        class="w-full"
+        pInputText
+        formControlName="token" />
+    </div>
+
+    <div
+      *ngIf="!isViewMode"
+      class="field">
+      <p-button
+        label="Save"
+        type="submit"
+        [disabled]="!form.valid" />
+    </div>
+  </form>
+</div>

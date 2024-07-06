@@ -7,8 +7,10 @@ using System.Globalization;
 using System.IO.Pipelines;
 using System.Text;
 using Microsoft.Extensions.Options;
+using Pyro.Domain.Core;
 using Pyro.Domain.Core.Exceptions;
 using Pyro.Domain.GitRepositories;
+using Pyro.Domain.UserProfiles;
 using Pyro.Infrastructure;
 
 namespace Pyro.Services;
@@ -18,25 +20,35 @@ public class GitBackend
     private readonly HttpContext httpContext;
     private readonly IOptions<GitOptions> gitOptions;
     private readonly IGitRepositoryRepository repository;
+    private readonly ICurrentUserProvider currentUserProvider;
+    private readonly IUserProfileRepository userProfileRepository;
 
     // TODO: move to infrastructure?
     // TODO: remove HttpContent dependency
     public GitBackend(
         IHttpContextAccessor httpContextAccessor,
         IOptions<GitOptions> gitOptions,
-        IGitRepositoryRepository repository)
+        IGitRepositoryRepository repository,
+        ICurrentUserProvider currentUserProvider,
+        IUserProfileRepository userProfileRepository)
     {
         this.httpContext = httpContextAccessor.HttpContext ??
                            throw new ArgumentNullException(null, "HttpContext is not available");
 
         this.gitOptions = gitOptions;
         this.repository = repository;
+        this.currentUserProvider = currentUserProvider;
+        this.userProfileRepository = userProfileRepository;
     }
 
     public async Task Handle(string repositoryName, CancellationToken cancellationToken = default)
     {
         var gitRepository = await repository.GetGitRepository(repositoryName, cancellationToken) ??
-                            throw new NotFoundException();
+                            throw new NotFoundException("Repository not found");
+
+        var currentUser = currentUserProvider.GetCurrentUser();
+        var userProfile = await userProfileRepository.GetUserProfile(currentUser.Id, cancellationToken) ??
+                          throw new NotFoundException("User profile not found");
 
         var basePath = gitOptions.Value.BasePath;
         var gitPath = Path.Combine(basePath, $"{gitRepository.Name}.git");
@@ -63,10 +75,10 @@ public class GitBackend
                 { "CONTENT_TYPE", httpContext.Request.ContentType },
                 { "CONTENT_LENGTH", httpContext.Request.ContentLength?.ToString(CultureInfo.InvariantCulture) },
                 { "HTTP_CONTENT_ENCODING", httpContext.Request.Headers.ContentEncoding },
-                { "REMOTE_USER", httpContext.User.Identity?.Name },
+                { "REMOTE_USER", currentUser.Login },
                 { "REMOTE_ADDR", httpContext.Connection.RemoteIpAddress?.ToString() },
-                { "GIT_COMMITTER_NAME", "pyro" }, // TODO: Use real user name
-                { "GIT_COMMITTER_EMAIL", "pyro@localhost.local" },
+                { "GIT_COMMITTER_NAME", currentUser.Login },
+                { "GIT_COMMITTER_EMAIL", userProfile.Email },
             },
         };
 

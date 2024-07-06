@@ -27,6 +27,7 @@ public static partial class IdentityMapper
     [MapperIgnoreSource(nameof(User.Password))]
     [MapperIgnoreSource(nameof(User.Salt))]
     [MapperIgnoreSource(nameof(User.Tokens))]
+    [MapperIgnoreSource(nameof(User.AccessTokens))]
     [MapperIgnoreSource(nameof(User.DomainEvents))]
     public static partial UserResponse ToResponse(this User user);
 
@@ -34,10 +35,22 @@ public static partial class IdentityMapper
 
     public static partial CreateUser ToCommand(this CreateUserRequest user);
 
-    [MapProperty([nameof(TokenPair.AccessToken), nameof(Token.Value)], [nameof(TokenPairResponse.AccessToken)])]
-    [MapProperty([nameof(TokenPair.RefreshToken), nameof(Token.Value)], [nameof(TokenPairResponse.RefreshToken)])]
-    public static partial TokenPairResponse ToResponse(this TokenPair tokenPair);
+    [MapProperty([nameof(JwtTokenPair.AccessToken), nameof(Token.Value)], [nameof(TokenPairResponse.AccessToken)])]
+    [MapProperty([nameof(JwtTokenPair.RefreshToken), nameof(Token.Value)], [nameof(TokenPairResponse.RefreshToken)])]
+    public static partial TokenPairResponse ToResponse(this JwtTokenPair jwtTokenPair);
 
     [MapperIgnoreSource(nameof(RefreshTokenResult.IsSuccess))]
     public static partial TokenResponse ToResponse(this RefreshTokenResult token);
+
+    public static partial CreateAccessToken ToCommand(this CreateAccessTokenRequest token);
+
+    public static partial CreateAccessTokenResult ToResponse(this CreateAccessTokenResult token);
+
+    [MapperIgnoreSource(nameof(AccessToken.Id))]
+    [MapperIgnoreSource(nameof(AccessToken.Token))]
+    [MapperIgnoreSource(nameof(AccessToken.Salt))]
+    [MapperIgnoreSource(nameof(AccessToken.UserId))]
+    public static partial AccessTokenResponse ToResponse(this AccessToken token);
+
+    public static partial IEnumerable<AccessTokenResponse> ToResponse(this IEnumerable<AccessToken> token);
 }

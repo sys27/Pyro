@@ -5,6 +5,7 @@ using JWT;
 using JWT.Algorithms;
 using JWT.Extensions.AspNetCore;
 using JWT.Extensions.AspNetCore.Factories;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Options;
@@ -17,6 +18,8 @@ namespace Pyro.Extensions;
 
 internal static class AuthExtensions
 {
+    public const string BasicAuthenticationScheme = "Basic";
+
     public static IServiceCollection AddAuth(this IServiceCollection services)
     {
         services.AddDataProtection()
@@ -35,7 +38,9 @@ internal static class AuthExtensions
         services.AddSingleton<IIdentityFactory, PyroClaimsIdentityFactory>();
 
         services.ConfigureOptions<JwtAuthenticationConfigureOptions>();
-        services.AddAuthentication().AddJwt();
+        services.AddAuthentication(JwtAuthenticationDefaults.AuthenticationScheme)
+            .AddJwt()
+            .AddBasicAuthentication();
         services.AddAuthorization();
 
         services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
@@ -44,6 +49,9 @@ internal static class AuthExtensions
 
         return services;
     }
+
+    private static AuthenticationBuilder AddBasicAuthentication(this AuthenticationBuilder builder)
+        => builder.AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>(BasicAuthenticationScheme, null);
 
     private sealed class JwtAuthenticationConfigureOptions : IPostConfigureOptions<JwtAuthenticationOptions>
     {

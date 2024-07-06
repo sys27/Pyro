@@ -8,4 +8,5 @@ export class Endpoints {
 
     public static readonly Repositories: string = '/api/repositories';
     public static readonly Profile: string = '/api/profile';
+    public static readonly AccessTokens: string = `${this.Users}/access-tokens`;
 }

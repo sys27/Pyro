@@ -13,14 +13,14 @@ public record LoginCommand(string Login, string Password) : IRequest<LoginResult
 
 public readonly struct LoginResult : IEquatable<LoginResult>
 {
-    private LoginResult(bool isSuccess, TokenPair? tokenPair)
+    private LoginResult(bool isSuccess, JwtTokenPair? tokenPair)
     {
         IsSuccess = isSuccess;
         TokenPair = tokenPair;
     }
 
-    public static LoginResult Success(TokenPair tokenPair)
-        => new LoginResult(true, tokenPair);
+    public static LoginResult Success(JwtTokenPair jwtTokenPair)
+        => new LoginResult(true, jwtTokenPair);
 
     public static LoginResult Fail()
         => new LoginResult(false, null);
@@ -43,7 +43,7 @@ public readonly struct LoginResult : IEquatable<LoginResult>
     [MemberNotNullWhen(true, nameof(TokenPair))]
     public bool IsSuccess { get; }
 
-    public TokenPair? TokenPair { get; }
+    public JwtTokenPair? TokenPair { get; }
 }
 
 public class LoginValidator : AbstractValidator<LoginCommand>
@@ -56,7 +56,6 @@ public class LoginValidator : AbstractValidator<LoginCommand>
 
         RuleFor(x => x.Password)
             .NotEmpty()
-            .MinimumLength(8)
             .MaximumLength(50);
     }
 }
@@ -65,13 +64,13 @@ public class LoginHandler : IRequestHandler<LoginCommand, LoginResult>
 {
     private readonly ILogger<LoginHandler> logger;
     private readonly IUserRepository repository;
-    private readonly PasswordService passwordService;
+    private readonly IPasswordService passwordService;
     private readonly TokenService tokenService;
 
     public LoginHandler(
         ILogger<LoginHandler> logger,
         IUserRepository repository,
-        PasswordService passwordService,
+        IPasswordService passwordService,
         TokenService tokenService)
     {
         this.logger = logger;

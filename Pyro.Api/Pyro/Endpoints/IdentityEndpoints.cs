@@ -108,6 +108,60 @@ internal static class IdentityEndpoints
             .WithName("Update User")
             .WithOpenApi();
 
+        var accessTokenBuilder = usersBuilder.MapGroup("/access-tokens")
+            .WithTags("Access Tokens");
+
+        accessTokenBuilder.MapGet("/", async (
+                IMediator mediator,
+                CancellationToken cancellationToken) =>
+            {
+                var request = new GetAccessTokens();
+                var accessTokens = await mediator.Send(request, cancellationToken);
+                var result = accessTokens.ToResponse();
+
+                return Results.Ok(result);
+            })
+            .Produces<IReadOnlyList<AccessTokenResponse>>()
+            .Produces(401)
+            .Produces(403)
+            .ProducesProblem(500)
+            .WithName("Get Access Tokens")
+            .WithOpenApi();
+
+        accessTokenBuilder.MapPost("/", async (
+                IMediator mediator,
+                PyroDbContext dbContext,
+                CreateAccessTokenRequest request,
+                CancellationToken cancellationToken) =>
+            {
+                var command = request.ToCommand();
+                var result = await mediator.Send(command, cancellationToken);
+                await dbContext.SaveChangesAsync(cancellationToken);
+
+                return Results.Created((string)null!, result.ToResponse());
+            })
+            .Produces<CreateAccessTokenResult>()
+            .ProducesValidationProblem()
+            .Produces(401)
+            .Produces(403)
+            .ProducesProblem(500)
+            .WithName("Create Access Token")
+            .WithOpenApi();
+
+        accessTokenBuilder.MapDelete("/{name}", async (
+                IMediator mediator,
+                PyroDbContext dbContext,
+                string name,
+                CancellationToken cancellationToken)
+            =>
+        {
+            var command = new DeleteAccessToken(name);
+            await mediator.Send(command, cancellationToken);
+            await dbContext.SaveChangesAsync(cancellationToken);
+
+            return Results.Ok();
+        });
+
         return app;
     }
 

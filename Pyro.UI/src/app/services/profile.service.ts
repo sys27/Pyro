@@ -8,7 +8,7 @@ import { PyroResponse, ResponseError } from '../models/response';
     providedIn: 'root',
 })
 export class ProfileService {
-    public constructor(private http: HttpClient) {}
+    public constructor(private readonly http: HttpClient) {}
 
     public getProfile(): Observable<PyroResponse<Profile>> {
         return this.http
