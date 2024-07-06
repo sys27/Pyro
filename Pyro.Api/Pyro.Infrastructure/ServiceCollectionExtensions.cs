@@ -18,7 +18,7 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        services.Configure<GitService.Options>(configuration.GetSection(GitService.Options.Section));
+        services.Configure<GitOptions>(configuration.GetSection(GitOptions.Section));
 
         services.AddTransient<DomainEventInterceptor>();
         services.AddDbContext<PyroDbContext>((provider, options) => options

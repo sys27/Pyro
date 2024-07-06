@@ -1,6 +1,7 @@
 // Copyright (c) Dmytro Kyshchenko. All rights reserved.
 // Licensed under the GPL-3.0 license. See LICENSE file in the project root for full license information.
 
+using System.Diagnostics;
 using LibGit2Sharp;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -16,13 +17,13 @@ internal class GitService : IGitService
 {
     private const string ReadmeFile = "README.md";
 
-    private readonly Options options;
+    private readonly GitOptions options;
     private readonly ILogger<GitService> logger;
     private readonly TimeProvider timeProvider;
     private readonly IUserProfileRepository profileRepository;
 
     public GitService(
-        IOptions<Options> options,
+        IOptions<GitOptions> options,
         ILogger<GitService> logger,
         TimeProvider timeProvider,
         IUserProfileRepository profileRepository)
@@ -36,6 +37,20 @@ internal class GitService : IGitService
     private string GetGitPath(GitRepository repository)
         => Path.Combine(options.BasePath, $"{repository.Name}.git");
 
+    private static void MakeFileExecutable(string filePath)
+    {
+        using var process = new Process();
+        process.StartInfo = new ProcessStartInfo
+        {
+            FileName = "chmod",
+            Arguments = $"+x \"{filePath}\"",
+            UseShellExecute = false,
+        };
+
+        process.Start();
+        process.WaitForExit();
+    }
+
     public async Task InitializeRepository(
         GitRepository gitRepo,
         CancellationToken cancellationToken = default)
@@ -45,6 +60,17 @@ internal class GitService : IGitService
 
         var gitPath = GetGitPath(gitRepo);
         gitPath = Repository.Init(gitPath, true);
+
+        var postUpdateHookPath = Path.Combine(gitPath, "hooks", "post-update");
+
+        // lang=sh
+        const string postUpdateContent =
+            """
+            #!/bin/sh
+            exec git update-server-info
+            """;
+        await File.WriteAllTextAsync(postUpdateHookPath, postUpdateContent, cancellationToken);
+        MakeFileExecutable(postUpdateHookPath);
 
         var clonePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
         clonePath = Repository.Clone(gitPath, clonePath);
@@ -59,7 +85,9 @@ internal class GitService : IGitService
 
         Commands.Stage(repo, ReadmeFile);
         repo.Commit("Initial commit", signature, signature);
-        var branch = repo.Branches.Rename(repo.Head, gitRepo.DefaultBranch);
+        var branch = gitRepo.DefaultBranch == "master"
+            ? repo.Branches[gitRepo.DefaultBranch]
+            : repo.Branches.Rename(repo.Head, gitRepo.DefaultBranch);
 
         var origin = repo.Network.Remotes["origin"];
         repo.Network.Push(origin, branch.CanonicalName);
@@ -239,12 +267,5 @@ internal class GitService : IGitService
         }
 
         return (repository.Head.Tip, null);
-    }
-
-    public class Options
-    {
-        public const string Section = "Git";
-
-        public required string BasePath { get; init; }
     }
 }

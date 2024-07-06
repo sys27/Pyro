@@ -1,11 +1,9 @@
 // Copyright (c) Dmytro Kyshchenko. All rights reserved.
 // Licensed under the GPL-3.0 license. See LICENSE file in the project root for full license information.
 
-using System.Diagnostics;
 using System.Text.Json;
 using FluentValidation;
 using Hellang.Middleware.ProblemDetails;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.FileProviders;
 using Pyro;
@@ -47,6 +45,9 @@ builder.Services.AddAuth();
 
 builder.Services.AddTransient<IStartupFilter, MigrationStartupFilter>();
 
+// TODO:
+builder.Services.AddScoped<GitBackend>();
+
 var app = builder.Build();
 
 app.UseProblemDetails();
@@ -54,10 +55,7 @@ app.UseProblemDetails();
 if (!app.Environment.IsDevelopment())
 {
     app.UseHsts();
-}
 
-if (!app.Environment.IsDevelopment())
-{
     app.UseFileServer(new FileServerOptions
     {
         EnableDefaultFiles = true,
@@ -78,5 +76,7 @@ app.MapGroup("/api")
     .MapIdentityEndpoints()
     .MapProfileEndpoints()
     .MapGitRepositoryEndpoints();
+
+app.MapGitBackendEndpoints();
 
 app.Run();
