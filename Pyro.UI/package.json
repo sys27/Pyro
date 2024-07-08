@@ -19,7 +19,7 @@
     "@angular/platform-browser-dynamic": "^18.0.6",
     "@angular/router": "^18.0.6",
     "dompurify": "^3.1.6",
-    "highlight.js": "^11.9.0",
+    "highlight.js": "^11.10.0",
     "marked": "^13.0.2",
     "marked-alert": "^2.0.1",
     "marked-highlight": "^2.1.3",
