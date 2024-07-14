@@ -3,9 +3,8 @@
 
 using MediatR;
 
-namespace Pyro.Domain.Core.Models;
+namespace Pyro.Domain.Shared.Models;
 
-public interface IIntegrationEvent : INotification
+public interface IDomainEvent : INotification
 {
-    Guid MessageId { get; }
 }

@@ -2,8 +2,8 @@
 // Licensed under the GPL-3.0 license. See LICENSE file in the project root for full license information.
 
 using System.Security.Claims;
-using Pyro.Domain.Core;
-using Pyro.Domain.Core.Models;
+using Pyro.Domain.Shared;
+using Pyro.Domain.Shared.Models;
 
 namespace Pyro.Services;
 

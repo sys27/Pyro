@@ -1,9 +1,9 @@
 // Copyright (c) Dmytro Kyshchenko. All rights reserved.
 // Licensed under the GPL-3.0 license. See LICENSE file in the project root for full license information.
 
-using Pyro.Domain.Core.Models;
+using Pyro.Domain.Shared.Models;
 
-namespace Pyro.Domain.Core;
+namespace Pyro.Domain.Shared;
 
 /// <summary>
 /// Represents a bus that can be used to publish and consume integration events.

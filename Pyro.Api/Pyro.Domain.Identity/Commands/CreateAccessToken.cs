@@ -3,9 +3,9 @@
 
 using FluentValidation;
 using MediatR;
-using Pyro.Domain.Core;
-using Pyro.Domain.Core.Exceptions;
 using Pyro.Domain.Identity.Models;
+using Pyro.Domain.Shared;
+using Pyro.Domain.Shared.Exceptions;
 
 namespace Pyro.Domain.Identity.Commands;
 
@@ -45,9 +45,8 @@ public class CreateAccessTokenHandler : IRequestHandler<CreateAccessToken, Creat
     public async Task<CreateAccessTokenResult> Handle(CreateAccessToken request, CancellationToken cancellationToken)
     {
         var currentUser = currentUserProvider.GetCurrentUser();
-        var user = await userRepository.GetUserById(currentUser.Id, cancellationToken);
-        if (user is null)
-            throw new DomainException("User not found");
+        var user = await userRepository.GetUserById(currentUser.Id, cancellationToken) ??
+                   throw new DomainException("User not found");
 
         var token = passwordService.GeneratePassword();
         var (tokenHash, salt) = passwordService.GeneratePasswordHash(token);

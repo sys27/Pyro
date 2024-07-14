@@ -3,8 +3,8 @@
 
 using MediatR;
 using Microsoft.Extensions.Logging;
-using Pyro.Domain.Core.Models;
 using Pyro.Domain.Git;
+using Pyro.Domain.Shared.Models;
 
 namespace Pyro.Domain.GitRepositories;
 

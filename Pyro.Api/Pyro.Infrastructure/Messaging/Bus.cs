@@ -6,8 +6,8 @@ using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Pyro.Domain.Core;
-using Pyro.Domain.Core.Models;
+using Pyro.Domain.Shared;
+using Pyro.Domain.Shared.Models;
 using Pyro.Infrastructure.DataAccess;
 
 namespace Pyro.Infrastructure.Messaging;

@@ -4,10 +4,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Pyro.Domain.Core;
 using Pyro.Domain.Git;
 using Pyro.Domain.GitRepositories;
 using Pyro.Domain.Identity;
+using Pyro.Domain.Shared;
 using Pyro.Domain.UserProfiles;
 using Pyro.Infrastructure.DataAccess;
 using Pyro.Infrastructure.Messaging;

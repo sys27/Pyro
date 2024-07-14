@@ -7,9 +7,9 @@ using System.Globalization;
 using System.IO.Pipelines;
 using System.Text;
 using Microsoft.Extensions.Options;
-using Pyro.Domain.Core;
-using Pyro.Domain.Core.Exceptions;
 using Pyro.Domain.GitRepositories;
+using Pyro.Domain.Shared;
+using Pyro.Domain.Shared.Exceptions;
 using Pyro.Domain.UserProfiles;
 using Pyro.Infrastructure;
 

@@ -3,8 +3,8 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["Pyro.Api/Pyro/Pyro.csproj", "Pyro/"]
 COPY ["Pyro.Api/Pyro.Domain/Pyro.Domain.csproj", "Pyro.Domain/"]
-COPY ["Pyro.Api/Pyro.Domain.Core/Pyro.Domain.Core.csproj", "Pyro.Domain.Core/"]
 COPY ["Pyro.Api/Pyro.Domain.Identity/Pyro.Domain.Identity.csproj", "Pyro.Domain.Identity/"]
+COPY ["Pyro.Api/Pyro.Domain.Shared/Pyro.Domain.Shared.csproj", "Pyro.Domain.Shared/"]
 COPY ["Pyro.Api/Pyro.Infrastructure/Pyro.Infrastructure.csproj", "Pyro.Infrastructure/"]
 COPY ["Pyro.Api/Pyro.sln", "./"]
 COPY ["Pyro.Api/Directory.Build.targets", "./"]

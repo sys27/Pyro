@@ -30,9 +30,9 @@ export class UserNewComponent implements OnInit {
     public roles: Role[] | undefined;
 
     public form = this.formBuilder.nonNullable.group({
-        login: ['', [Validators.required]],
-        password: ['', Validators.required],
-        roles: new FormControl<Role[]>([]),
+        login: ['', [Validators.required, Validators.maxLength(32)]],
+        password: ['', [Validators.required, Validators.minLength(8)]],
+        roles: new FormControl<Role[]>([], Validators.required),
     });
 
     public constructor(

@@ -14,9 +14,12 @@ import { CreateRepository, RepositoryService } from '../../../services/repositor
 })
 export class RepositoryNewComponent {
     public form = this.formBuilder.nonNullable.group({
-        name: ['', Validators.required],
-        description: [''],
-        defaultBranch: ['', Validators.required],
+        name: [
+            '',
+            [Validators.required, Validators.maxLength(20), Validators.pattern(/^[a-zA-Z0-9-_]+$/)],
+        ],
+        description: ['', [Validators.maxLength(250)]],
+        defaultBranch: ['', [Validators.required, Validators.maxLength(50)]],
     });
 
     public constructor(

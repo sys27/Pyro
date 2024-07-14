@@ -3,8 +3,8 @@
 
 using FluentValidation;
 using MediatR;
-using Pyro.Domain.Core;
-using Pyro.Domain.Core.Exceptions;
+using Pyro.Domain.Shared;
+using Pyro.Domain.Shared.Exceptions;
 
 namespace Pyro.Domain.Identity.Commands;
 

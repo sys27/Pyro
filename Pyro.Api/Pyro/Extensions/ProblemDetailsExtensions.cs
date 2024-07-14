@@ -3,7 +3,7 @@
 
 using FluentValidation;
 using Hellang.Middleware.ProblemDetails;
-using Pyro.Domain.Core.Exceptions;
+using Pyro.Domain.Shared.Exceptions;
 
 namespace Pyro.Extensions;
 

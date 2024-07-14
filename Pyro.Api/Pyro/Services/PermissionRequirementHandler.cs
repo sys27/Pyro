@@ -2,7 +2,7 @@
 // Licensed under the GPL-3.0 license. See LICENSE file in the project root for full license information.
 
 using Microsoft.AspNetCore.Authorization;
-using Pyro.Domain.Core;
+using Pyro.Domain.Shared;
 
 namespace Pyro.Services;
 

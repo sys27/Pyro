@@ -2,9 +2,9 @@
 // Licensed under the GPL-3.0 license. See LICENSE file in the project root for full license information.
 
 using MediatR;
-using Pyro.Domain.Core;
-using Pyro.Domain.Core.Exceptions;
 using Pyro.Domain.Identity.Models;
+using Pyro.Domain.Shared;
+using Pyro.Domain.Shared.Exceptions;
 
 namespace Pyro.Domain.Identity.Queries;
 
