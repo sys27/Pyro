@@ -5,10 +5,10 @@ using System.Diagnostics;
 using LibGit2Sharp;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Pyro.Domain.Core.Exceptions;
 using Pyro.Domain.Git;
 using Pyro.Domain.GitRepositories;
 using Pyro.Domain.Identity.Models;
+using Pyro.Domain.Shared.Exceptions;
 using Pyro.Domain.UserProfiles;
 
 namespace Pyro.Infrastructure;

@@ -3,7 +3,7 @@
 
 using MediatR;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Pyro.Domain.Core.Models;
+using Pyro.Domain.Shared.Models;
 
 namespace Pyro.Infrastructure.DataAccess;
 

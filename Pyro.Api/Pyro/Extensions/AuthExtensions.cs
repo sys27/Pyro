@@ -9,8 +9,8 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Options;
-using Pyro.Domain.Core;
 using Pyro.Domain.Identity;
+using Pyro.Domain.Shared;
 using Pyro.Infrastructure.DataAccess;
 using Pyro.Services;
 

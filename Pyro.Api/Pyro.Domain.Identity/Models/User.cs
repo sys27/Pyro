@@ -2,8 +2,8 @@
 // Licensed under the GPL-3.0 license. See LICENSE file in the project root for full license information.
 
 using System.Diagnostics.CodeAnalysis;
-using Pyro.Domain.Core.Exceptions;
-using Pyro.Domain.Core.Models;
+using Pyro.Domain.Shared.Exceptions;
+using Pyro.Domain.Shared.Models;
 
 namespace Pyro.Domain.Identity.Models;
 
@@ -15,7 +15,6 @@ public class User : DomainEntity
     private readonly List<AuthenticationToken> tokens = [];
     private readonly List<AccessToken> accessTokens = [];
 
-    private string login;
     private byte[] password;
     private byte[] salt;
 
@@ -35,22 +34,7 @@ public class User : DomainEntity
 
     public Guid Id { get; init; }
 
-    public required string Login
-    {
-        get => login;
-
-        [MemberNotNull(nameof(login))]
-        init
-        {
-            if (string.IsNullOrWhiteSpace(value))
-                throw new DomainValidationException("Login cannot be null or empty.");
-
-            if (value.Length > 32)
-                throw new DomainValidationException("Login cannot be longer than 32 characters.");
-
-            login = value;
-        }
-    }
+    public required string Login { get; init; }
 
     public required IReadOnlyList<byte> Password
     {

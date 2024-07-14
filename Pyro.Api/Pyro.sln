@@ -18,7 +18,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pyro.Domain", "Pyro.Domain\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pyro.Infrastructure", "Pyro.Infrastructure\Pyro.Infrastructure.csproj", "{C2D4FD96-A3C9-4FB1-B26D-7FA08977AAF3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pyro.Domain.Core", "Pyro.Domain.Core\Pyro.Domain.Core.csproj", "{00B74122-71B4-4826-9992-A013AE3B94A2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pyro.Domain.Shared", "Pyro.Domain.Shared\Pyro.Domain.Shared.csproj", "{00B74122-71B4-4826-9992-A013AE3B94A2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pyro.Domain.Identity", "Pyro.Domain.Identity\Pyro.Domain.Identity.csproj", "{F8F49194-B0E1-4C19-832D-C5B4A4B85289}"
 EndProject

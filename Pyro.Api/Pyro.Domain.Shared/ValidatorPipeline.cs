@@ -4,7 +4,7 @@
 using FluentValidation;
 using MediatR;
 
-namespace Pyro.Domain.Core;
+namespace Pyro.Domain.Shared;
 
 public class ValidatorPipeline<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : notnull

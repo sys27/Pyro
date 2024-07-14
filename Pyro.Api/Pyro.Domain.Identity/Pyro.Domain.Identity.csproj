@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Pyro.Domain.Core\Pyro.Domain.Core.csproj"/>
+    <ProjectReference Include="..\Pyro.Domain.Shared\Pyro.Domain.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>

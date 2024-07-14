@@ -14,9 +14,9 @@ import { ProfileService, UpdateProfile } from '../../../services/profile.service
 })
 export class ProfileComponent implements OnInit {
     public form = this.formBuilder.group({
-        email: ['', Validators.required, Validators.email],
-        name: [''],
-        status: [''],
+        email: ['', [Validators.required, Validators.email, Validators.maxLength(150)]],
+        name: ['', [Validators.maxLength(50)]],
+        status: ['', [Validators.maxLength(150)]],
     });
 
     public constructor(
