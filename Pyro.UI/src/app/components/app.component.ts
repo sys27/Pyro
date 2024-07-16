@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { MenuItem, PrimeNGConfig } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
@@ -11,6 +11,7 @@ import { SplitButtonModule } from 'primeng/splitbutton';
 import { ToastModule } from 'primeng/toast';
 import { ToolbarModule } from 'primeng/toolbar';
 import { AuthService } from '../services/auth.service';
+import { NotificationService } from '../services/notification.service';
 import { ThemeService } from '../services/theme.service';
 
 @Component({
@@ -33,7 +34,7 @@ import { ThemeService } from '../services/theme.service';
     templateUrl: './app.component.html',
     styleUrl: './app.component.css',
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
     public title = 'Pyro';
     public themeIcon: string = 'pi pi-sun';
     public loginMenuItems: MenuItem[] = [
@@ -46,11 +47,16 @@ export class AppComponent implements OnInit {
         private readonly router: Router,
         public readonly authService: AuthService,
         private readonly themeService: ThemeService,
+        private readonly notificationService: NotificationService,
     ) {}
 
     public ngOnInit(): void {
         this.themeService.useTheme();
         this.primeNg.ripple = true;
+    }
+
+    public ngOnDestroy(): void {
+        this.notificationService.ngOnDestroy();
     }
 
     public toggleThemeClick(): void {

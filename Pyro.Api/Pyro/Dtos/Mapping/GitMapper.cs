@@ -15,6 +15,7 @@ public static partial class GitMapper
 {
     [MapperIgnoreSource(nameof(GitRepository.Id))]
     [MapperIgnoreSource(nameof(GitRepository.DomainEvents))]
+    [MapperIgnoreSource(nameof(GitRepository.IsNew))]
     public static partial GitRepositoryResponse ToResponse(this GitRepository gitRepository);
 
     public static partial IReadOnlyList<GitRepositoryResponse> ToResponse(this IReadOnlyList<GitRepository> gitRepository);

@@ -36,7 +36,9 @@ public class CreateGitRepositoryHandler : IRequestHandler<CreateGitRepository, G
     private readonly IGitRepositoryRepository repository;
     private readonly IBus bus;
 
-    public CreateGitRepositoryHandler(IGitRepositoryRepository repository, IBus bus)
+    public CreateGitRepositoryHandler(
+        IGitRepositoryRepository repository,
+        IBus bus)
     {
         this.repository = repository;
         this.bus = bus;

@@ -13,24 +13,27 @@ namespace Pyro;
     JsonSerializerDefaults.Web,
     AllowTrailingCommas = true,
     GenerationMode = JsonSourceGenerationMode.Metadata)]
+[JsonSerializable(typeof(CreateAccessTokenRequest))]
 [JsonSerializable(typeof(CreateGitRepositoryRequest))]
 [JsonSerializable(typeof(CreateUserRequest))]
 [JsonSerializable(typeof(LoginRequest))]
 [JsonSerializable(typeof(RefreshTokenRequest))]
 [JsonSerializable(typeof(UpdateUserProfileRequest))]
 [JsonSerializable(typeof(UpdateUserRequest))]
+[JsonSerializable(typeof(AccessTokenResponse))]
+[JsonSerializable(typeof(BranchItemResponse))]
 [JsonSerializable(typeof(CommitInfoResponse))]
 [JsonSerializable(typeof(CommitUserResponse))]
-[JsonSerializable(typeof(TreeViewResponse))]
-[JsonSerializable(typeof(TreeViewItemResponse))]
+[JsonSerializable(typeof(GitRepositoryCreated))]
 [JsonSerializable(typeof(GitRepositoryResponse))]
 [JsonSerializable(typeof(PermissionResponse))]
 [JsonSerializable(typeof(RoleResponse))]
 [JsonSerializable(typeof(TokenPairResponse))]
 [JsonSerializable(typeof(TokenResponse))]
+[JsonSerializable(typeof(TreeViewItemResponse))]
+[JsonSerializable(typeof(TreeViewResponse))]
 [JsonSerializable(typeof(UserProfileResponse))]
 [JsonSerializable(typeof(UserResponse))]
-[JsonSerializable(typeof(GitRepositoryCreated))]
 internal partial class PyroJsonContext : JsonSerializerContext
 {
 }

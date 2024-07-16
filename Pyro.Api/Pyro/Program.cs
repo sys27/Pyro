@@ -4,6 +4,8 @@
 using System.Text.Json;
 using FluentValidation;
 using Hellang.Middleware.ProblemDetails;
+using Microsoft.AspNetCore.Http.Connections;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.FileProviders;
 using Pyro;
@@ -27,6 +29,10 @@ builder.Services.AddProblemDetails(builder.Environment);
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddSingleton<IContentTypeProvider, FileExtensionContentTypeProvider>();
+
+builder.Services.AddSignalR(options => options.EnableDetailedErrors = builder.Environment.IsDevelopment());
+builder.Services.AddSingleton<IUserIdProvider, LoginUserIdProvider>();
+builder.Services.AddSingleton<INotificationService, NotificationService>();
 
 builder.Services.AddIdentityDomain();
 builder.Services.AddInfrastructure(builder.Configuration);
@@ -78,6 +84,11 @@ app.MapGroup("/api")
     .MapIdentityEndpoints()
     .MapProfileEndpoints()
     .MapGitRepositoryEndpoints();
+
+app.MapHub<PyroHub>(
+        "/signalr",
+        options => options.Transports = HttpTransportType.WebSockets | HttpTransportType.ServerSentEvents)
+    .RequireAuthorization();
 
 app.MapGitBackendEndpoints();
 

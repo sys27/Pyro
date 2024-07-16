@@ -8,6 +8,7 @@ using JWT.Extensions.AspNetCore.Factories;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Pyro.Domain.Identity;
 using Pyro.Domain.Shared;
@@ -53,6 +54,19 @@ internal static class AuthExtensions
     private static AuthenticationBuilder AddBasicAuthentication(this AuthenticationBuilder builder)
         => builder.AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>(BasicAuthenticationScheme, null);
 
+    private static AuthenticationBuilder AddJwt(this AuthenticationBuilder builder)
+    {
+        builder.Services.AddJwtDecoder();
+        builder.Services.TryAddSingleton<IDateTimeProvider, SystemClockDatetimeProvider>();
+
+        builder.Services.TryAddSingleton<IIdentityFactory, ClaimsIdentityFactory>();
+        builder.Services.TryAddSingleton<ITicketFactory, DefaultTicketFactory>();
+
+        return builder.AddScheme<JwtAuthenticationOptions, PyroJwtAuthenticationHandler>(
+            JwtAuthenticationDefaults.AuthenticationScheme,
+            null);
+    }
+
     private sealed class JwtAuthenticationConfigureOptions : IPostConfigureOptions<JwtAuthenticationOptions>
     {
         private readonly ISigningKeyService signingKeyService;
@@ -70,5 +84,18 @@ internal static class AuthExtensions
             options.VerifySignature = true;
             options.Keys = keys;
         }
+    }
+
+    private sealed class SystemClockDatetimeProvider : IDateTimeProvider
+    {
+#pragma warning disable CS0618 // Type or member is obsolete
+        private readonly ISystemClock clock;
+
+        public SystemClockDatetimeProvider(ISystemClock clock)
+            => this.clock = clock;
+
+        public DateTimeOffset GetNow()
+            => clock.UtcNow;
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 }

@@ -1,8 +1,10 @@
-import { HttpInterceptorFn } from '@angular/common/http';
+import { HttpContextToken, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { of, switchMap, take } from 'rxjs';
 import { Endpoints } from '../endpoints';
 import { AuthService } from './auth.service';
+
+export const ALLOW_ANONYMOUS = new HttpContextToken<boolean>(() => false);
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
     let authService = inject(AuthService);
@@ -25,11 +27,14 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         }),
         switchMap(currentUser => {
             if (currentUser) {
-                req = req.clone({
-                    setHeaders: {
-                        Authorization: `Bearer ${currentUser.accessToken}`,
-                    },
-                });
+                let allowAnonymous = req.context.get(ALLOW_ANONYMOUS);
+                if (!allowAnonymous) {
+                    req = req.clone({
+                        setHeaders: {
+                            Authorization: `Bearer ${currentUser.accessToken}`,
+                        },
+                    });
+                }
             }
 
             return next(req);

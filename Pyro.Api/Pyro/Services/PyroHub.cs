@@ -1,8 +1,10 @@
 // Copyright (c) Dmytro Kyshchenko. All rights reserved.
 // Licensed under the GPL-3.0 license. See LICENSE file in the project root for full license information.
 
-using Pyro.Domain.Shared.Models;
+using Microsoft.AspNetCore.SignalR;
 
-namespace Pyro.Domain.GitRepositories;
+namespace Pyro.Services;
 
-public record GitRepositoryCreated(Guid GitRepositoryId) : IntegrationEvent;
+public class PyroHub : Hub<IPyroHubClient>
+{
+}

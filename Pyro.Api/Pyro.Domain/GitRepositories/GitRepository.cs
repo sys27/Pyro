@@ -17,4 +17,12 @@ public class GitRepository : DomainEntity
     public string? Description { get; init; }
 
     public required string DefaultBranch { get; init; }
+
+    public GitRepositoryStatus Status { get; private set; } = GitRepositoryStatus.New;
+
+    public bool IsNew
+        => Status == GitRepositoryStatus.New;
+
+    public void MarkAsInitialized()
+        => Status = GitRepositoryStatus.Initialized;
 }
