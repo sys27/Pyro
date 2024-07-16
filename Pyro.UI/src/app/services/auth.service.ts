@@ -1,9 +1,10 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpContext } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, catchError, of, switchMap } from 'rxjs';
 import { Endpoints } from '../endpoints';
 import { CurrentUser } from '../models/current-user';
 import { ResponseError } from '../models/response';
+import { ALLOW_ANONYMOUS } from './auth.interceptor';
 
 @Injectable({
     providedIn: 'root',
@@ -48,25 +49,31 @@ export class AuthService {
             throw new Error('No refresh token');
         }
 
-        return this.httpClient.post<RefreshResponse>(Endpoints.Refresh, { refreshToken }).pipe(
-            catchError((error: ResponseError) => {
-                localStorage.removeItem(AuthService.accessTokenKey);
-                localStorage.removeItem(AuthService.refreshTokenKey);
-                this.updateCurrentUser();
+        return this.httpClient
+            .post<RefreshResponse>(
+                Endpoints.Refresh,
+                { refreshToken },
+                { context: new HttpContext().set(ALLOW_ANONYMOUS, true) },
+            )
+            .pipe(
+                catchError((error: ResponseError) => {
+                    localStorage.removeItem(AuthService.accessTokenKey);
+                    localStorage.removeItem(AuthService.refreshTokenKey);
+                    this.updateCurrentUser();
 
-                return of(error);
-            }),
-            switchMap(response => {
-                if (response instanceof ResponseError) {
+                    return of(error);
+                }),
+                switchMap(response => {
+                    if (response instanceof ResponseError) {
+                        return this.currentUser;
+                    }
+
+                    localStorage.setItem(AuthService.accessTokenKey, response.accessToken);
+                    this.updateCurrentUser();
+
                     return this.currentUser;
-                }
-
-                localStorage.setItem(AuthService.accessTokenKey, response.accessToken);
-                this.updateCurrentUser();
-
-                return this.currentUser;
-            }),
-        );
+                }),
+            );
     }
 
     private getUserFromJwt(jwt: string): CurrentUser {

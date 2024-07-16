@@ -6,4 +6,5 @@ namespace Pyro.Dtos.Responses;
 public record GitRepositoryResponse(
     string Name,
     string? Description,
-    string DefaultBranch);
+    string DefaultBranch,
+    int Status);

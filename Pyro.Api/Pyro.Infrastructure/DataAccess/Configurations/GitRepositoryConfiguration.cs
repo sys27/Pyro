@@ -32,6 +32,9 @@ internal class GitRepositoryConfiguration : IEntityTypeConfiguration<GitReposito
             .HasMaxLength(50)
             .IsRequired();
 
+        builder.Property(x => x.Status)
+            .IsRequired();
+
         builder.HasIndex(x => x.Name)
             .IsUnique()
             .HasDatabaseName("IX_GitRepository_Name");
