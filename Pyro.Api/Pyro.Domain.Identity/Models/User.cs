@@ -12,11 +12,11 @@ public class User : DomainEntity
     public static readonly Guid PyroUser = Guid.Parse("F9BA057A-35B0-4D10-8326-702D8F7EC966");
 
     private readonly List<Role> roles = [];
-    private readonly List<AuthenticationToken> tokens = [];
+    private readonly List<AuthenticationToken> authenticationTokens = [];
     private readonly List<AccessToken> accessTokens = [];
 
-    private byte[] password;
-    private byte[] salt;
+    private byte[] password = [];
+    private byte[] salt = [];
 
     public static User Create(string login, byte[] password, byte[] salt)
     {
@@ -36,7 +36,7 @@ public class User : DomainEntity
 
     public required string Login { get; init; }
 
-    public required IReadOnlyList<byte> Password
+    public IReadOnlyList<byte> Password
     {
         get => password;
 
@@ -53,7 +53,7 @@ public class User : DomainEntity
         }
     }
 
-    public required IReadOnlyList<byte> Salt
+    public IReadOnlyList<byte> Salt
     {
         get => salt;
 
@@ -72,13 +72,13 @@ public class User : DomainEntity
 
     public bool IsLocked { get; private set; }
 
-    public IReadOnlyCollection<Role> Roles
+    public IReadOnlyList<Role> Roles
         => roles;
 
-    public IReadOnlyCollection<AuthenticationToken> Tokens
-        => tokens;
+    public IReadOnlyList<AuthenticationToken> AuthenticationTokens
+        => authenticationTokens;
 
-    public IReadOnlyCollection<AccessToken> AccessTokens
+    public IReadOnlyList<AccessToken> AccessTokens
         => accessTokens;
 
     public void Lock()
@@ -95,19 +95,19 @@ public class User : DomainEntity
     public void ClearRoles()
         => roles.Clear();
 
-    public void AddToken(AuthenticationToken token)
+    public void AddAuthenticationToken(AuthenticationToken token)
     {
-        if (tokens.Any(x => x.TokenId == token.TokenId))
+        if (authenticationTokens.Any(x => x.TokenId == token.TokenId))
             return;
 
-        tokens.Add(token);
+        authenticationTokens.Add(token);
     }
 
-    public AuthenticationToken? GetToken(Guid tokenId)
-        => tokens.FirstOrDefault(x => x.TokenId == tokenId);
+    public AuthenticationToken? GetAuthenticationToken(Guid tokenId)
+        => authenticationTokens.FirstOrDefault(x => x.TokenId == tokenId);
 
-    public void ClearTokens()
-        => tokens.Clear();
+    public void ClearAuthenticationTokens()
+        => authenticationTokens.Clear();
 
     public void AddAccessToken(AccessToken token)
     {

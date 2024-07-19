@@ -45,6 +45,16 @@ jobs:
       with:
         images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
+    - name: Run tests
+      uses: docker/build-push-action@v6
+      with:
+        context: .
+        target: test
+        push: false
+        tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-tests
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
     - name: Build and push
       id: push
       uses: docker/build-push-action@v6

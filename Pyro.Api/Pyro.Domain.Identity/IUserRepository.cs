@@ -18,9 +18,9 @@ public interface IUserRepository
         string login,
         CancellationToken cancellationToken = default);
 
-    Task<User> AddUser(User user, CancellationToken cancellationToken);
+    Task<User> AddUser(User user, CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<Role>> GetRolesAsync(CancellationToken cancellationToken);
+    Task<IReadOnlyList<Role>> GetRolesAsync(CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<Permission>> GetPermissionsAsync(CancellationToken cancellationToken);
+    Task<IReadOnlyList<Permission>> GetPermissionsAsync(CancellationToken cancellationToken = default);
 }

@@ -6,7 +6,7 @@ using Pyro.Domain.Identity.Models;
 
 namespace Pyro.Domain.Identity;
 
-public class TokenService
+public class TokenService : ITokenService
 {
     private static readonly Dictionary<string, object> headers = [];
 

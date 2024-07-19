@@ -11,7 +11,7 @@ namespace Pyro.Domain.Identity.Commands;
 public record CreateUser(
     string Login,
     string Password,
-    IEnumerable<string> Roles) : IRequest;
+    IEnumerable<string> Roles) : IRequest<User>;
 
 public class CreateUserValidator : AbstractValidator<CreateUser>
 {
@@ -30,7 +30,7 @@ public class CreateUserValidator : AbstractValidator<CreateUser>
     }
 }
 
-public class CreateUserHandler : IRequestHandler<CreateUser>
+public class CreateUserHandler : IRequestHandler<CreateUser, User>
 {
     private readonly IUserRepository repository;
     private readonly IPasswordService passwordService;
@@ -41,7 +41,7 @@ public class CreateUserHandler : IRequestHandler<CreateUser>
         this.passwordService = passwordService;
     }
 
-    public async Task Handle(CreateUser request, CancellationToken cancellationToken)
+    public async Task<User> Handle(CreateUser request, CancellationToken cancellationToken = default)
     {
         var (password, salt) = passwordService.GeneratePasswordHash(request.Password);
         var user = User.Create(request.Login, password, salt);
@@ -56,5 +56,7 @@ public class CreateUserHandler : IRequestHandler<CreateUser>
             user.AddRole(role);
 
         await repository.AddUser(user, cancellationToken);
+
+        return user;
     }
 }

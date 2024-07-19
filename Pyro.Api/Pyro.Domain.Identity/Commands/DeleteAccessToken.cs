@@ -31,7 +31,7 @@ public class DeleteAccessTokenHandler : IRequestHandler<DeleteAccessToken>
         this.userRepository = userRepository;
     }
 
-    public async Task Handle(DeleteAccessToken request, CancellationToken cancellationToken)
+    public async Task Handle(DeleteAccessToken request, CancellationToken cancellationToken = default)
     {
         var currentUser = currentUserProvider.GetCurrentUser();
         var user = await userRepository.GetUserById(currentUser.Id, cancellationToken) ??

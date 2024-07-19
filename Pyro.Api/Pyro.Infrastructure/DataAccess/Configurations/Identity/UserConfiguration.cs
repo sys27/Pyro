@@ -77,7 +77,7 @@ internal class UserConfiguration : IEntityTypeConfiguration<User>
                     j.HasData(SeedData.UserRoles);
                 });
 
-        builder.HasMany(x => x.Tokens)
+        builder.HasMany(x => x.AuthenticationTokens)
             .WithOne(x => x.User)
             .OnDelete(DeleteBehavior.Cascade);
 
