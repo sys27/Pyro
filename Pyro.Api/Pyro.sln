@@ -22,6 +22,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pyro.Domain.Shared", "Pyro.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pyro.Domain.Identity", "Pyro.Domain.Identity\Pyro.Domain.Identity.csproj", "{F8F49194-B0E1-4C19-832D-C5B4A4B85289}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pyro.Domain.Identity.Tests", "Pyro.Domain.Identity.Tests\Pyro.Domain.Identity.Tests.csproj", "{86D48A6A-6876-4C77-AD4C-707EEF49D4AF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pyro.Domain.Tests", "Pyro.Domain.Tests\Pyro.Domain.Tests.csproj", "{67BFBD98-84F3-4CD3-A70C-A2BA4AF0DA53}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,5 +52,15 @@ Global
 		{F8F49194-B0E1-4C19-832D-C5B4A4B85289}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F8F49194-B0E1-4C19-832D-C5B4A4B85289}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F8F49194-B0E1-4C19-832D-C5B4A4B85289}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86D48A6A-6876-4C77-AD4C-707EEF49D4AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86D48A6A-6876-4C77-AD4C-707EEF49D4AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86D48A6A-6876-4C77-AD4C-707EEF49D4AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86D48A6A-6876-4C77-AD4C-707EEF49D4AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{67BFBD98-84F3-4CD3-A70C-A2BA4AF0DA53}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67BFBD98-84F3-4CD3-A70C-A2BA4AF0DA53}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67BFBD98-84F3-4CD3-A70C-A2BA4AF0DA53}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67BFBD98-84F3-4CD3-A70C-A2BA4AF0DA53}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection
 EndGlobal

@@ -26,7 +26,7 @@ public static partial class IdentityMapper
 
     [MapperIgnoreSource(nameof(User.Password))]
     [MapperIgnoreSource(nameof(User.Salt))]
-    [MapperIgnoreSource(nameof(User.Tokens))]
+    [MapperIgnoreSource(nameof(User.AuthenticationTokens))]
     [MapperIgnoreSource(nameof(User.AccessTokens))]
     [MapperIgnoreSource(nameof(User.DomainEvents))]
     public static partial UserResponse ToResponse(this User user);

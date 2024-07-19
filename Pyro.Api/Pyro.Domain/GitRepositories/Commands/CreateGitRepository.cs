@@ -44,7 +44,9 @@ public class CreateGitRepositoryHandler : IRequestHandler<CreateGitRepository, G
         this.bus = bus;
     }
 
-    public async Task<GitRepository> Handle(CreateGitRepository request, CancellationToken cancellationToken)
+    public async Task<GitRepository> Handle(
+        CreateGitRepository request,
+        CancellationToken cancellationToken = default)
     {
         var gitRepository = new GitRepository
         {

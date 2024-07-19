@@ -25,7 +25,7 @@ public class LogoutHandler : IRequestHandler<Logout>
         this.userRepository = userRepository;
     }
 
-    public async Task Handle(Logout request, CancellationToken cancellationToken)
+    public async Task Handle(Logout request, CancellationToken cancellationToken = default)
     {
         var currentUser = currentUserProvider.GetCurrentUser();
         var user = await userRepository.GetUserById(currentUser.Id, cancellationToken);
@@ -37,6 +37,6 @@ public class LogoutHandler : IRequestHandler<Logout>
         }
 
         // TODO: for now we just remove all refresh tokens
-        user.ClearTokens();
+        user.ClearAuthenticationTokens();
     }
 }

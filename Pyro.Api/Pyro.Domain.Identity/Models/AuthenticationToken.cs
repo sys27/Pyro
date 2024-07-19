@@ -6,13 +6,26 @@ namespace Pyro.Domain.Identity.Models;
 // TODO: remove old tokens
 public class AuthenticationToken
 {
-    public Guid Id { get; init; }
+    public static AuthenticationToken Create(Guid tokenId, User user, DateTimeOffset expiresAt)
+        => new AuthenticationToken
+        {
+            Id = Guid.NewGuid(),
+            TokenId = tokenId,
+            ExpiresAt = expiresAt,
+            UserId = user.Id,
+            User = user,
+        };
 
-    public required Guid TokenId { get; init; }
+    public Guid Id { get; private set; }
 
-    public required DateTimeOffset ExpiresAt { get; init; }
+    public Guid TokenId { get; private set; }
 
-    public required Guid UserId { get; init; }
+    public DateTimeOffset ExpiresAt { get; private set; }
 
-    public required User User { get; init; }
+    public Guid UserId { get; private set; }
+
+    public User User { get; private set; } = null!;
+
+    public bool IsExpired(TimeProvider timeProvider)
+        => ExpiresAt <= timeProvider.GetUtcNow();
 }

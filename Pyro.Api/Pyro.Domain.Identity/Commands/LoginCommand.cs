@@ -65,13 +65,13 @@ public class LoginHandler : IRequestHandler<LoginCommand, LoginResult>
     private readonly ILogger<LoginHandler> logger;
     private readonly IUserRepository repository;
     private readonly IPasswordService passwordService;
-    private readonly TokenService tokenService;
+    private readonly ITokenService tokenService;
 
     public LoginHandler(
         ILogger<LoginHandler> logger,
         IUserRepository repository,
         IPasswordService passwordService,
-        TokenService tokenService)
+        ITokenService tokenService)
     {
         this.logger = logger;
         this.repository = repository;
@@ -79,7 +79,7 @@ public class LoginHandler : IRequestHandler<LoginCommand, LoginResult>
         this.tokenService = tokenService;
     }
 
-    public async Task<LoginResult> Handle(LoginCommand request, CancellationToken cancellationToken)
+    public async Task<LoginResult> Handle(LoginCommand request, CancellationToken cancellationToken = default)
     {
         var user = await repository.GetUserByLogin(request.Login, cancellationToken);
         if (user is null)
@@ -104,14 +104,8 @@ public class LoginHandler : IRequestHandler<LoginCommand, LoginResult>
         }
 
         var tokenPair = await tokenService.GenerateTokenPair(user);
-        var token = new AuthenticationToken
-        {
-            TokenId = tokenPair.RefreshToken.Id,
-            ExpiresAt = tokenPair.RefreshToken.ExpiresAt,
-            UserId = user.Id,
-            User = user,
-        };
-        user.AddToken(token);
+        var token = AuthenticationToken.Create(tokenPair.RefreshToken.Id, user, tokenPair.RefreshToken.ExpiresAt);
+        user.AddAuthenticationToken(token);
 
         return LoginResult.Success(tokenPair);
     }

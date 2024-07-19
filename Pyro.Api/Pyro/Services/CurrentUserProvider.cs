@@ -16,9 +16,8 @@ public class CurrentUserProvider : ICurrentUserProvider
 
     public CurrentUser GetCurrentUser()
     {
-        var httpContext = httpContextAccessor.HttpContext;
-        if (httpContext is null)
-            throw new InvalidOperationException("HttpContext is null. You are probably using the CurrentUserProvider outside of an HTTP request.");
+        var httpContext = httpContextAccessor.HttpContext ??
+                          throw new InvalidOperationException("HttpContext is null. You are probably using the CurrentUserProvider outside of an HTTP request.");
 
         var user = httpContext.User;
         var userId = Guid.Parse(GetClaim(user, "sub"));
@@ -42,9 +41,8 @@ public class CurrentUserProvider : ICurrentUserProvider
 
     private IEnumerable<string> GetClaims(ClaimsPrincipal user, string name)
     {
-        var claims = user.FindAll(name);
-        if (claims is null)
-            throw new InvalidOperationException($"The '{name}' claim was not found.");
+        var claims = user.FindAll(name) ??
+                     throw new InvalidOperationException($"The '{name}' claim was not found.");
 
         return claims.Select(c => c.Value);
     }

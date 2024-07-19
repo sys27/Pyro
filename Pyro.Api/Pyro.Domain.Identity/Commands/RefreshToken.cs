@@ -31,19 +31,22 @@ public class RefreshTokenHandler : IRequestHandler<RefreshToken, RefreshTokenRes
 {
     private readonly ILogger<RefreshTokenHandler> logger;
     private readonly IUserRepository userRepository;
-    private readonly TokenService tokenService;
+    private readonly ITokenService tokenService;
+    private readonly TimeProvider timeProvider;
 
     public RefreshTokenHandler(
         ILogger<RefreshTokenHandler> logger,
         IUserRepository userRepository,
-        TokenService tokenService)
+        ITokenService tokenService,
+        TimeProvider timeProvider)
     {
         this.logger = logger;
         this.userRepository = userRepository;
         this.tokenService = tokenService;
+        this.timeProvider = timeProvider;
     }
 
-    public async Task<RefreshTokenResult> Handle(RefreshToken request, CancellationToken cancellationToken)
+    public async Task<RefreshTokenResult> Handle(RefreshToken request, CancellationToken cancellationToken = default)
     {
         var jwtToken = await tokenService.DecodeTokenId(request.Token);
         var user = await userRepository.GetUserById(jwtToken.UserId, cancellationToken);
@@ -54,10 +57,24 @@ public class RefreshTokenHandler : IRequestHandler<RefreshToken, RefreshTokenRes
             return RefreshTokenResult.Fail();
         }
 
-        var token = user.GetToken(jwtToken.TokenId);
+        if (user.IsLocked)
+        {
+            logger.LogWarning("User with login '{Login}' is locked", user.Login);
+
+            return RefreshTokenResult.Fail();
+        }
+
+        var token = user.GetAuthenticationToken(jwtToken.TokenId);
         if (token is null)
         {
             logger.LogWarning("The token (Id: {TokenId}) was not found", jwtToken.TokenId);
+
+            return RefreshTokenResult.Fail();
+        }
+
+        if (token.IsExpired(timeProvider))
+        {
+            logger.LogWarning("The token (Id: {Token}) is expired", jwtToken.TokenId);
 
             return RefreshTokenResult.Fail();
         }

@@ -29,7 +29,7 @@ public class UpdateUserHandler : IRequestHandler<UpdateUser, User>
     public UpdateUserHandler(IUserRepository repository)
         => this.repository = repository;
 
-    public async Task<User> Handle(UpdateUser request, CancellationToken cancellationToken)
+    public async Task<User> Handle(UpdateUser request, CancellationToken cancellationToken = default)
     {
         var allRoles = await repository.GetRolesAsync(cancellationToken);
         var invalidRoles = request.Roles.Except(allRoles.Select(x => x.Name)).ToList();

@@ -42,7 +42,9 @@ public class CreateAccessTokenHandler : IRequestHandler<CreateAccessToken, Creat
         this.passwordService = passwordService;
     }
 
-    public async Task<CreateAccessTokenResult> Handle(CreateAccessToken request, CancellationToken cancellationToken)
+    public async Task<CreateAccessTokenResult> Handle(
+        CreateAccessToken request,
+        CancellationToken cancellationToken = default)
     {
         var currentUser = currentUserProvider.GetCurrentUser();
         var user = await userRepository.GetUserById(currentUser.Id, cancellationToken) ??

@@ -24,7 +24,7 @@ public class CreateUserProfileHandler : IRequestHandler<CreateUserProfile>
     public CreateUserProfileHandler(IUserProfileRepository repository)
         => this.repository = repository;
 
-    public async Task Handle(CreateUserProfile request, CancellationToken cancellationToken)
+    public async Task Handle(CreateUserProfile request, CancellationToken cancellationToken = default)
     {
         var userProfile = new UserProfile
         {
