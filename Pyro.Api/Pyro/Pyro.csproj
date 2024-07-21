@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Pyro.Contracts\Pyro.Contracts.csproj" />
     <ProjectReference Include="..\Pyro.Infrastructure\Pyro.Infrastructure.csproj"/>
   </ItemGroup>
 

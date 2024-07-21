@@ -22,9 +22,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pyro.Domain.Shared", "Pyro.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pyro.Domain.Identity", "Pyro.Domain.Identity\Pyro.Domain.Identity.csproj", "{F8F49194-B0E1-4C19-832D-C5B4A4B85289}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pyro.Domain.Identity.Tests", "Pyro.Domain.Identity.Tests\Pyro.Domain.Identity.Tests.csproj", "{86D48A6A-6876-4C77-AD4C-707EEF49D4AF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pyro.Domain.Identity.UnitTests", "Pyro.Domain.Identity.UnitTests\Pyro.Domain.Identity.UnitTests.csproj", "{86D48A6A-6876-4C77-AD4C-707EEF49D4AF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pyro.Domain.Tests", "Pyro.Domain.Tests\Pyro.Domain.Tests.csproj", "{67BFBD98-84F3-4CD3-A70C-A2BA4AF0DA53}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pyro.Domain.UnitTests", "Pyro.Domain.UnitTests\Pyro.Domain.UnitTests.csproj", "{67BFBD98-84F3-4CD3-A70C-A2BA4AF0DA53}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pyro.ApiTests", "Pyro.ApiTests\Pyro.ApiTests.csproj", "{CC533EC3-F0B5-40CF-A7C7-E8FDE740E390}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pyro.Contracts", "Pyro.Contracts\Pyro.Contracts.csproj", "{A9D69827-A68B-485B-B4EB-466B894602C4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -60,6 +64,14 @@ Global
 		{67BFBD98-84F3-4CD3-A70C-A2BA4AF0DA53}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{67BFBD98-84F3-4CD3-A70C-A2BA4AF0DA53}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{67BFBD98-84F3-4CD3-A70C-A2BA4AF0DA53}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC533EC3-F0B5-40CF-A7C7-E8FDE740E390}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC533EC3-F0B5-40CF-A7C7-E8FDE740E390}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC533EC3-F0B5-40CF-A7C7-E8FDE740E390}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC533EC3-F0B5-40CF-A7C7-E8FDE740E390}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9D69827-A68B-485B-B4EB-466B894602C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9D69827-A68B-485B-B4EB-466B894602C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9D69827-A68B-485B-B4EB-466B894602C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9D69827-A68B-485B-B4EB-466B894602C4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection

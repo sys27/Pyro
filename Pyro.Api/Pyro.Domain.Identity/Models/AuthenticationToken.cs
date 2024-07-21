@@ -9,14 +9,13 @@ public class AuthenticationToken
     public static AuthenticationToken Create(Guid tokenId, User user, DateTimeOffset expiresAt)
         => new AuthenticationToken
         {
-            Id = Guid.NewGuid(),
             TokenId = tokenId,
             ExpiresAt = expiresAt,
             UserId = user.Id,
             User = user,
         };
 
-    public Guid Id { get; private set; }
+    public Guid Id { get; }
 
     public Guid TokenId { get; private set; }
 

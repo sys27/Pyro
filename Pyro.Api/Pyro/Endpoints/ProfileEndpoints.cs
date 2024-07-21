@@ -2,10 +2,10 @@
 // Licensed under the GPL-3.0 license. See LICENSE file in the project root for full license information.
 
 using MediatR;
+using Pyro.Contracts.Requests;
+using Pyro.Contracts.Responses;
 using Pyro.Domain.UserProfiles;
-using Pyro.Dtos.Mapping;
-using Pyro.Dtos.Requests;
-using Pyro.Dtos.Responses;
+using Pyro.DtoMappings;
 using Pyro.Infrastructure.DataAccess;
 
 namespace Pyro.Endpoints;

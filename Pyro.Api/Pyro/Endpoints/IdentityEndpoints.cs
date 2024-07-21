@@ -3,11 +3,11 @@
 
 using System.Net.Mime;
 using MediatR;
+using Pyro.Contracts.Requests;
+using Pyro.Contracts.Responses;
 using Pyro.Domain.Identity.Commands;
 using Pyro.Domain.Identity.Queries;
-using Pyro.Dtos.Mapping;
-using Pyro.Dtos.Requests;
-using Pyro.Dtos.Responses;
+using Pyro.DtoMappings;
 using Pyro.Infrastructure.DataAccess;
 
 namespace Pyro.Endpoints;
@@ -36,7 +36,7 @@ internal static class IdentityEndpoints
 
                 return Results.Ok(result);
             })
-            .Produces<IReadOnlyCollection<UserResponse>>()
+            .Produces<IReadOnlyList<UserResponse>>()
             .Produces(401)
             .Produces(403)
             .ProducesProblem(500, MediaTypeNames.Application.Json)
@@ -72,7 +72,7 @@ internal static class IdentityEndpoints
                 await mediator.Send(command, cancellationToken);
                 await dbContext.SaveChangesAsync(cancellationToken);
 
-                return Results.Created($"/users/{request.Login}", null);
+                return Results.Created($"/api/users/{request.Login}", null);
             })
             .Produces(201)
             .ProducesValidationProblem()
@@ -152,15 +152,21 @@ internal static class IdentityEndpoints
                 IMediator mediator,
                 PyroDbContext dbContext,
                 string name,
-                CancellationToken cancellationToken)
-            =>
-        {
-            var command = new DeleteAccessToken(name);
-            await mediator.Send(command, cancellationToken);
-            await dbContext.SaveChangesAsync(cancellationToken);
+                CancellationToken cancellationToken) =>
+            {
+                var command = new DeleteAccessToken(name);
+                await mediator.Send(command, cancellationToken);
+                await dbContext.SaveChangesAsync(cancellationToken);
 
-            return Results.Ok();
-        });
+                return Results.Ok();
+            })
+            .Produces(200)
+            .ProducesValidationProblem()
+            .Produces(401)
+            .Produces(403)
+            .ProducesProblem(500)
+            .WithName("Delete Access Token")
+            .WithOpenApi();
 
         return app;
     }
