@@ -21,6 +21,12 @@ using Pyro.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Configuration.Sources.Clear();
+builder.Configuration
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+    .AddEnvironmentVariables("ASPNETCORE_");
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.Configure<JsonSerializerOptions>(options =>
     options.TypeInfoResolver = PyroJsonContext.Default);
@@ -43,15 +49,13 @@ builder.Services
 builder.Services.AddMediatR(c => c
     .RegisterServicesFromAssemblyContaining<GitRepository>()
     .RegisterServicesFromAssemblyContaining<User>()
-    .RegisterServicesFromAssemblyContaining<Program>()
+    .RegisterServicesFromAssemblyContaining<Pyro.Program>()
     .AddOpenBehavior(typeof(LoggingPipeline<,>))
     .AddOpenBehavior(typeof(ValidatorPipeline<,>)));
 
 builder.Services.AddHostedService<OutboxMessageProcessing>();
 
 builder.Services.AddAuth();
-
-builder.Services.AddTransient<IStartupFilter, MigrationStartupFilter>();
 
 // TODO:
 builder.Services.AddScoped<GitBackend>();
@@ -92,4 +96,12 @@ app.MapHub<PyroHub>(
 
 app.MapGitBackendEndpoints();
 
+app.ApplyMigrations();
 app.Run();
+
+namespace Pyro
+{
+    public partial class Program
+    {
+    }
+}

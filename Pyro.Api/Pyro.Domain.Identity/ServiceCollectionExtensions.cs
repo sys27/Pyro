@@ -10,5 +10,5 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddIdentityDomain(this IServiceCollection services)
         => services
             .AddSingleton<IPasswordService, PasswordService>()
-            .AddSingleton<TokenService>();
+            .AddSingleton<ITokenService, TokenService>();
 }

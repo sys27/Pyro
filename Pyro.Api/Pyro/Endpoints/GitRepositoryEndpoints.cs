@@ -4,10 +4,10 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
+using Pyro.Contracts.Requests;
+using Pyro.Contracts.Responses;
 using Pyro.Domain.GitRepositories.Queries;
-using Pyro.Dtos.Mapping;
-using Pyro.Dtos.Requests;
-using Pyro.Dtos.Responses;
+using Pyro.DtoMappings;
 using Pyro.Infrastructure.DataAccess;
 using static Pyro.Domain.Identity.Models.Permission;
 

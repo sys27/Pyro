@@ -48,38 +48,83 @@ jobs:
       with:
         images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
         tags: |
-          type=schedule
           type=ref,event=branch
           type=ref,event=tag
           type=ref,event=pr
-          latest
+          type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'master') }}
 
-    - name: Build and push
-      id: push
+    - name: Build images
       uses: docker/build-push-action@v6
+      env:
+        DOCKER_BUILD_SUMMARY: false
+        DOCKER_BUILD_RECORD_UPLOAD: false
       with:
         platforms: linux/amd64,linux/arm64
         context: .
-        push: ${{ github.event_name != 'pull_request' }}
+        push: false
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
 
-    - name: Run tests
+    - name: Export image to docker
+      id: build
       uses: docker/build-push-action@v6
+      env:
+        DOCKER_BUILD_SUMMARY: false
+        DOCKER_BUILD_RECORD_UPLOAD: false
+      with:
+        context: .
+        push: false
+        outputs: type=docker
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Build tests
+      uses: docker/build-push-action@v6
+      env:
+        DOCKER_BUILD_SUMMARY: false
+        DOCKER_BUILD_RECORD_UPLOAD: false
       with:
         context: .
         target: test
         push: false
-        tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-tests
+        outputs: type=docker
+        tags: tests-image
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Run tests
+      run: >
+        docker run --rm -t
+        --name tests
+        -e PYRO_IMAGE_ID=${{ steps.build.outputs.imageid }}
+        -e GITHUB_SERVER_URL=$GITHUB_SERVER_URL
+        -e GITHUB_REPOSITORY=$GITHUB_REPOSITORY
+        -e GITHUB_WORKSPACE=$GITHUB_WORKSPACE
+        -e GITHUB_SHA=$GITHUB_SHA
+        -e GITHUB_STEP_SUMMARY=/summary
+        -v /var/run/docker.sock:/var/run/docker.sock
+        -v $GITHUB_STEP_SUMMARY:/summary
+        tests-image
+
+    - name: Push
+      id: push
+      uses: docker/build-push-action@v6
+      with:
+        platforms: linux/amd64,linux/arm64
+        context: .
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
 
     - name: Generate artifact attestation
       uses: actions/attest-build-provenance@v1
-      if: ${{ github.event_name != 'pull_request' }}
       with:
         subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
         subject-digest: ${{ steps.push.outputs.digest }}
-        push-to-registry: ${{ github.event_name != 'pull_request' }}
+        push-to-registry: true
