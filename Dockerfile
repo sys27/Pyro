@@ -1,4 +1,4 @@
-﻿FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS build
+﻿FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["Pyro.Api/Pyro/Pyro.csproj", "Pyro/"]
@@ -21,14 +21,14 @@ RUN dotnet test "Pyro.sln" --nologo --no-restore --no-build -c $BUILD_CONFIGURAT
 FROM build AS publish
 RUN dotnet publish "Pyro/Pyro.csproj" --nologo --no-restore --no-build -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
-FROM node:lts-alpine AS node
+FROM --platform=$BUILDPLATFORM node:lts-alpine AS node
 WORKDIR /src
 COPY ["Pyro.UI/package.json", "Pyro.UI/package-lock.json", "./"]
 RUN npm ci
 COPY Pyro.UI .
 RUN npm run build
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine AS final
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/aspnet:8.0-alpine AS final
 RUN addgroup -S pyro && adduser -S pyro -G pyro
 USER pyro
 EXPOSE 8080
