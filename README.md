@@ -1,6 +1,7 @@
-[![Build Docker Image CI](https://github.com/sys27/Pyro/actions/workflows/docker-image.yml/badge.svg)](https://github.com/sys27/Pyro/actions/workflows/docker-image.yml)
-
 # Pyro
+
+[![Build Docker Image CI](https://github.com/sys27/Pyro/actions/workflows/docker-image.yml/badge.svg)](https://github.com/sys27/Pyro/actions/workflows/docker-image.yml)
+![GitHub License](https://img.shields.io/github/license/sys27/Pyro)
 
 Pyro is a platform designed to manage and collaborate on code, repositories, issues, and pull requests.
 
