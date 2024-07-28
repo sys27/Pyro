@@ -28,6 +28,8 @@ export class LoginComponent {
     ) {}
 
     private sanitizeReturnUrl(returnUrl: string): string {
+        returnUrl ??= '/';
+
         const currentUrl = window.location.origin;
 
         let url = new URL(returnUrl, currentUrl);
