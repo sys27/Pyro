@@ -26,13 +26,17 @@ Pyro is a platform designed to manage and collaborate on code, repositories, iss
 docker run -d \
     --name pyro \
     -p 8080:80 \
-    -v <data_dir>:/data \
-    ghcr.io/sys27/pyro:latest
+    -v $(pwd)/data:/data \
+    sys27/pyro:latest
 ```
 
 `Pyro` stores all information (a database file and repositories) in the `/data` directory of the container. And by default, it creates an anonymous volume but you can create your volume and mount it into `/data` or use bind mounts.
 
-Now you can navigate to `htttp://localhost:8080/` and login with `pyro`/`pyro`.
+Now you can navigate to `http://localhost:8080/` and login with `pyro`/`pyro`.
+
+## How to build / run tests
+
+See [BUILD.md](https://github.com/sys27/Pyro/blob/master/BUILD.md)
 
 ## License
 
