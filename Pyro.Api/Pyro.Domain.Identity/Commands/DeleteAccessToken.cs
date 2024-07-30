@@ -35,7 +35,7 @@ public class DeleteAccessTokenHandler : IRequestHandler<DeleteAccessToken>
     {
         var currentUser = currentUserProvider.GetCurrentUser();
         var user = await userRepository.GetUserById(currentUser.Id, cancellationToken) ??
-                   throw new NotFoundException("User not found");
+                   throw new NotFoundException($"User (Id: {currentUser.Id}) not found");
 
         user.DeleteAccessToken(request.Name);
     }

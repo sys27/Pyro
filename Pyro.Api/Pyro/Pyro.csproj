@@ -21,6 +21,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Pyro.Contracts\Pyro.Contracts.csproj" />
+    <ProjectReference Include="..\Pyro.Infrastructure.Issues\Pyro.Infrastructure.Issues.csproj" />
+    <ProjectReference Include="..\Pyro.Infrastructure.Shared\Pyro.Infrastructure.Shared.csproj" />
+    <ProjectReference Include="..\Pyro.Infrastructure.Identity\Pyro.Infrastructure.Identity.csproj" />
     <ProjectReference Include="..\Pyro.Infrastructure\Pyro.Infrastructure.csproj"/>
   </ItemGroup>
 

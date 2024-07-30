@@ -6,7 +6,7 @@ using MediatR;
 
 namespace Pyro.Domain.UserProfiles;
 
-public record CreateUserProfile(Guid UserId) : IRequest;
+public record CreateUserProfile(Guid UserId, string Name) : IRequest;
 
 public class CreateUserProfileValidator : AbstractValidator<CreateUserProfile>
 {
@@ -14,6 +14,10 @@ public class CreateUserProfileValidator : AbstractValidator<CreateUserProfile>
     {
         RuleFor(x => x.UserId)
             .NotEmpty();
+
+        RuleFor(x => x.Name)
+            .NotEmpty()
+            .MaximumLength(50);
     }
 }
 
@@ -29,6 +33,7 @@ public class CreateUserProfileHandler : IRequestHandler<CreateUserProfile>
         var userProfile = new UserProfile
         {
             Id = request.UserId,
+            Name = request.Name,
         };
         await repository.AddUserProfile(userProfile, cancellationToken);
     }

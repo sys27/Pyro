@@ -1,5 +1,7 @@
 export { RepositoryCodeComponent } from './repository-code/repository-code.component';
 export { RepositoryFileComponent } from './repository-file/repository-file.component';
+export { RepositoryIssueNewComponent } from './repository-issue-new/repository-issue-new.component';
+export { RepositoryIssueComponent } from './repository-issue/repository-issue.component';
 export { RepositoryIssuesComponent } from './repository-issues/repository-issues.component';
 export { RepositoryListComponent } from './repository-list/repository-list.component';
 export { RepositoryNewComponent } from './repository-new/repository-new.component';

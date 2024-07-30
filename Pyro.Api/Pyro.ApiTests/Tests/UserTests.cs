@@ -2,8 +2,8 @@
 // Licensed under the GPL-3.0 license. See LICENSE file in the project root for full license information.
 
 using System.Net;
-using Pyro.Contracts.Requests;
-using Pyro.Contracts.Responses;
+using Pyro.Contracts.Requests.Identity;
+using Pyro.Contracts.Responses.Identity;
 
 namespace Pyro.ApiTests.Tests;
 

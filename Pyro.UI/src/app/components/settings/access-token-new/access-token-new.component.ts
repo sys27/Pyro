@@ -4,8 +4,8 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { CalendarModule } from 'primeng/calendar';
 import { InputTextModule } from 'primeng/inputtext';
-import { AccessTokenService, CreateAccessToken } from '../../../services/access-token.service';
-import { mapErrorToNull } from '../../../services/operators';
+import { AccessTokenService, CreateAccessToken } from '@services/access-token.service';
+import { mapErrorToNull } from '@services/operators';
 
 @Component({
     selector: 'access-token-new',

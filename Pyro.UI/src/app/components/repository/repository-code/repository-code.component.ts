@@ -2,6 +2,9 @@ import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { MarkdownService } from '@services/markdown.service';
+import { mapErrorToEmpty, mapErrorToNull } from '@services/operators';
+import { BranchItem, Repository, RepositoryService, TreeView } from '@services/repository.service';
 import { ButtonModule } from 'primeng/button';
 import { DeferModule } from 'primeng/defer';
 import { DropdownModule } from 'primeng/dropdown';
@@ -24,14 +27,6 @@ import {
     takeUntil,
     withLatestFrom,
 } from 'rxjs';
-import { MarkdownService } from '../../../services/markdown.service';
-import { mapErrorToEmpty, mapErrorToNull } from '../../../services/operators';
-import {
-    BranchItem,
-    Repository,
-    RepositoryService,
-    TreeView,
-} from '../../../services/repository.service';
 
 @Component({
     selector: 'repo-code',

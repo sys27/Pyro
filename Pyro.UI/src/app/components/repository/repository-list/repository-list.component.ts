@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { mapErrorToEmpty } from '@services/operators';
+import { RepositoryItem, RepositoryService } from '@services/repository.service';
 import { TableModule } from 'primeng/table';
 import { Observable, shareReplay } from 'rxjs';
-import { mapErrorToEmpty } from '../../../services/operators';
-import { RepositoryItem, RepositoryService } from '../../../services/repository.service';
 
 @Component({
     selector: 'repo-list',

@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { mapErrorToNull } from '@services/operators';
+import { Repository, RepositoryService } from '@services/repository.service';
 import { Observable, combineLatest, from, map, of, shareReplay, switchMap } from 'rxjs';
-import { mapErrorToNull } from '../../../services/operators';
-import { Repository, RepositoryService } from '../../../services/repository.service';
 
 @Component({
     selector: 'repository-file',

@@ -1,0 +1,33 @@
+<p-panel *ngIf="!isEditMode">
+  <ng-template pTemplate="header">
+    <div class="flex flex-row gap-2">
+      <span class="pi pi-user"></span>
+      <span>{{ comment().author.name }}</span>
+    </div>
+  </ng-template>
+  <ng-template pTemplate="icons">
+    <button
+      *ngIf="canEditIssue$ | async"
+      class="p-panel-header-icon p-link"
+      [disabled]="!(canEditIssue$ | async)"
+      (click)="toggleEditMode()">
+      <span class="pi pi-pencil"></span>
+    </button>
+  </ng-template>
+
+  <div [innerHTML]="comment().content | md | async"></div>
+
+  <ng-template pTemplate="footer">
+    <div class="text-right text-400">
+      <span>{{ comment().createdAt | date: 'short' }}</span>
+    </div>
+  </ng-template>
+</p-panel>
+
+<comment-new
+  *ngIf="isEditMode"
+  [repositoryName]="repositoryName()"
+  [issueNumber]="issueNumber()"
+  [comment]="comment()"
+  (commentAdded)="onCommentAdded($event)"
+  (onCancel)="onCancel()" />

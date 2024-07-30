@@ -6,11 +6,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Pyro.Domain.Git;
 using Pyro.Domain.GitRepositories;
-using Pyro.Domain.Identity;
 using Pyro.Domain.Shared;
 using Pyro.Domain.UserProfiles;
 using Pyro.Infrastructure.DataAccess;
 using Pyro.Infrastructure.Messaging;
+using Pyro.Infrastructure.Shared.DataAccess;
 
 namespace Pyro.Infrastructure;
 
@@ -20,17 +20,15 @@ public static class ServiceCollectionExtensions
     {
         services.Configure<GitOptions>(configuration.GetSection(GitOptions.Section));
 
-        services.AddTransient<DomainEventInterceptor>();
         services.AddDbContext<PyroDbContext>((provider, options) => options
             .UseSqlite(configuration.GetConnectionString("DefaultConnection"))
             .AddInterceptors(provider.GetRequiredService<DomainEventInterceptor>()));
+        services.AddScoped<DbContext, PyroDbContext>(sp => sp.GetRequiredService<PyroDbContext>());
 
         return services
             .AddScoped<IBus, Bus>()
             .AddScoped<IGitService, GitService>()
             .AddScoped<IGitRepositoryRepository, GitRepositoryRepository>()
-            .AddScoped<IUserRepository, UserRepository>()
-            .AddScoped<IUserProfileRepository, UserProfileRepository>()
-            .AddSingleton<ISigningKeyService, SigningKeyService>();
+            .AddScoped<IUserProfileRepository, UserProfileRepository>();
     }
 }

@@ -8,13 +8,14 @@ using Pyro.Domain.Shared.Exceptions;
 
 namespace Pyro.Domain.UserProfiles;
 
-public record UpdateProfile(string? Name, string? Status) : IRequest;
+public record UpdateProfile(string Name, string? Status) : IRequest;
 
 public class UpdateProfileValidator : AbstractValidator<UpdateProfile>
 {
     public UpdateProfileValidator()
     {
         RuleFor(x => x.Name)
+            .NotEmpty()
             .MaximumLength(50);
 
         RuleFor(x => x.Status)
@@ -38,9 +39,8 @@ public class UpdateProfileHandler : IRequestHandler<UpdateProfile>
     public async Task Handle(UpdateProfile request, CancellationToken cancellationToken)
     {
         var currentUser = currentUserProvider.GetCurrentUser();
-        var profile = await repository.GetUserProfile(currentUser.Id, cancellationToken);
-        if (profile is null)
-            throw new NotFoundException("User profile not found");
+        var profile = await repository.GetUserProfile(currentUser.Id, cancellationToken) ??
+                      throw new NotFoundException("User profile not found");
 
         profile.Name = request.Name;
         profile.Status = request.Status;

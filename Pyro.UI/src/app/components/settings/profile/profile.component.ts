@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-import { mapErrorToNull } from '../../../services/operators';
-import { ProfileService, UpdateProfile } from '../../../services/profile.service';
+import { mapErrorToNull } from '@services/operators';
+import { ProfileService, UpdateProfile } from '@services/profile.service';
 
 @Component({
     selector: 'profile',
@@ -15,7 +15,7 @@ import { ProfileService, UpdateProfile } from '../../../services/profile.service
 export class ProfileComponent implements OnInit {
     public form = this.formBuilder.group({
         email: ['', [Validators.required, Validators.email, Validators.maxLength(150)]],
-        name: ['', [Validators.maxLength(50)]],
+        name: ['', [Validators.required, Validators.maxLength(50)]],
         status: ['', [Validators.maxLength(150)]],
     });
 

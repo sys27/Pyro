@@ -27,7 +27,7 @@ public class User : DomainEntity
             Password = password,
             Salt = salt,
         };
-        user.PublishEvent(new UserCreated(user.Id));
+        user.PublishEvent(new UserCreated(user.Id, login));
 
         return user;
     }

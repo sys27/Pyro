@@ -5,8 +5,8 @@ import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { Observable, shareReplay } from 'rxjs';
-import { AccessToken, AccessTokenService } from '../../../services/access-token.service';
-import { mapErrorToEmpty } from '../../../services/operators';
+import { AccessToken, AccessTokenService } from '@services/access-token.service';
+import { mapErrorToEmpty } from '@services/operators';
 
 @Component({
     selector: 'access-token-list',

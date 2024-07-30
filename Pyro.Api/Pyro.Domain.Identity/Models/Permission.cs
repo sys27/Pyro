@@ -13,6 +13,10 @@ public class Permission
     public const string UserEdit = "user.edit";
     public const string UserManage = "user.manage";
 
+    public const string IssueView = "issue.view";
+    public const string IssueEdit = "issue.edit";
+    public const string IssueManage = "issue.manage";
+
     private readonly List<Role> roles = [];
 
     // TODO: hide id

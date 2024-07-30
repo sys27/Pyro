@@ -8,7 +8,7 @@ using Pyro.Contracts.Requests;
 using Pyro.Contracts.Responses;
 using Pyro.Domain.GitRepositories.Queries;
 using Pyro.DtoMappings;
-using Pyro.Infrastructure.DataAccess;
+using Pyro.Infrastructure.Shared.DataAccess;
 using static Pyro.Domain.Identity.Models.Permission;
 
 namespace Pyro.Endpoints;
@@ -66,13 +66,13 @@ internal static class GitRepositoryEndpoints
 
         repositories.MapPost("/", async (
                 IMediator mediator,
-                PyroDbContext dbContext,
+                UnitOfWork unitOfWork,
                 CreateGitRepositoryRequest request,
                 CancellationToken cancellationToken) =>
             {
                 var command = request.ToCommand();
                 var gitRepository = await mediator.Send(command, cancellationToken);
-                await dbContext.SaveChangesAsync(cancellationToken);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
 
                 var result = gitRepository.ToResponse();
 

@@ -3,12 +3,12 @@
 
 using System.Net.Mime;
 using MediatR;
-using Pyro.Contracts.Requests;
-using Pyro.Contracts.Responses;
+using Pyro.Contracts.Requests.Identity;
+using Pyro.Contracts.Responses.Identity;
 using Pyro.Domain.Identity.Commands;
 using Pyro.Domain.Identity.Queries;
 using Pyro.DtoMappings;
-using Pyro.Infrastructure.DataAccess;
+using Pyro.Infrastructure.Shared.DataAccess;
 
 namespace Pyro.Endpoints;
 
@@ -64,13 +64,13 @@ internal static class IdentityEndpoints
 
         usersBuilder.MapPost("/", async (
                 IMediator mediator,
-                PyroDbContext dbContext,
+                UnitOfWork unitOfWork,
                 CreateUserRequest request,
                 CancellationToken cancellationToken) =>
             {
                 var command = request.ToCommand();
                 await mediator.Send(command, cancellationToken);
-                await dbContext.SaveChangesAsync(cancellationToken);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
 
                 return Results.Created($"/api/users/{request.Login}", null);
             })
@@ -84,7 +84,7 @@ internal static class IdentityEndpoints
 
         usersBuilder.MapPut("/{login}", async (
                 IMediator mediator,
-                PyroDbContext dbContext,
+                UnitOfWork unitOfWork,
                 string login,
                 UpdateUserRequest request,
                 CancellationToken cancellationToken) =>
@@ -95,7 +95,7 @@ internal static class IdentityEndpoints
 
                 var command = new UpdateUser(user, request.Roles);
                 user = await mediator.Send(command, cancellationToken);
-                await dbContext.SaveChangesAsync(cancellationToken);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
 
                 return Results.Ok(user.ToResponse());
             })
@@ -130,13 +130,13 @@ internal static class IdentityEndpoints
 
         accessTokenBuilder.MapPost("/", async (
                 IMediator mediator,
-                PyroDbContext dbContext,
+                UnitOfWork unitOfWork,
                 CreateAccessTokenRequest request,
                 CancellationToken cancellationToken) =>
             {
                 var command = request.ToCommand();
                 var result = await mediator.Send(command, cancellationToken);
-                await dbContext.SaveChangesAsync(cancellationToken);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
 
                 return Results.Created((string)null!, result.ToResponse());
             })
@@ -150,13 +150,13 @@ internal static class IdentityEndpoints
 
         accessTokenBuilder.MapDelete("/{name}", async (
                 IMediator mediator,
-                PyroDbContext dbContext,
+                UnitOfWork unitOfWork,
                 string name,
                 CancellationToken cancellationToken) =>
             {
                 var command = new DeleteAccessToken(name);
                 await mediator.Send(command, cancellationToken);
-                await dbContext.SaveChangesAsync(cancellationToken);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
 
                 return Results.Ok();
             })
@@ -230,13 +230,13 @@ internal static class IdentityEndpoints
 
         identity.MapPost("/login", async (
                 IMediator mediator,
-                PyroDbContext dbContext,
+                UnitOfWork unitOfWork,
                 LoginRequest request,
                 CancellationToken cancellationToken = default) =>
             {
                 var command = new LoginCommand(request.Login, request.Password);
                 var result = await mediator.Send(command, cancellationToken);
-                await dbContext.SaveChangesAsync(cancellationToken);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
 
                 return result.IsSuccess
                     ? Results.Ok(result.TokenPair.ToResponse())
@@ -252,12 +252,12 @@ internal static class IdentityEndpoints
 
         identity.MapPost("/logout", async (
                 IMediator mediator,
-                PyroDbContext dbContext,
+                UnitOfWork unitOfWork,
                 CancellationToken cancellationToken = default) =>
             {
                 var command = new Logout();
                 await mediator.Send(command, cancellationToken);
-                await dbContext.SaveChangesAsync(cancellationToken);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
 
                 return Results.NoContent();
             })

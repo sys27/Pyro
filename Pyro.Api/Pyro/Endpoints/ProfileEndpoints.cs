@@ -6,7 +6,7 @@ using Pyro.Contracts.Requests;
 using Pyro.Contracts.Responses;
 using Pyro.Domain.UserProfiles;
 using Pyro.DtoMappings;
-using Pyro.Infrastructure.DataAccess;
+using Pyro.Infrastructure.Shared.DataAccess;
 
 namespace Pyro.Endpoints;
 
@@ -36,13 +36,13 @@ internal static class ProfileEndpoints
 
         profileBuilder.MapPut("/", async (
                 IMediator mediator,
-                PyroDbContext dbContext,
+                UnitOfWork unitOfWork,
                 UpdateUserProfileRequest request,
                 CancellationToken cancellationToken) =>
             {
                 var command = request.ToCommand();
                 await mediator.Send(command, cancellationToken);
-                await dbContext.SaveChangesAsync(cancellationToken);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
 
                 return Results.NoContent();
             })

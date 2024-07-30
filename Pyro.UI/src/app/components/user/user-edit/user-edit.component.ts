@@ -6,8 +6,8 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { InputTextModule } from 'primeng/inputtext';
 import { ListboxModule } from 'primeng/listbox';
 import { MultiSelectModule } from 'primeng/multiselect';
-import { mapErrorToEmpty, mapErrorToNull } from '../../../services/operators';
-import { Role, UpdateUser, UserService } from '../../../services/user.service';
+import { mapErrorToEmpty, mapErrorToNull } from '@services/operators';
+import { Role, UpdateUser, UserService } from '@services/user.service';
 
 @Component({
     selector: 'user',

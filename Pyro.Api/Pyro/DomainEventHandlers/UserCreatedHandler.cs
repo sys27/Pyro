@@ -16,7 +16,7 @@ public class UserCreatedHandler : INotificationHandler<UserCreated>
 
     public async Task Handle(UserCreated notification, CancellationToken cancellationToken)
     {
-        var command = new CreateUserProfile(notification.UserId);
+        var command = new CreateUserProfile(notification.UserId, notification.Name);
         await mediator.Send(command, cancellationToken);
     }
 }

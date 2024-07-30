@@ -3,4 +3,4 @@
 
 namespace Pyro.Contracts.Requests;
 
-public record UpdateUserProfileRequest(string? Name, string Status);
+public record UpdateUserProfileRequest(string Name, string Status);
