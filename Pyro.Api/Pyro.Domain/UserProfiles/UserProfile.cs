@@ -5,11 +5,13 @@ namespace Pyro.Domain.UserProfiles;
 
 public class UserProfile
 {
+    public static readonly Guid Pyro = Guid.Parse("F9BA057A-35B0-4D10-8326-702D8F7EC966");
+
     public Guid Id { get; init; }
 
-    public string? Email { get; init; }
+    public required string Name { get; set; }
 
-    public string? Name { get; set; }
+    public string? Email { get; init; }
 
     public string? Status { get; set; }
 

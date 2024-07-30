@@ -7,7 +7,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Pyro.Domain.Git;
 using Pyro.Domain.GitRepositories;
-using Pyro.Domain.Identity.Models;
 using Pyro.Domain.Shared.Exceptions;
 using Pyro.Domain.UserProfiles;
 
@@ -55,7 +54,7 @@ internal class GitService : IGitService
         GitRepository gitRepo,
         CancellationToken cancellationToken = default)
     {
-        var pyroUser = await profileRepository.GetUserProfile(User.PyroUser, cancellationToken) ??
+        var pyroUser = await profileRepository.GetUserProfile(UserProfile.Pyro, cancellationToken) ??
                        throw new DomainException("Pyro user not found");
 
         var gitPath = GetGitPath(gitRepo);

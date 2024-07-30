@@ -6,6 +6,8 @@ import {
     RepositoryCodeComponent,
     RepositoryComponent,
     RepositoryFileComponent,
+    RepositoryIssueComponent,
+    RepositoryIssueNewComponent,
     RepositoryIssuesComponent,
     RepositoryListComponent,
     RepositoryNewComponent,
@@ -37,6 +39,21 @@ export const routes: Routes = [
             {
                 matcher: urlMatcher('file'),
                 component: RepositoryFileComponent,
+                canActivate: [authGuard],
+            },
+            {
+                path: 'issues/new',
+                component: RepositoryIssueNewComponent,
+                canActivate: [authGuard],
+            },
+            {
+                path: 'issues/:issueNumber',
+                component: RepositoryIssueComponent,
+                canActivate: [authGuard],
+            },
+            {
+                path: 'issues/:issueNumber/edit',
+                component: RepositoryIssueNewComponent,
                 canActivate: [authGuard],
             },
             {

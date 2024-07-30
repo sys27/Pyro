@@ -1,0 +1,39 @@
+<p-panel [header]="isEditMode ? 'Edit comment' : 'Add comment'">
+  <form
+    [formGroup]="form"
+    (ngSubmit)="onSubmit()">
+    <p-tabView>
+      <p-tabPanel header="Write">
+        <textarea
+          #commentText
+          pInputTextarea
+          rows="5"
+          autoResize="true"
+          formControlName="comment"
+          class="w-full"
+          placeholder="Write a comment"></textarea>
+      </p-tabPanel>
+
+      <p-tabPanel header="Preview">
+        <ng-template pTemplate="content">
+          <div [innerHTML]="commentText.value | md | async"></div>
+        </ng-template>
+      </p-tabPanel>
+    </p-tabView>
+
+    <div class="flex flex-row-reverse gap-2">
+      <p-button
+        *ngIf="isEditMode"
+        severity="secondary"
+        label="Cancel"
+        (onClick)="cancel()"
+        [loading]="isLoading" />
+      <p-button
+        severity="success"
+        label="Comment"
+        type="submit"
+        [disabled]="form.invalid"
+        [loading]="isLoading" />
+    </div>
+  </form>
+</p-panel>

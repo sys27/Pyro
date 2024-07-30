@@ -1,8 +1,8 @@
 // Copyright (c) Dmytro Kyshchenko. All rights reserved.
 // Licensed under the GPL-3.0 license. See LICENSE file in the project root for full license information.
 
-using Pyro.Contracts.Requests;
-using Pyro.Contracts.Responses;
+using Pyro.Contracts.Requests.Identity;
+using Pyro.Contracts.Responses.Identity;
 using Pyro.Domain.Identity.Commands;
 using Pyro.Domain.Identity.Models;
 using Riok.Mapperly.Abstractions;

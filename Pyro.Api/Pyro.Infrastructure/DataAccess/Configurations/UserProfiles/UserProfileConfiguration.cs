@@ -3,7 +3,6 @@
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Pyro.Domain.Identity.Models;
 using Pyro.Domain.UserProfiles;
 
 namespace Pyro.Infrastructure.DataAccess.Configurations.UserProfiles;
@@ -26,6 +25,7 @@ internal class UserProfileConfiguration : IEntityTypeConfiguration<UserProfile>
             .HasMaxLength(150);
 
         builder.Property(x => x.Name)
+            .IsRequired()
             .HasMaxLength(50);
 
         builder.Property(x => x.Status)
@@ -34,10 +34,6 @@ internal class UserProfileConfiguration : IEntityTypeConfiguration<UserProfile>
         builder.HasOne(x => x.Avatar)
             .WithOne()
             .HasForeignKey<UserAvatar>(x => x.Id);
-
-        builder.HasOne(typeof(User))
-            .WithOne()
-            .HasForeignKey(typeof(User), nameof(User.Id));
 
         builder.HasData(SeedData.UserProfiles);
     }

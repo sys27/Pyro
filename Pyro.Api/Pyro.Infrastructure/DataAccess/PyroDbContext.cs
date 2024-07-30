@@ -3,7 +3,6 @@
 
 using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Pyro.Domain.GitRepositories;
 using Pyro.Infrastructure.Messaging;
 
 namespace Pyro.Infrastructure.DataAccess;
@@ -24,8 +23,6 @@ public class PyroDbContext : DbContext, IDataProtectionKeyContext
     }
 
     internal DbSet<OutboxMessage> OutboxMessages { get; init; }
-
-    public DbSet<GitRepository> GitRepositories { get; init; }
 
     public DbSet<DataProtectionKey> DataProtectionKeys { get; init; }
 }

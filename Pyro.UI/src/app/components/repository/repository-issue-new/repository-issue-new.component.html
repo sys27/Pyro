@@ -1,0 +1,38 @@
+<div class="flex align-items-center justify-content-center">
+  <form
+    class="w-6"
+    [formGroup]="form"
+    (ngSubmit)="onSubmit()">
+    <h1>{{ (isEditMode$ | async) ? 'Edit Issue' : 'New Issue' }}</h1>
+
+    <div class="field">
+      <label for="title">Title:</label>
+      <input
+        id="title"
+        type="text"
+        class="w-full"
+        pInputText
+        formControlName="title" />
+    </div>
+
+    <div class="field">
+      <label for="assignee">Assignee:</label>
+      <p-dropdown
+        *ngIf="users$ | async as users"
+        id="assignee"
+        formControlName="assigneeId"
+        [options]="users"
+        optionLabel="name"
+        optionValue="id"
+        styleClass="w-full" />
+    </div>
+
+    <div class="field">
+      <p-button
+        [label]="(isEditMode$ | async) ? 'Update' : 'Create'"
+        type="submit"
+        [disabled]="form.invalid"
+        [loading]="isLoading" />
+    </div>
+  </form>
+</div>

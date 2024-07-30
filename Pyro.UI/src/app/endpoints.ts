@@ -9,4 +9,9 @@ export class Endpoints {
     public static readonly Repositories: string = '/api/repositories';
     public static readonly Profile: string = '/api/profile';
     public static readonly AccessTokens: string = `${this.Users}/access-tokens`;
+
+    public static readonly IssueUsers: string = `/api/repositories/issues/users`;
+    public static Issues(repositoryName: string): string {
+        return `/api/repositories/${repositoryName}/issues`;
+    }
 }

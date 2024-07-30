@@ -4,8 +4,8 @@ import { RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { Observable } from 'rxjs';
-import { mapErrorToEmpty } from '../../../services/operators';
-import { UserItem, UserService } from '../../../services/user.service';
+import { mapErrorToEmpty } from '@services/operators';
+import { UserItem, UserService } from '@services/user.service';
 
 @Component({
     selector: 'user-list',

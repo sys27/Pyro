@@ -10,9 +10,9 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SplitButtonModule } from 'primeng/splitbutton';
 import { ToastModule } from 'primeng/toast';
 import { ToolbarModule } from 'primeng/toolbar';
-import { AuthService } from '../services/auth.service';
-import { NotificationService } from '../services/notification.service';
-import { ThemeService } from '../services/theme.service';
+import { AuthService } from '@services/auth.service';
+import { NotificationService } from '@services/notification.service';
+import { ThemeService } from '@services/theme.service';
 
 @Component({
     selector: 'app-root',

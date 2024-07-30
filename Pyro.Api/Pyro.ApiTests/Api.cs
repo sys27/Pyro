@@ -5,10 +5,12 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text;
+using System.Text.Json;
 using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Containers;
-using Pyro.Contracts.Requests;
-using Pyro.Contracts.Responses;
+using Pyro.Contracts.Requests.Identity;
+using Pyro.Contracts.Responses.Identity;
 
 namespace Pyro.ApiTests;
 
@@ -17,6 +19,7 @@ public class Api
 {
     private static IContainer? container;
     private static HttpClient? client;
+    private static User? user;
 
     [OneTimeSetUp]
     public async Task SetUp()
@@ -48,6 +51,29 @@ public class Api
         var tokenPairResponse = await Post<TokenPairResponse>("/api/identity/login", loginRequest);
         var token = tokenPairResponse?.AccessToken;
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        user = GetUser(token);
+    }
+
+    private static User? GetUser(string? accessToken)
+    {
+        if (accessToken is null)
+            return null;
+
+        var parts = accessToken.Split('.');
+        if (parts.Length != 3)
+            throw new InvalidOperationException("Invalid token");
+
+        // pad a payload with '=' to make it a multiple of 4
+        var payload = parts[1];
+        var padding = payload.Length % 4;
+        if (padding > 0)
+            payload += new string('=', 4 - padding);
+        var json = Encoding.UTF8.GetString(Convert.FromBase64String(payload));
+        var user = JsonSerializer.Deserialize<User>(json, new JsonSerializerOptions(JsonSerializerDefaults.Web)) ??
+                   throw new InvalidOperationException("Invalid token");
+
+        return user;
     }
 
     [OneTimeTearDown]
@@ -55,6 +81,7 @@ public class Api
     {
         await Post("/api/identity/logout");
 
+        user = null;
         client?.Dispose();
 
         if (container is not null)
@@ -159,4 +186,6 @@ public class Api
 
     public static Task Delete([StringSyntax("Uri")] string url)
         => SendRequest(HttpMethod.Delete, url);
+
+    public static User? User => user;
 }

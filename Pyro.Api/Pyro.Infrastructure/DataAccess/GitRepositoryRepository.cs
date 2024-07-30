@@ -16,7 +16,7 @@ internal class GitRepositoryRepository : IGitRepositoryRepository
     public async Task<IReadOnlyList<GitRepository>> GetRepositories(
         CancellationToken cancellationToken = default)
     {
-        var gitRepositories = await dbContext.GitRepositories
+        var gitRepositories = await dbContext.Set<GitRepository>()
             .ToListAsync(cancellationToken);
 
         return gitRepositories;
@@ -26,7 +26,7 @@ internal class GitRepositoryRepository : IGitRepositoryRepository
         Guid id,
         CancellationToken cancellationToken = default)
     {
-        var gitRepository = await dbContext.GitRepositories
+        var gitRepository = await dbContext.Set<GitRepository>()
             .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
 
         return gitRepository;
@@ -36,7 +36,7 @@ internal class GitRepositoryRepository : IGitRepositoryRepository
         string name,
         CancellationToken cancellationToken = default)
     {
-        var gitRepository = await dbContext.GitRepositories
+        var gitRepository = await dbContext.Set<GitRepository>()
             .FirstOrDefaultAsync(x => x.Name == name, cancellationToken);
 
         return gitRepository;
@@ -46,7 +46,7 @@ internal class GitRepositoryRepository : IGitRepositoryRepository
         GitRepository gitRepository,
         CancellationToken cancellationToken = default)
     {
-        await dbContext.GitRepositories.AddAsync(gitRepository, cancellationToken);
+        await dbContext.Set<GitRepository>().AddAsync(gitRepository, cancellationToken);
 
         return gitRepository;
     }

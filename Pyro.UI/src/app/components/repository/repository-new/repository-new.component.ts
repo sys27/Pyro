@@ -1,11 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { NotificationEvent, NotificationService } from '@services/notification.service';
+import { CreateRepository, RepositoryService } from '@services/repository.service';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { filter, Observable, Subject, switchMap, takeUntil } from 'rxjs';
-import { NotificationEvent, NotificationService } from '../../../services/notification.service';
-import { CreateRepository, RepositoryService } from '../../../services/repository.service';
 
 @Component({
     selector: 'repository-new',

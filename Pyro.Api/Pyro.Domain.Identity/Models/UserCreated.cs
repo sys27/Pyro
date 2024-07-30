@@ -5,4 +5,4 @@ using Pyro.Domain.Shared.Models;
 
 namespace Pyro.Domain.Identity.Models;
 
-public record UserCreated(Guid UserId) : IDomainEvent;
+public record UserCreated(Guid UserId, string Name) : IDomainEvent;

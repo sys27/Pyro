@@ -2,7 +2,7 @@ export class CurrentUser {
     public constructor(
         private readonly _accessToken: string,
         private readonly _expiresIn: Date,
-        private readonly _id: number,
+        private readonly _id: string,
         private readonly _login: string,
         private readonly _roles: string[],
         private readonly _permissions: string[],
@@ -16,7 +16,7 @@ export class CurrentUser {
         return this._expiresIn;
     }
 
-    public get id(): number {
+    public get id(): string {
         return this._id;
     }
 

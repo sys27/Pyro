@@ -10,14 +10,18 @@ using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.FileProviders;
 using Pyro;
 using Pyro.BackgroundServices;
-using Pyro.Domain.GitRepositories;
 using Pyro.Domain.Identity;
 using Pyro.Domain.Identity.Models;
+using Pyro.Domain.Issues;
 using Pyro.Domain.Shared;
 using Pyro.Endpoints;
 using Pyro.Extensions;
 using Pyro.Infrastructure;
+using Pyro.Infrastructure.Identity;
+using Pyro.Infrastructure.Issues;
+using Pyro.Infrastructure.Shared;
 using Pyro.Services;
+using User = Pyro.Domain.Identity.Models.User;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,15 +45,20 @@ builder.Services.AddSingleton<IUserIdProvider, LoginUserIdProvider>();
 builder.Services.AddSingleton<INotificationService, NotificationService>();
 
 builder.Services.AddIdentityDomain();
+builder.Services.AddSharedInfrastructure();
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddIdentityInfrastructure(builder.Configuration);
+builder.Services.AddIssuesInfrastructure(builder.Configuration);
 
 builder.Services
-    .AddValidatorsFromAssemblyContaining<GitRepository>()
-    .AddValidatorsFromAssemblyContaining<User>();
+    .AddValidatorsFromAssemblyContaining<Pyro.Domain.GitRepositories.GitRepository>()
+    .AddValidatorsFromAssemblyContaining<User>()
+    .AddValidatorsFromAssemblyContaining<Issue>();
 builder.Services.AddMediatR(c => c
-    .RegisterServicesFromAssemblyContaining<GitRepository>()
-    .RegisterServicesFromAssemblyContaining<User>()
-    .RegisterServicesFromAssemblyContaining<Pyro.Program>()
+    .RegisterServicesFromAssemblyContaining<Pyro.Domain.GitRepositories.GitRepository>()
+    .RegisterServicesFromAssemblyContaining<Permission>()
+    .RegisterServicesFromAssemblyContaining<Issue>()
+    .RegisterServicesFromAssemblyContaining<Program>()
     .AddOpenBehavior(typeof(LoggingPipeline<,>))
     .AddOpenBehavior(typeof(ValidatorPipeline<,>)));
 
@@ -87,7 +96,8 @@ app.MapGroup("/api")
     .RequireAuthorization()
     .MapIdentityEndpoints()
     .MapProfileEndpoints()
-    .MapGitRepositoryEndpoints();
+    .MapGitRepositoryEndpoints()
+    .MapIssueEndpoints();
 
 app.MapHub<PyroHub>(
         "/signalr",
@@ -98,10 +108,3 @@ app.MapGitBackendEndpoints();
 
 app.ApplyMigrations();
 app.Run();
-
-namespace Pyro
-{
-    public partial class Program
-    {
-    }
-}

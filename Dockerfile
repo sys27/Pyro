@@ -9,10 +9,19 @@ COPY ["Pyro.Api/Pyro.ApiTests/Pyro.ApiTests.csproj", "Pyro.ApiTests/"]
 COPY ["Pyro.Api/Pyro.Contracts/Pyro.Contracts.csproj", "Pyro.Contracts/"]
 COPY ["Pyro.Api/Pyro.Domain/Pyro.Domain.csproj", "Pyro.Domain/"]
 COPY ["Pyro.Api/Pyro.Domain.UnitTests/Pyro.Domain.UnitTests.csproj", "Pyro.Domain.UnitTests/"]
+COPY ["Pyro.Api/Pyro.Infrastructure/Pyro.Infrastructure.csproj", "Pyro.Infrastructure/"]
+
+COPY ["Pyro.Api/Pyro.Domain.Shared/Pyro.Domain.Shared.csproj", "Pyro.Domain.Shared/"]
+COPY ["Pyro.Api/Pyro.Infrastructure.Shared/Pyro.Infrastructure.Shared.csproj", "Pyro.Infrastructure.Shared/"]
+
 COPY ["Pyro.Api/Pyro.Domain.Identity/Pyro.Domain.Identity.csproj", "Pyro.Domain.Identity/"]
 COPY ["Pyro.Api/Pyro.Domain.Identity.UnitTests/Pyro.Domain.Identity.UnitTests.csproj", "Pyro.Domain.Identity.UnitTests/"]
-COPY ["Pyro.Api/Pyro.Domain.Shared/Pyro.Domain.Shared.csproj", "Pyro.Domain.Shared/"]
-COPY ["Pyro.Api/Pyro.Infrastructure/Pyro.Infrastructure.csproj", "Pyro.Infrastructure/"]
+COPY ["Pyro.Api/Pyro.Infrastructure.Identity/Pyro.Infrastructure.Identity.csproj", "Pyro.Infrastructure.Identity/"]
+
+COPY ["Pyro.Api/Pyro.Domain.Issues/Pyro.Domain.Issues.csproj", "Pyro.Domain.Issues/"]
+COPY ["Pyro.Api/Pyro.Domain.Issues.UnitTests/Pyro.Domain.Issues.UnitTests.csproj", "Pyro.Domain.Issues.UnitTests/"]
+COPY ["Pyro.Api/Pyro.Infrastructure.Issues/Pyro.Infrastructure.Issues.csproj", "Pyro.Infrastructure.Issues/"]
+
 COPY ["Pyro.Api/Pyro.sln", "./"]
 COPY ["Pyro.Api/Directory.Build.targets", "./"]
 COPY ["Pyro.Api/Directory.Packages.props", "./"]

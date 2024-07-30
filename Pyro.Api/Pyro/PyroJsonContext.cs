@@ -4,7 +4,9 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Pyro.Contracts.Requests;
+using Pyro.Contracts.Requests.Identity;
 using Pyro.Contracts.Responses;
+using Pyro.Contracts.Responses.Identity;
 using Pyro.Domain.GitRepositories;
 
 namespace Pyro;
