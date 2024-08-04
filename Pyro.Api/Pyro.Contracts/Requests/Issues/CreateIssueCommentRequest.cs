@@ -3,4 +3,4 @@
 
 namespace Pyro.Contracts.Requests.Issues;
 
-public record UpdateCommentRequest(string Content);
+public record CreateIssueCommentRequest(string Content);

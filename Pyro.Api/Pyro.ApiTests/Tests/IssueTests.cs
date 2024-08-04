@@ -2,15 +2,33 @@
 // Licensed under the GPL-3.0 license. See LICENSE file in the project root for full license information.
 
 using Bogus;
+using Pyro.ApiTests.Clients;
 using Pyro.Contracts.Requests;
 using Pyro.Contracts.Requests.Issues;
-using Pyro.Contracts.Responses;
-using Pyro.Contracts.Responses.Issues;
 
 namespace Pyro.ApiTests.Tests;
 
 public class IssueTests
 {
+    private PyroClient pyroClient;
+    private IssueClient issueClient;
+
+    [OneTimeSetUp]
+    public async Task SetUp()
+    {
+        pyroClient = new PyroClient(Api.BaseAddress);
+        issueClient = pyroClient.Share<IssueClient>();
+        await issueClient.Login();
+    }
+
+    [OneTimeTearDown]
+    public async Task TearDown()
+    {
+        await issueClient.Logout();
+        issueClient.Dispose();
+        pyroClient.Dispose();
+    }
+
     [Test]
     public async Task CreateGetUpdateIssue()
     {
@@ -34,7 +52,7 @@ public class IssueTests
             new Faker().Lorem.Word(),
             new Faker().Lorem.Sentence(),
             "master");
-        var repository = await Api.Post<GitRepositoryResponse>("/api/repositories", createRequest) ??
+        var repository = await pyroClient.CreateGitRepository(createRequest) ??
                          throw new Exception("Repository not created");
 
         return repository.Name;
@@ -45,7 +63,7 @@ public class IssueTests
         var createRequest = new CreateIssueRequest(
             new Faker().Lorem.Sentence(),
             null);
-        var issue = await Api.Post<IssueResponse>($"/api/repositories/{name}/issues", createRequest);
+        var issue = await issueClient.CreateIssue(name, createRequest);
 
         Assert.That(issue, Is.Not.Null);
         Assert.Multiple(() =>
@@ -62,7 +80,7 @@ public class IssueTests
         var updateRequest = new UpdateIssueRequest(
             new Faker().Lorem.Sentence(),
             Guid.Parse("F9BA057A-35B0-4D10-8326-702D8F7EC966"));
-        var issue = await Api.Put<IssueResponse>($"/api/repositories/{name}/issues/{number}", updateRequest);
+        var issue = await issueClient.UpdateIssue(name, number, updateRequest);
 
         Assert.That(issue, Is.Not.Null);
         Assert.Multiple(() =>
@@ -74,18 +92,18 @@ public class IssueTests
 
     private async Task GetIssue(string name, int number)
     {
-        var issue = await Api.Get<IssueResponse>($"/api/repositories/{name}/issues/{number}");
+        var issue = await issueClient.GetIssue(name, number);
 
         Assert.That(issue, Is.Not.Null);
         Assert.That(issue.IssueNumber, Is.EqualTo(number));
     }
 
     private async Task DeleteIssue(string name, int number)
-        => await Api.Delete($"/api/repositories/{name}/issues/{number}");
+        => await issueClient.DeleteIssue(name, number);
 
     private async Task GetIssuesAfterIssueDelete(string name, int number)
     {
-        var issues = await Api.Get<IReadOnlyList<IssueResponse>>($"/api/repositories/{name}/issues");
+        var issues = await issueClient.GetIssues(name);
 
         Assert.That(issues, Is.Not.Null);
         Assert.That(issues.Select(x => x.IssueNumber), Does.Not.Contains(number));
@@ -93,8 +111,8 @@ public class IssueTests
 
     private async Task<Guid> CreateComment(string name, int number)
     {
-        var createRequest = new CreateCommentRequest(new Faker().Lorem.Sentence());
-        var comment = await Api.Post<IssueCommentResponse>($"/api/repositories/{name}/issues/{number}/comments", createRequest);
+        var createRequest = new CreateIssueCommentRequest(new Faker().Lorem.Sentence());
+        var comment = await issueClient.CreateComment(name, number, createRequest);
 
         Assert.That(comment, Is.Not.Null);
         Assert.That(comment.Content, Is.EqualTo(createRequest.Content));
@@ -104,19 +122,19 @@ public class IssueTests
 
     private async Task UpdateComment(string name, int number, Guid commentId)
     {
-        var updateRequest = new UpdateCommentRequest(new Faker().Lorem.Sentence());
-        var comment = await Api.Put<IssueCommentResponse>($"/api/repositories/{name}/issues/{number}/comments/{commentId}", updateRequest);
+        var updateRequest = new UpdateIssueCommentRequest(new Faker().Lorem.Sentence());
+        var comment = await issueClient.UpdateComment(name, number, commentId, updateRequest);
 
         Assert.That(comment, Is.Not.Null);
         Assert.That(comment.Content, Is.EqualTo(updateRequest.Content));
     }
 
     private async Task DeleteComment(string name, int number, Guid id)
-        => await Api.Delete($"/api/repositories/{name}/issues/{number}/comments/{id}");
+        => await issueClient.DeleteComment(name, number, id);
 
     private async Task GetCommentsAfterCommentDelete(string name, int number)
     {
-        var comments = await Api.Get<IReadOnlyList<IssueCommentResponse>>($"/api/repositories/{name}/issues/{number}/comments");
+        var comments = await issueClient.GetComments(name, number);
 
         Assert.That(comments, Is.Empty);
     }
