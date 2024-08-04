@@ -1,18 +1,33 @@
 // Copyright (c) Dmytro Kyshchenko. All rights reserved.
 // Licensed under the GPL-3.0 license. See LICENSE file in the project root for full license information.
 
-using System.Net;
+using Pyro.ApiTests.Clients;
 using Pyro.Contracts.Requests.Identity;
-using Pyro.Contracts.Responses.Identity;
 
 namespace Pyro.ApiTests.Tests;
 
 public class UserTests
 {
+    private IdentityClient client;
+
+    [OneTimeSetUp]
+    public async Task SetUp()
+    {
+        client = new IdentityClient(Api.BaseAddress);
+        await client.Login();
+    }
+
+    [OneTimeTearDown]
+    public async Task TearDown()
+    {
+        await client.Logout();
+        client.Dispose();
+    }
+
     [Test]
     public async Task GetUsers()
     {
-        var result = await Api.Get<IReadOnlyList<UserResponse>>("/api/users");
+        var result = await client.GetUsers();
 
         Assert.That(result, Is.Not.Empty);
     }
@@ -21,7 +36,7 @@ public class UserTests
     public async Task GetUserByLogin()
     {
         const string login = "pyro";
-        var result = await Api.Get<UserResponse>($"/api/users/{login}");
+        var result = await client.GetUser(login);
 
         Assert.That(result, Is.Not.Null);
         Assert.That(result.Login, Is.EqualTo(login));
@@ -31,10 +46,9 @@ public class UserTests
     public async Task GetMissingUserByLogin()
     {
         const string login = "missing";
-        using var response = await Api.Get($"/api/users/{login}");
+        var result = await client.GetUser(login);
 
-        Assert.That(response, Is.Not.Null);
-        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
+        Assert.That(result, Is.Null);
     }
 
     [Test]
@@ -44,9 +58,9 @@ public class UserTests
             Guid.NewGuid().ToString().Replace("-", string.Empty),
             "password",
             ["Admin"]);
-        await Api.Post("/api/users", createRequest);
+        await client.CreateUser(createRequest);
 
-        var user = await Api.Get<UserResponse>($"/api/users/{createRequest.Login}");
+        var user = await client.GetUser(createRequest.Login);
 
         Assert.That(user, Is.Not.Null);
         Assert.Multiple(() =>
@@ -57,7 +71,7 @@ public class UserTests
         });
 
         var updateRequest = new UpdateUserRequest(["User"]);
-        user = await Api.Put<UserResponse>($"/api/users/{createRequest.Login}", updateRequest);
+        user = await client.UpdateUser(createRequest.Login, updateRequest);
 
         Assert.That(user, Is.Not.Null);
         Assert.Multiple(() =>
@@ -74,7 +88,7 @@ public class UserTests
         var createRequest = new CreateAccessTokenRequest(
             Guid.NewGuid().ToString(),
             DateTimeOffset.UtcNow.AddMonths(1));
-        var token = await Api.Post<AccessTokenResponse>("/api/users/access-tokens", createRequest);
+        var token = await client.CreateAccessToken(createRequest);
 
         Assert.That(token, Is.Not.Null);
         Assert.Multiple(() =>
@@ -83,14 +97,14 @@ public class UserTests
             Assert.That(token.ExpiresAt, Is.EqualTo(createRequest.ExpiresAt));
         });
 
-        var tokens = await Api.Get<IReadOnlyList<AccessTokenResponse>>("/api/users/access-tokens");
+        var tokens = await client.GetAccessTokens();
 
         Assert.That(tokens, Is.Not.Empty);
         Assert.That(tokens, Contains.Item(token));
 
-        await Api.Delete($"/api/users/access-tokens/{token.Name}");
+        await client.DeleteAccessToken(token.Name);
 
-        tokens = await Api.Get<IReadOnlyList<AccessTokenResponse>>("/api/users/access-tokens");
+        tokens = await client.GetAccessTokens();
 
         Assert.That(tokens, Is.Empty);
     }

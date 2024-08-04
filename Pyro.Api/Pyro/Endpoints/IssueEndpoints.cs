@@ -187,7 +187,7 @@ internal static class IssueEndpoints
                 UnitOfWork unitOfWork,
                 string name,
                 int number,
-                CreateCommentRequest request,
+                CreateIssueCommentRequest request,
                 CancellationToken cancellationToken) =>
             {
                 var command = new CreateIssueComment(name, number, request.Content);
@@ -213,7 +213,7 @@ internal static class IssueEndpoints
                 string name,
                 int number,
                 Guid commentId,
-                UpdateCommentRequest request,
+                UpdateIssueCommentRequest request,
                 CancellationToken cancellationToken) =>
             {
                 var command = new UpdateIssueComment(name, number, commentId, request.Content);
