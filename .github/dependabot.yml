@@ -4,7 +4,6 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
-    target-branch: "master"
     assignees:
       - "sys27"
     reviewers:
@@ -22,3 +21,12 @@ updates:
       angular:
         patterns:
           - "@angular/*"
+
+  - package-ecosystem: docker
+    directory: "/"
+    schedule:
+      interval: "daily"
+    assignees:
+      - "sys27"
+    reviewers:
+      - "sys27"

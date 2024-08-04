@@ -1,4 +1,4 @@
-﻿FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS build
+﻿FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0.303-alpine3.20 AS build
 ARG BUILD_CONFIGURATION=Release
 ARG TARGETOS
 ARG TARGETARCH
@@ -39,14 +39,14 @@ RUN dotnet publish "Pyro/Pyro.csproj" \
     --nologo --no-restore --no-build -c $BUILD_CONFIGURATION \
     -o /app/publish /p:UseAppHost=false
 
-FROM --platform=$BUILDPLATFORM node:lts-alpine AS node
+FROM --platform=$BUILDPLATFORM node:20.16.0-alpine AS node
 WORKDIR /src
 COPY ["Pyro.UI/package.json", "Pyro.UI/package-lock.json", "./"]
 RUN npm ci
 COPY Pyro.UI .
 RUN npm run build
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine AS final
+FROM mcr.microsoft.com/dotnet/aspnet:8.0.7-alpine3.20 AS final
 EXPOSE 80
 
 ENV ASPNETCORE_ENVIRONMENT="Production"
