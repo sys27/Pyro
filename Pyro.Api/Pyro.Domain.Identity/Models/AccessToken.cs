@@ -2,15 +2,14 @@
 // Licensed under the GPL-3.0 license. See LICENSE file in the project root for full license information.
 
 using System.Diagnostics.CodeAnalysis;
+using Pyro.Domain.Shared.Models;
 
 namespace Pyro.Domain.Identity.Models;
 
-public class AccessToken
+public class AccessToken : Entity
 {
     private readonly byte[] token;
     private readonly byte[] salt;
-
-    public Guid Id { get; init; }
 
     public required string Name { get; init; }
 

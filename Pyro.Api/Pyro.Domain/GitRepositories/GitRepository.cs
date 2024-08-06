@@ -10,8 +10,6 @@ namespace Pyro.Domain.GitRepositories;
 /// </summary>
 public class GitRepository : DomainEntity
 {
-    public Guid Id { get; init; }
-
     public required string Name { get; init; }
 
     public string? Description { get; init; }
