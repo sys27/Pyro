@@ -22,7 +22,6 @@ public class User : DomainEntity
     {
         var user = new User
         {
-            Id = Guid.NewGuid(),
             Login = login,
             Password = password,
             Salt = salt,
@@ -31,8 +30,6 @@ public class User : DomainEntity
 
         return user;
     }
-
-    public Guid Id { get; init; }
 
     public required string Login { get; init; }
 

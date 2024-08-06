@@ -4,6 +4,7 @@
 using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Pyro.Infrastructure.Messaging;
+using Pyro.Infrastructure.Shared.DataAccess;
 
 namespace Pyro.Infrastructure.DataAccess;
 
@@ -20,6 +21,7 @@ public class PyroDbContext : DbContext, IDataProtectionKeyContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(PyroDbContext).Assembly);
+        modelBuilder.ConfigureIds();
     }
 
     internal DbSet<OutboxMessage> OutboxMessages { get; init; }

@@ -37,7 +37,6 @@ namespace Pyro.Infrastructure.Migrations
             modelBuilder.Entity("Pyro.Domain.GitRepositories.GitRepository", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("BLOB");
 
                     b.Property<string>("DefaultBranch")

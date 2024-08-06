@@ -1,12 +1,12 @@
 // Copyright (c) Dmytro Kyshchenko. All rights reserved.
 // Licensed under the GPL-3.0 license. See LICENSE file in the project root for full license information.
 
+using Pyro.Domain.Shared.Models;
+
 namespace Pyro.Domain.Issues;
 
-public class IssueComment
+public class IssueComment : Entity
 {
-    public Guid Id { get; init; }
-
     public required string Content { get; set; }
 
     public required Issue Issue { get; init; }

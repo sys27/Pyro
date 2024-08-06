@@ -50,7 +50,6 @@ public class CreateGitRepositoryHandler : IRequestHandler<CreateGitRepository, G
     {
         var gitRepository = new GitRepository
         {
-            Id = Guid.NewGuid(),
             Name = request.Name,
             Description = request.Description,
             DefaultBranch = request.DefaultBranch,

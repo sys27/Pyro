@@ -20,7 +20,6 @@ namespace Pyro.Infrastructure.Identity.Migrations
             modelBuilder.Entity("Pyro.Domain.Identity.Models.AccessToken", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("BLOB");
 
                     b.Property<DateTimeOffset>("ExpiresAt")
@@ -60,7 +59,6 @@ namespace Pyro.Infrastructure.Identity.Migrations
             modelBuilder.Entity("Pyro.Domain.Identity.Models.AuthenticationToken", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("BLOB");
 
                     b.Property<DateTimeOffset>("ExpiresAt")
@@ -151,7 +149,6 @@ namespace Pyro.Infrastructure.Identity.Migrations
             modelBuilder.Entity("Pyro.Domain.Identity.Models.Role", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("BLOB");
 
                     b.Property<string>("Name")
@@ -183,7 +180,6 @@ namespace Pyro.Infrastructure.Identity.Migrations
             modelBuilder.Entity("Pyro.Domain.Identity.Models.SigningKey", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("BLOB");
 
                     b.Property<DateTimeOffset>("CreatedAt")
@@ -201,7 +197,6 @@ namespace Pyro.Infrastructure.Identity.Migrations
             modelBuilder.Entity("Pyro.Domain.Identity.Models.User", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("BLOB");
 
                     b.Property<bool>("IsLocked")

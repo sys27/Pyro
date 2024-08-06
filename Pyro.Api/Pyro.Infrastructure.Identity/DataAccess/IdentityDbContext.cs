@@ -2,6 +2,7 @@
 // Licensed under the GPL-3.0 license. See LICENSE file in the project root for full license information.
 
 using Microsoft.EntityFrameworkCore;
+using Pyro.Infrastructure.Shared.DataAccess;
 
 namespace Pyro.Infrastructure.Identity.DataAccess;
 
@@ -15,5 +16,6 @@ public class IdentityDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(IdentityDbContext).Assembly);
+        modelBuilder.ConfigureIds();
     }
 }

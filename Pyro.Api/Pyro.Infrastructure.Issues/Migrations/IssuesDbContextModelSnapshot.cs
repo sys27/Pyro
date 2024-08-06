@@ -44,7 +44,6 @@ namespace Pyro.Infrastructure.Issues.Migrations
             modelBuilder.Entity("Pyro.Domain.Issues.Issue", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("BLOB");
 
                     b.Property<Guid?>("AssigneeId")
@@ -85,7 +84,6 @@ namespace Pyro.Infrastructure.Issues.Migrations
             modelBuilder.Entity("Pyro.Domain.Issues.IssueComment", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("BLOB");
 
                     b.Property<Guid>("AuthorId")

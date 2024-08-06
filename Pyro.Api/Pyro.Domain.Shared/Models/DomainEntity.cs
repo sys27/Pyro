@@ -3,7 +3,7 @@
 
 namespace Pyro.Domain.Shared.Models;
 
-public abstract class DomainEntity
+public abstract class DomainEntity : Entity
 {
     private readonly HashSet<IDomainEvent> domainEvents = [];
 
