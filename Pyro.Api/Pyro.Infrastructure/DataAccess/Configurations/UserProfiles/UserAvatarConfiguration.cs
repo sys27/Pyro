@@ -18,8 +18,7 @@ internal class UserAvatarConfiguration : IEntityTypeConfiguration<UserAvatar>
 
         builder.Property(x => x.Id)
             .HasColumnType("BLOB")
-            .IsRequired()
-            .ValueGeneratedOnAdd();
+            .IsRequired();
 
         builder.Property(x => x.Image)
             .IsRequired();

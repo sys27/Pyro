@@ -17,8 +17,7 @@ internal class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.Property(x => x.Id)
             .HasColumnType("BLOB")
-            .IsRequired()
-            .ValueGeneratedOnAdd();
+            .IsRequired();
 
         builder.Property(x => x.Login)
             .IsRequired()

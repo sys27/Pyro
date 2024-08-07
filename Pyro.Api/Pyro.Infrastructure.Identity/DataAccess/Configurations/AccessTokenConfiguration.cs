@@ -17,8 +17,7 @@ internal class AccessTokenConfiguration : IEntityTypeConfiguration<AccessToken>
 
         builder.Property(x => x.Id)
             .HasColumnType("BLOB")
-            .IsRequired()
-            .ValueGeneratedOnAdd();
+            .IsRequired();
 
         builder.Property(x => x.Name)
             .IsRequired()

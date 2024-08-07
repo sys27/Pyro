@@ -16,8 +16,7 @@ internal class PermissionConfiguration : IEntityTypeConfiguration<Permission>
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Id)
-            .HasColumnType("BLOB")
-            .ValueGeneratedNever();
+            .HasColumnType("BLOB");
 
         builder.Property(x => x.Name)
             .IsRequired();
