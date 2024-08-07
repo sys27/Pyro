@@ -69,7 +69,6 @@ namespace Pyro.Infrastructure.Migrations
             modelBuilder.Entity("Pyro.Domain.UserProfiles.UserAvatar", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("BLOB");
 
                     b.Property<byte[]>("Image")
@@ -85,7 +84,6 @@ namespace Pyro.Infrastructure.Migrations
             modelBuilder.Entity("Pyro.Domain.UserProfiles.UserProfile", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("BLOB");
 
                     b.Property<string>("Email")
@@ -118,7 +116,6 @@ namespace Pyro.Infrastructure.Migrations
             modelBuilder.Entity("Pyro.Infrastructure.Messaging.OutboxMessage", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("BLOB");
 
                     b.Property<long>("CreatedAt")

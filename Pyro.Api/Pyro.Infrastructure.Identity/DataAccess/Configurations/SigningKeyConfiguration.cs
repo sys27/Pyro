@@ -17,7 +17,6 @@ internal class SigningKeyConfiguration : IEntityTypeConfiguration<SigningKey>
 
         builder.Property(x => x.Id)
             .IsRequired()
-            .ValueGeneratedOnAdd()
             .HasColumnType("BLOB");
 
         builder.Property(x => x.Key)

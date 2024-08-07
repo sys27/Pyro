@@ -18,8 +18,7 @@ internal class GitRepositoryConfiguration : IEntityTypeConfiguration<GitReposito
 
         builder.Property(x => x.Id)
             .HasColumnType("BLOB")
-            .IsRequired()
-            .ValueGeneratedOnAdd();
+            .IsRequired();
 
         builder.Property(x => x.Name)
             .HasMaxLength(50)
