@@ -45,7 +45,7 @@ namespace Pyro.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(250)
+                        .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
@@ -89,7 +89,7 @@ namespace Pyro.Infrastructure.Migrations
                         .HasColumnType("BLOB");
 
                     b.Property<string>("Email")
-                        .HasMaxLength(150)
+                        .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
@@ -98,7 +98,7 @@ namespace Pyro.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Status")
-                        .HasMaxLength(150)
+                        .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id")

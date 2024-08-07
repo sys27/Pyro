@@ -22,14 +22,14 @@ internal class UserProfileConfiguration : IEntityTypeConfiguration<UserProfile>
             .ValueGeneratedOnAdd();
 
         builder.Property(x => x.Email)
-            .HasMaxLength(150);
+            .HasMaxLength(200);
 
         builder.Property(x => x.Name)
             .IsRequired()
             .HasMaxLength(50);
 
         builder.Property(x => x.Status)
-            .HasMaxLength(150);
+            .HasMaxLength(200);
 
         builder.HasOne(x => x.Avatar)
             .WithOne()

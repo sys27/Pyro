@@ -15,7 +15,7 @@ public class DeleteIssueValidator : AbstractValidator<DeleteIssue>
     {
         RuleFor(x => x.RepositoryName)
             .NotEmpty()
-            .MaximumLength(20);
+            .MaximumLength(50);
 
         RuleFor(x => x.IssueNumber)
             .GreaterThan(0);

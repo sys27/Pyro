@@ -19,11 +19,11 @@ public class CreateGitRepositoryValidator : AbstractValidator<CreateGitRepositor
     {
         RuleFor(x => x.Name)
             .NotEmpty()
-            .MaximumLength(20)
+            .MaximumLength(50)
             .Matches(Regexes.GetRepositoryNameRegex());
 
         RuleFor(x => x.Description)
-            .MaximumLength(250);
+            .MaximumLength(200);
 
         RuleFor(x => x.DefaultBranch)
             .NotEmpty()

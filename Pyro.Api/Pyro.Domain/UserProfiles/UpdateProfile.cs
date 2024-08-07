@@ -19,7 +19,7 @@ public class UpdateProfileValidator : AbstractValidator<UpdateProfile>
             .MaximumLength(50);
 
         RuleFor(x => x.Status)
-            .MaximumLength(150);
+            .MaximumLength(200);
     }
 }
 
