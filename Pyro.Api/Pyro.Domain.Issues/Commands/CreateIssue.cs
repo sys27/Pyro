@@ -16,7 +16,7 @@ public class CreateIssueValidator : AbstractValidator<CreateIssue>
     {
         RuleFor(x => x.RepositoryName)
             .NotEmpty()
-            .MaximumLength(20);
+            .MaximumLength(50);
 
         RuleFor(x => x.Title)
             .NotEmpty()

@@ -26,7 +26,7 @@ internal class GitRepositoryConfiguration : IEntityTypeConfiguration<GitReposito
             .IsRequired();
 
         builder.Property(x => x.Description)
-            .HasMaxLength(250);
+            .HasMaxLength(200);
 
         builder.Property(x => x.DefaultBranch)
             .HasMaxLength(50)
