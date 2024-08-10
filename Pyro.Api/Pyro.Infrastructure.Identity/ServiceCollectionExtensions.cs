@@ -4,6 +4,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Pyro.Domain.Identity;
 using Pyro.Infrastructure.Identity.DataAccess;
 using Pyro.Infrastructure.Shared.DataAccess;
@@ -16,9 +17,16 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddDbContext<IdentityDbContext>((provider, options) => options
-            .UseSqlite(configuration.GetConnectionString("DefaultConnection"))
-            .AddInterceptors(provider.GetRequiredService<DomainEventInterceptor>()));
+        services.AddDbContext<IdentityDbContext>((provider, options) =>
+        {
+            var env = provider.GetRequiredService<IHostEnvironment>();
+
+            options
+                .UseSqlite(configuration.GetConnectionString("DefaultConnection"))
+                .EnableDetailedErrors(env.IsDevelopment())
+                .EnableSensitiveDataLogging(env.IsDevelopment())
+                .AddInterceptors(provider.GetRequiredService<DomainEventInterceptor>());
+        });
         services.AddScoped<DbContext, IdentityDbContext>(sp => sp.GetRequiredService<IdentityDbContext>());
 
         return services

@@ -14,7 +14,6 @@ internal class GitRepositoryConfiguration : IEntityTypeConfiguration<GitReposito
         builder.ToTable("GitRepositories", b => b.ExcludeFromMigrations());
 
         builder.Property<Guid>("Id")
-            .HasColumnType("BLOB")
             .IsRequired();
 
         builder.HasKey("Id")

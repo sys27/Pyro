@@ -3,6 +3,7 @@
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Pyro.Infrastructure.Shared.DataAccess.Converters;
 
 namespace Pyro.Infrastructure.Shared.DataAccess;
 
@@ -19,6 +20,28 @@ public static class ModelBuilderExtensions
             var idProperty = entity.FindProperty("Id");
             if (idProperty is not null)
                 idProperty.ValueGenerated = ValueGenerated.Never;
+        }
+    }
+
+    public static void ConfigureGuids(this ModelBuilder modelBuilder)
+    {
+        foreach (var entity in modelBuilder.Model.GetEntityTypes())
+        {
+            var properties = entity.GetProperties().Where(x => x.ClrType == typeof(Guid));
+
+            foreach (var property in properties)
+            {
+                property.SetColumnType("BLOB");
+                property.SetValueConverter(GuidConverter.Instance);
+            }
+
+            properties = entity.GetProperties().Where(x => x.ClrType == typeof(Guid?));
+
+            foreach (var property in properties)
+            {
+                property.SetColumnType("BLOB");
+                property.SetValueConverter(NullableGuidConverter.Instance);
+            }
         }
     }
 }

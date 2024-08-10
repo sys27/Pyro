@@ -22,8 +22,7 @@ internal class IssueConfiguration : IEntityTypeConfiguration<Issue>
             .HasName("PK_Issue");
 
         builder.Property(x => x.Id)
-            .IsRequired()
-            .HasColumnType("BLOB");
+            .IsRequired();
 
         builder.Property(x => x.Title)
             .IsRequired()
@@ -35,8 +34,7 @@ internal class IssueConfiguration : IEntityTypeConfiguration<Issue>
             .HasValueGenerator<IssueNumberValueGenerator>();
 
         builder.Property<Guid>("RepositoryId")
-            .IsRequired()
-            .HasColumnType("BLOB");
+            .IsRequired();
 
         builder.HasOne(x => x.Repository)
             .WithMany()
@@ -44,8 +42,7 @@ internal class IssueConfiguration : IEntityTypeConfiguration<Issue>
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.Property<Guid>("AuthorId")
-            .IsRequired()
-            .HasColumnType("BLOB");
+            .IsRequired();
 
         builder.HasOne(x => x.Author)
             .WithMany()
@@ -56,8 +53,7 @@ internal class IssueConfiguration : IEntityTypeConfiguration<Issue>
             .IsRequired()
             .HasConversion<DateTimeOffsetToBinaryConverter>();
 
-        builder.Property<Guid?>("AssigneeId")
-            .HasColumnType("BLOB");
+        builder.Property<Guid?>("AssigneeId");
 
         builder.HasOne(x => x.Assignee)
             .WithMany()

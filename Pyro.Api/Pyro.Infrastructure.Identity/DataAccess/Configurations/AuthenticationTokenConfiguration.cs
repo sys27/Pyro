@@ -16,18 +16,15 @@ public class AuthenticationTokenConfiguration : IEntityTypeConfiguration<Authent
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Id)
-            .HasColumnType("BLOB")
             .IsRequired();
 
         builder.Property(x => x.TokenId)
-            .HasColumnType("BLOB")
             .IsRequired();
 
         builder.Property(x => x.ExpiresAt)
             .IsRequired();
 
         builder.Property(x => x.UserId)
-            .HasColumnType("BLOB")
             .IsRequired();
 
         builder.HasIndex(x => x.TokenId)

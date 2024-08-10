@@ -17,7 +17,6 @@ internal class GitRepositoryConfiguration : IEntityTypeConfiguration<GitReposito
             .HasName("PK_GitRepository");
 
         builder.Property(x => x.Id)
-            .HasColumnType("BLOB")
             .IsRequired();
 
         builder.Property(x => x.Name)

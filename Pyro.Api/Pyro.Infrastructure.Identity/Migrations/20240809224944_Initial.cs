@@ -18,7 +18,7 @@ namespace Pyro.Infrastructure.Identity.Migrations
                 name: "Permissions",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "BLOB", nullable: false),
+                    Id = table.Column<byte[]>(type: "BLOB", nullable: false),
                     Name = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
@@ -30,7 +30,7 @@ namespace Pyro.Infrastructure.Identity.Migrations
                 name: "Roles",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "BLOB", nullable: false),
+                    Id = table.Column<byte[]>(type: "BLOB", nullable: false),
                     Name = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false)
                 },
                 constraints: table =>
@@ -42,7 +42,7 @@ namespace Pyro.Infrastructure.Identity.Migrations
                 name: "SigningKeys",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "BLOB", nullable: false),
+                    Id = table.Column<byte[]>(type: "BLOB", nullable: false),
                     Key = table.Column<string>(type: "TEXT", nullable: false),
                     CreatedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false)
                 },
@@ -55,7 +55,7 @@ namespace Pyro.Infrastructure.Identity.Migrations
                 name: "Users",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "BLOB", nullable: false),
+                    Id = table.Column<byte[]>(type: "BLOB", nullable: false),
                     Login = table.Column<string>(type: "TEXT", maxLength: 32, nullable: false),
                     IsLocked = table.Column<bool>(type: "INTEGER", nullable: false, defaultValue: false),
                     Password = table.Column<byte[]>(type: "BLOB", maxLength: 64, nullable: false),
@@ -70,8 +70,8 @@ namespace Pyro.Infrastructure.Identity.Migrations
                 name: "RolePermissions",
                 columns: table => new
                 {
-                    RoleId = table.Column<Guid>(type: "BLOB", nullable: false),
-                    PermissionId = table.Column<Guid>(type: "BLOB", nullable: false)
+                    RoleId = table.Column<byte[]>(type: "BLOB", nullable: false),
+                    PermissionId = table.Column<byte[]>(type: "BLOB", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -94,10 +94,10 @@ namespace Pyro.Infrastructure.Identity.Migrations
                 name: "AccessTokens",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "BLOB", nullable: false),
+                    Id = table.Column<byte[]>(type: "BLOB", nullable: false),
                     Name = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
                     ExpiresAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
-                    UserId = table.Column<Guid>(type: "BLOB", nullable: false),
+                    UserId = table.Column<byte[]>(type: "BLOB", nullable: false),
                     Salt = table.Column<byte[]>(type: "BLOB", maxLength: 16, nullable: false),
                     Token = table.Column<byte[]>(type: "BLOB", maxLength: 64, nullable: false)
                 },
@@ -116,10 +116,10 @@ namespace Pyro.Infrastructure.Identity.Migrations
                 name: "AuthenticationTokens",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "BLOB", nullable: false),
-                    TokenId = table.Column<Guid>(type: "BLOB", nullable: false),
+                    Id = table.Column<byte[]>(type: "BLOB", nullable: false),
+                    TokenId = table.Column<byte[]>(type: "BLOB", nullable: false),
                     ExpiresAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
-                    UserId = table.Column<Guid>(type: "BLOB", nullable: false)
+                    UserId = table.Column<byte[]>(type: "BLOB", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -136,8 +136,8 @@ namespace Pyro.Infrastructure.Identity.Migrations
                 name: "UserRoles",
                 columns: table => new
                 {
-                    UserId = table.Column<Guid>(type: "BLOB", nullable: false),
-                    RoleId = table.Column<Guid>(type: "BLOB", nullable: false)
+                    UserId = table.Column<byte[]>(type: "BLOB", nullable: false),
+                    RoleId = table.Column<byte[]>(type: "BLOB", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -161,12 +161,15 @@ namespace Pyro.Infrastructure.Identity.Migrations
                 columns: new[] { "Id", "Name" },
                 values: new object[,]
                 {
-                    { new Guid("2c182139-085d-4851-aa3b-ca218ee77e70"), "user.edit" },
-                    { new Guid("95fed72d-90b3-4104-891e-a7dae7ea4405"), "user.view" },
-                    { new Guid("a740c470-34ea-46c4-8ca0-dc692e1fb423"), "repository.manage" },
-                    { new Guid("e6a86676-0f74-4d00-a9b7-fc84a065d673"), "user.manage" },
-                    { new Guid("edf38b44-b150-46df-bc79-adaa3c01659f"), "repository.edit" },
-                    { new Guid("f65ad9fd-a259-4598-803a-f85607c7566b"), "repository.view" }
+                    { new byte[] { 253, 217, 90, 246, 89, 162, 152, 69, 128, 58, 248, 86, 7, 199, 86, 107 }, "repository.view" },
+                    { new byte[] { 68, 139, 243, 237, 80, 177, 223, 70, 188, 121, 173, 170, 60, 1, 101, 159 }, "repository.edit" },
+                    { new byte[] { 112, 196, 64, 167, 234, 52, 196, 70, 140, 160, 220, 105, 46, 31, 180, 35 }, "repository.manage" },
+                    { new byte[] { 45, 215, 254, 149, 179, 144, 4, 65, 137, 30, 167, 218, 231, 234, 68, 5 }, "user.view" },
+                    { new byte[] { 57, 33, 24, 44, 93, 8, 81, 72, 170, 59, 202, 33, 142, 231, 126, 112 }, "user.edit" },
+                    { new byte[] { 118, 102, 168, 230, 116, 15, 0, 77, 169, 183, 252, 132, 160, 101, 214, 115 }, "user.manage" },
+                    { new byte[] { 7, 26, 53, 106, 110, 179, 126, 65, 140, 172, 51, 248, 111, 65, 48, 17 }, "issue.view" },
+                    { new byte[] { 175, 99, 54, 119, 36, 94, 104, 68, 152, 194, 96, 121, 87, 70, 158, 140 }, "issue.edit" },
+                    { new byte[] { 111, 60, 124, 50, 244, 238, 2, 79, 184, 101, 202, 180, 209, 229, 80, 249 }, "issue.manage" }
                 });
 
             migrationBuilder.InsertData(
@@ -174,36 +177,41 @@ namespace Pyro.Infrastructure.Identity.Migrations
                 columns: new[] { "Id", "Name" },
                 values: new object[,]
                 {
-                    { new Guid("36b9e20e-9b6b-461b-b129-d6a49fe4f4f8"), "User" },
-                    { new Guid("9aa993eb-e3db-4fce-ba9f-b0bb23395b9d"), "Admin" }
+                    { new byte[] { 235, 147, 169, 154, 219, 227, 206, 79, 186, 159, 176, 187, 35, 57, 91, 157 }, "Admin" },
+                    { new byte[] { 14, 226, 185, 54, 107, 155, 27, 70, 177, 41, 214, 164, 159, 228, 244, 248 }, "User" }
                 });
 
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "Login", "Password", "Salt" },
-                values: new object[] { new Guid("f9ba057a-35b0-4d10-8326-702d8f7ec966"), "pyro", new byte[] { 239, 163, 54, 78, 41, 129, 181, 60, 27, 181, 100, 116, 243, 128, 253, 209, 87, 147, 27, 73, 138, 190, 50, 65, 18, 253, 153, 127, 194, 97, 240, 29, 179, 58, 68, 117, 170, 97, 172, 236, 70, 27, 167, 168, 87, 3, 66, 53, 11, 34, 206, 209, 211, 150, 81, 227, 19, 161, 249, 24, 45, 138, 206, 197 }, new byte[] { 109, 28, 230, 18, 208, 250, 67, 218, 171, 6, 152, 200, 162, 109, 186, 132 } });
+                values: new object[] { new byte[] { 122, 5, 186, 249, 176, 53, 16, 77, 131, 38, 112, 45, 143, 126, 201, 102 }, "pyro", new byte[] { 239, 163, 54, 78, 41, 129, 181, 60, 27, 181, 100, 116, 243, 128, 253, 209, 87, 147, 27, 73, 138, 190, 50, 65, 18, 253, 153, 127, 194, 97, 240, 29, 179, 58, 68, 117, 170, 97, 172, 236, 70, 27, 167, 168, 87, 3, 66, 53, 11, 34, 206, 209, 211, 150, 81, 227, 19, 161, 249, 24, 45, 138, 206, 197 }, new byte[] { 109, 28, 230, 18, 208, 250, 67, 218, 171, 6, 152, 200, 162, 109, 186, 132 } });
 
             migrationBuilder.InsertData(
                 table: "RolePermissions",
                 columns: new[] { "PermissionId", "RoleId" },
                 values: new object[,]
                 {
-                    { new Guid("2c182139-085d-4851-aa3b-ca218ee77e70"), new Guid("36b9e20e-9b6b-461b-b129-d6a49fe4f4f8") },
-                    { new Guid("95fed72d-90b3-4104-891e-a7dae7ea4405"), new Guid("36b9e20e-9b6b-461b-b129-d6a49fe4f4f8") },
-                    { new Guid("edf38b44-b150-46df-bc79-adaa3c01659f"), new Guid("36b9e20e-9b6b-461b-b129-d6a49fe4f4f8") },
-                    { new Guid("f65ad9fd-a259-4598-803a-f85607c7566b"), new Guid("36b9e20e-9b6b-461b-b129-d6a49fe4f4f8") },
-                    { new Guid("2c182139-085d-4851-aa3b-ca218ee77e70"), new Guid("9aa993eb-e3db-4fce-ba9f-b0bb23395b9d") },
-                    { new Guid("95fed72d-90b3-4104-891e-a7dae7ea4405"), new Guid("9aa993eb-e3db-4fce-ba9f-b0bb23395b9d") },
-                    { new Guid("a740c470-34ea-46c4-8ca0-dc692e1fb423"), new Guid("9aa993eb-e3db-4fce-ba9f-b0bb23395b9d") },
-                    { new Guid("e6a86676-0f74-4d00-a9b7-fc84a065d673"), new Guid("9aa993eb-e3db-4fce-ba9f-b0bb23395b9d") },
-                    { new Guid("edf38b44-b150-46df-bc79-adaa3c01659f"), new Guid("9aa993eb-e3db-4fce-ba9f-b0bb23395b9d") },
-                    { new Guid("f65ad9fd-a259-4598-803a-f85607c7566b"), new Guid("9aa993eb-e3db-4fce-ba9f-b0bb23395b9d") }
+                    { new byte[] { 253, 217, 90, 246, 89, 162, 152, 69, 128, 58, 248, 86, 7, 199, 86, 107 }, new byte[] { 235, 147, 169, 154, 219, 227, 206, 79, 186, 159, 176, 187, 35, 57, 91, 157 } },
+                    { new byte[] { 68, 139, 243, 237, 80, 177, 223, 70, 188, 121, 173, 170, 60, 1, 101, 159 }, new byte[] { 235, 147, 169, 154, 219, 227, 206, 79, 186, 159, 176, 187, 35, 57, 91, 157 } },
+                    { new byte[] { 112, 196, 64, 167, 234, 52, 196, 70, 140, 160, 220, 105, 46, 31, 180, 35 }, new byte[] { 235, 147, 169, 154, 219, 227, 206, 79, 186, 159, 176, 187, 35, 57, 91, 157 } },
+                    { new byte[] { 45, 215, 254, 149, 179, 144, 4, 65, 137, 30, 167, 218, 231, 234, 68, 5 }, new byte[] { 235, 147, 169, 154, 219, 227, 206, 79, 186, 159, 176, 187, 35, 57, 91, 157 } },
+                    { new byte[] { 57, 33, 24, 44, 93, 8, 81, 72, 170, 59, 202, 33, 142, 231, 126, 112 }, new byte[] { 235, 147, 169, 154, 219, 227, 206, 79, 186, 159, 176, 187, 35, 57, 91, 157 } },
+                    { new byte[] { 118, 102, 168, 230, 116, 15, 0, 77, 169, 183, 252, 132, 160, 101, 214, 115 }, new byte[] { 235, 147, 169, 154, 219, 227, 206, 79, 186, 159, 176, 187, 35, 57, 91, 157 } },
+                    { new byte[] { 7, 26, 53, 106, 110, 179, 126, 65, 140, 172, 51, 248, 111, 65, 48, 17 }, new byte[] { 235, 147, 169, 154, 219, 227, 206, 79, 186, 159, 176, 187, 35, 57, 91, 157 } },
+                    { new byte[] { 175, 99, 54, 119, 36, 94, 104, 68, 152, 194, 96, 121, 87, 70, 158, 140 }, new byte[] { 235, 147, 169, 154, 219, 227, 206, 79, 186, 159, 176, 187, 35, 57, 91, 157 } },
+                    { new byte[] { 111, 60, 124, 50, 244, 238, 2, 79, 184, 101, 202, 180, 209, 229, 80, 249 }, new byte[] { 235, 147, 169, 154, 219, 227, 206, 79, 186, 159, 176, 187, 35, 57, 91, 157 } },
+                    { new byte[] { 253, 217, 90, 246, 89, 162, 152, 69, 128, 58, 248, 86, 7, 199, 86, 107 }, new byte[] { 14, 226, 185, 54, 107, 155, 27, 70, 177, 41, 214, 164, 159, 228, 244, 248 } },
+                    { new byte[] { 68, 139, 243, 237, 80, 177, 223, 70, 188, 121, 173, 170, 60, 1, 101, 159 }, new byte[] { 14, 226, 185, 54, 107, 155, 27, 70, 177, 41, 214, 164, 159, 228, 244, 248 } },
+                    { new byte[] { 45, 215, 254, 149, 179, 144, 4, 65, 137, 30, 167, 218, 231, 234, 68, 5 }, new byte[] { 14, 226, 185, 54, 107, 155, 27, 70, 177, 41, 214, 164, 159, 228, 244, 248 } },
+                    { new byte[] { 57, 33, 24, 44, 93, 8, 81, 72, 170, 59, 202, 33, 142, 231, 126, 112 }, new byte[] { 14, 226, 185, 54, 107, 155, 27, 70, 177, 41, 214, 164, 159, 228, 244, 248 } },
+                    { new byte[] { 7, 26, 53, 106, 110, 179, 126, 65, 140, 172, 51, 248, 111, 65, 48, 17 }, new byte[] { 14, 226, 185, 54, 107, 155, 27, 70, 177, 41, 214, 164, 159, 228, 244, 248 } },
+                    { new byte[] { 175, 99, 54, 119, 36, 94, 104, 68, 152, 194, 96, 121, 87, 70, 158, 140 }, new byte[] { 14, 226, 185, 54, 107, 155, 27, 70, 177, 41, 214, 164, 159, 228, 244, 248 } }
                 });
 
             migrationBuilder.InsertData(
                 table: "UserRoles",
                 columns: new[] { "RoleId", "UserId" },
-                values: new object[] { new Guid("9aa993eb-e3db-4fce-ba9f-b0bb23395b9d"), new Guid("f9ba057a-35b0-4d10-8326-702d8f7ec966") });
+                values: new object[] { new byte[] { 235, 147, 169, 154, 219, 227, 206, 79, 186, 159, 176, 187, 35, 57, 91, 157 }, new byte[] { 122, 5, 186, 249, 176, 53, 16, 77, 131, 38, 112, 45, 143, 126, 201, 102 } });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AccessTokens_Name",

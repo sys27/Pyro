@@ -16,7 +16,6 @@ internal class UserConfiguration : IEntityTypeConfiguration<User>
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Id)
-            .HasColumnType("BLOB")
             .IsRequired();
 
         builder.Property(x => x.Login)
@@ -64,11 +63,9 @@ internal class UserConfiguration : IEntityTypeConfiguration<User>
                     j.HasKey("UserId", "RoleId");
 
                     j.Property<Guid>("UserId")
-                        .HasColumnType("BLOB")
                         .IsRequired();
 
                     j.Property<Guid>("RoleId")
-                        .HasColumnType("BLOB")
                         .IsRequired();
 
                     j.HasIndex("RoleId");

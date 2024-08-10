@@ -17,5 +17,6 @@ public class IdentityDbContext : DbContext
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(IdentityDbContext).Assembly);
         modelBuilder.ConfigureIds();
+        modelBuilder.ConfigureGuids();
     }
 }
