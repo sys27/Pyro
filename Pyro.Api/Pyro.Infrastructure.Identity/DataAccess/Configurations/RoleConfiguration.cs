@@ -16,7 +16,6 @@ internal class RoleConfiguration : IEntityTypeConfiguration<Role>
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Id)
-            .HasColumnType("BLOB")
             .IsRequired();
 
         builder.Property(x => x.Name)
@@ -47,11 +46,9 @@ internal class RoleConfiguration : IEntityTypeConfiguration<Role>
                     j.HasKey("RoleId", "PermissionId");
 
                     j.Property<Guid>("RoleId")
-                        .HasColumnType("BLOB")
                         .IsRequired();
 
                     j.Property<Guid>("PermissionId")
-                        .HasColumnType("BLOB")
                         .IsRequired();
 
                     j.HasIndex("PermissionId");

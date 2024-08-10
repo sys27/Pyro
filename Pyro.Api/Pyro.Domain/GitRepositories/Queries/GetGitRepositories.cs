@@ -14,9 +14,9 @@ public class GetGitRepositoriesHandler : IRequestHandler<GetGitRepositories, IRe
     public GetGitRepositoriesHandler(IGitRepositoryRepository repository)
         => this.repository = repository;
 
-    public Task<IReadOnlyList<GitRepository>> Handle(GetGitRepositories request, CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<GitRepository>> Handle(GetGitRepositories request, CancellationToken cancellationToken)
     {
-        var repositories = repository.GetRepositories(cancellationToken);
+        var repositories = await repository.GetRepositories(cancellationToken);
 
         return repositories;
     }

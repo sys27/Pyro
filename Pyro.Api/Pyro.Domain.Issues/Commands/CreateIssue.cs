@@ -51,7 +51,6 @@ public class CreateIssueHandler : IRequestHandler<CreateIssue, Issue>
 
         var issue = new Issue
         {
-            Id = Guid.NewGuid(),
             Title = request.Title,
             Repository = new GitRepository(request.RepositoryName),
             Author = author,

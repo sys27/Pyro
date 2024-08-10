@@ -18,16 +18,14 @@ internal class IssueCommentConfiguration : IEntityTypeConfiguration<IssueComment
             .HasName("PK_IssueComment");
 
         builder.Property(x => x.Id)
-            .IsRequired()
-            .HasColumnType("BLOB");
+            .IsRequired();
 
         builder.Property(x => x.Content)
             .IsRequired()
             .HasMaxLength(2000);
 
         builder.Property<Guid>("IssueId")
-            .IsRequired()
-            .HasColumnType("BLOB");
+            .IsRequired();
 
         builder.HasOne(x => x.Issue)
             .WithMany(x => x.Comments)
@@ -35,8 +33,7 @@ internal class IssueCommentConfiguration : IEntityTypeConfiguration<IssueComment
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.Property<Guid>("AuthorId")
-            .IsRequired()
-            .HasColumnType("BLOB");
+            .IsRequired();
 
         builder.HasOne(x => x.Author)
             .WithMany()

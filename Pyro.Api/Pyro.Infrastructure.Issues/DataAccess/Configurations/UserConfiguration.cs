@@ -17,7 +17,6 @@ internal class UserConfiguration : IEntityTypeConfiguration<User>
             .HasName("PK_UserProfile");
 
         builder.Property(x => x.Id)
-            .HasColumnType("BLOB")
             .IsRequired();
 
         builder.Property(x => x.Name)

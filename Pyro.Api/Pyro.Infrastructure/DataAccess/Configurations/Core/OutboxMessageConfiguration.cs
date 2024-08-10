@@ -17,7 +17,6 @@ internal class OutboxMessageConfiguration : IEntityTypeConfiguration<OutboxMessa
             .HasName("PK_OutboxMessages");
 
         builder.Property(x => x.Id)
-            .HasColumnType("BLOB")
             .IsRequired();
 
         builder.Property(x => x.Type)

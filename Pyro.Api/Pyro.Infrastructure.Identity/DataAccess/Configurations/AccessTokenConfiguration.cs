@@ -16,7 +16,6 @@ internal class AccessTokenConfiguration : IEntityTypeConfiguration<AccessToken>
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Id)
-            .HasColumnType("BLOB")
             .IsRequired();
 
         builder.Property(x => x.Name)
@@ -43,8 +42,7 @@ internal class AccessTokenConfiguration : IEntityTypeConfiguration<AccessToken>
             .IsRequired();
 
         builder.Property(x => x.UserId)
-            .IsRequired()
-            .HasColumnType("BLOB");
+            .IsRequired();
 
         builder.HasIndex(x => x.Name)
             .IsUnique()

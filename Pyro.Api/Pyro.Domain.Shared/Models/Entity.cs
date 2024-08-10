@@ -7,5 +7,5 @@ namespace Pyro.Domain.Shared.Models;
 
 public abstract class Entity : IEntity
 {
-    public Guid Id { get; init; } = NewId.NextGuid();
+    public Guid Id { get; init; } = NewId.NextSequentialGuid();
 }

@@ -17,8 +17,7 @@ internal class IssueNumberTrackerConfiguration : IEntityTypeConfiguration<IssueN
             .HasName("PK_IssueNumberTracker");
 
         builder.Property(x => x.RepositoryId)
-            .IsRequired()
-            .HasColumnType("BLOB");
+            .IsRequired();
 
         builder.HasOne(typeof(GitRepository))
             .WithMany()

@@ -4,6 +4,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Pyro.Domain.Git;
 using Pyro.Domain.GitRepositories;
 using Pyro.Domain.Shared;
@@ -20,9 +21,16 @@ public static class ServiceCollectionExtensions
     {
         services.Configure<GitOptions>(configuration.GetSection(GitOptions.Section));
 
-        services.AddDbContext<PyroDbContext>((provider, options) => options
-            .UseSqlite(configuration.GetConnectionString("DefaultConnection"))
-            .AddInterceptors(provider.GetRequiredService<DomainEventInterceptor>()));
+        services.AddDbContext<PyroDbContext>((provider, options) =>
+        {
+            var env = provider.GetRequiredService<IHostEnvironment>();
+
+            options
+                .UseSqlite(configuration.GetConnectionString("DefaultConnection"))
+                .EnableDetailedErrors(env.IsDevelopment())
+                .EnableSensitiveDataLogging(env.IsDevelopment())
+                .AddInterceptors(provider.GetRequiredService<DomainEventInterceptor>());
+        });
         services.AddScoped<DbContext, PyroDbContext>(sp => sp.GetRequiredService<PyroDbContext>());
 
         return services
