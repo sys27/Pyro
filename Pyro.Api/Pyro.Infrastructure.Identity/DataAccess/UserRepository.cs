@@ -4,10 +4,11 @@
 using Microsoft.EntityFrameworkCore;
 using Pyro.Domain.Identity;
 using Pyro.Domain.Identity.Models;
+using Pyro.Domain.Identity.Queries;
 
 namespace Pyro.Infrastructure.Identity.DataAccess;
 
-public class UserRepository : IUserRepository
+internal class UserRepository : IUserRepository
 {
     private readonly IdentityDbContext dbContext;
 
@@ -15,13 +16,36 @@ public class UserRepository : IUserRepository
         => this.dbContext = dbContext;
 
     public async Task<IReadOnlyList<User>> GetUsers(
+        GetUsers query,
         CancellationToken cancellationToken = default)
     {
-        var users = await Users
-            .OrderBy(x => x.Login)
-            .ToListAsync(cancellationToken);
+        var users = Users;
 
-        return users;
+        if (query.Before is not null)
+        {
+            users = users
+                .Where(x => query.Before == null || x.Login.CompareTo(query.Before) < 0)
+                .OrderByDescending(x => x.Login)
+                .Take(query.Size)
+                .OrderBy(x => x.Login);
+        }
+        else if (query.After is not null)
+        {
+            users = users
+                .Where(x => query.After == null || x.Login.CompareTo(query.After) > 0)
+                .OrderBy(x => x.Login)
+                .Take(query.Size);
+        }
+        else
+        {
+            users = users
+                .OrderBy(x => x.Login)
+                .Take(query.Size);
+        }
+
+        var result = await users.ToListAsync(cancellationToken);
+
+        return result;
     }
 
     public async Task<User?> GetUserById(

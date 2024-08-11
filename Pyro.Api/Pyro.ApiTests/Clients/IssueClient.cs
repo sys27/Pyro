@@ -18,7 +18,7 @@ internal class IssueClient : BaseClient
     }
 
     public async Task<IReadOnlyList<IssueResponse>?> GetIssues(string repositoryName)
-        => await Get<IReadOnlyList<IssueResponse>>($"/api/repositories/{repositoryName}/issues");
+        => await Get<IReadOnlyList<IssueResponse>>($"/api/repositories/{repositoryName}/issues?size=50");
 
     public async Task<IssueResponse?> GetIssue(string repositoryName, int number)
         => await Get<IssueResponse>($"/api/repositories/{repositoryName}/issues/{number}");

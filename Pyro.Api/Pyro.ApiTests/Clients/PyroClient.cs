@@ -19,6 +19,9 @@ internal class PyroClient : BaseClient
     public async Task UpdateProfile(UpdateUserProfileRequest request)
         => await Put("/api/profile", request);
 
+    public async Task<IReadOnlyList<GitRepositoryResponse>?> GetGitRepositories()
+        => await Get<IReadOnlyList<GitRepositoryResponse>>("/api/repositories?size=50");
+
     public async Task<GitRepositoryResponse?> GetGitRepository(string name)
         => await Get<GitRepositoryResponse>($"/api/repositories/{name}");
 

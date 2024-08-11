@@ -38,8 +38,7 @@ internal class IssueNumberValueGenerator : ValueGenerator<int>
 
         var parameter = command.CreateParameter();
         parameter.ParameterName = "@repositoryId";
-        parameter.DbType = DbType.Binary;
-        parameter.Value = ((Guid)repositoryId).ToByteArray();
+        parameter.Value = repositoryId;
         command.Parameters.Add(parameter);
 
         var newNumber = command.ExecuteScalar() ??

@@ -1,10 +1,12 @@
 // Copyright (c) Dmytro Kyshchenko. All rights reserved.
 // Licensed under the GPL-3.0 license. See LICENSE file in the project root for full license information.
 
+using Pyro.Contracts.Requests;
 using Pyro.Contracts.Requests.Identity;
 using Pyro.Contracts.Responses.Identity;
 using Pyro.Domain.Identity.Commands;
 using Pyro.Domain.Identity.Models;
+using Pyro.Domain.Identity.Queries;
 using Riok.Mapperly.Abstractions;
 
 namespace Pyro.DtoMappings;
@@ -53,4 +55,6 @@ public static partial class IdentityMapper
     public static partial AccessTokenResponse ToResponse(this AccessToken token);
 
     public static partial IEnumerable<AccessTokenResponse> ToResponse(this IEnumerable<AccessToken> token);
+
+    public static partial GetUsers ToGetUsers(this PageRequest<string> request);
 }

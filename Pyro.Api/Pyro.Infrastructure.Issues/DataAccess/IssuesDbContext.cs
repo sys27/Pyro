@@ -17,6 +17,5 @@ public class IssuesDbContext : DbContext
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(IssuesDbContext).Assembly);
         modelBuilder.ConfigureIds();
-        modelBuilder.ConfigureGuids();
     }
 }

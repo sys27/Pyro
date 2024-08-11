@@ -21,10 +21,10 @@ internal static class IssueEndpoints
 
         issuesBuilder.MapGet("/", async (
                 IMediator mediator,
-                string name,
+                [AsParameters] GetUsersRequest request,
                 CancellationToken cancellationToken) =>
             {
-                var query = new GetIssues(name);
+                var query = request.ToGetIssues();
                 var issues = await mediator.Send(query, cancellationToken);
                 var result = issues.ToResponse();
 

@@ -22,7 +22,6 @@ public class PyroDbContext : DbContext, IDataProtectionKeyContext
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(PyroDbContext).Assembly);
         modelBuilder.ConfigureIds();
-        modelBuilder.ConfigureGuids();
     }
 
     internal DbSet<OutboxMessage> OutboxMessages { get; init; }

@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, catchError, of } from 'rxjs';
 import { Endpoints } from '../endpoints';
@@ -10,9 +10,19 @@ import { PyroResponse, ResponseError } from '../models/response';
 export class UserService {
     public constructor(private readonly httpClient: HttpClient) {}
 
-    public getUsers(): Observable<PyroResponse<UserItem[]>> {
+    public getUsers(before?: string, after?: string): Observable<PyroResponse<UserItem[]>> {
+        let params = new HttpParams().set('size', 20);
+
+        if (before) {
+            params = params.set('before', before);
+        }
+
+        if (after) {
+            params = params.set('after', after);
+        }
+
         return this.httpClient
-            .get<UserItem[]>(Endpoints.Users)
+            .get<UserItem[]>(Endpoints.Users, { params: params })
             .pipe(catchError((error: ResponseError) => of(error)));
     }
 

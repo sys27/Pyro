@@ -34,6 +34,7 @@ public class GitRepositoryTests
         await GetBranches(repository.Name);
         await GetTree(repository.Name);
         await GetFile(repository.Name);
+        await GetRepositories();
     }
 
     private async Task<string> CreateGitRepository()
@@ -101,5 +102,12 @@ public class GitRepositoryTests
         var file = await client.GetFile($"/api/repositories/{name}/file/master/README.md");
 
         Assert.That(file, Is.EqualTo($"# {name}"));
+    }
+
+    private async Task GetRepositories()
+    {
+        var repositories = await client.GetGitRepositories();
+
+        Assert.That(repositories, Is.Not.Empty);
     }
 }

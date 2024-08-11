@@ -6,6 +6,7 @@ using Pyro.Contracts.Responses;
 using Pyro.Domain.Git;
 using Pyro.Domain.GitRepositories;
 using Pyro.Domain.GitRepositories.Commands;
+using Pyro.Domain.GitRepositories.Queries;
 using Riok.Mapperly.Abstractions;
 
 namespace Pyro.DtoMappings;
@@ -35,4 +36,6 @@ public static partial class GitMapper
     public static partial BranchItemResponse ToResponse(this BranchItem user);
 
     public static partial IReadOnlyList<BranchItemResponse> ToResponse(this IReadOnlyList<BranchItem> user);
+
+    public static partial GetGitRepositories ToGetGitRepositories(this PageRequest<string> request);
 }

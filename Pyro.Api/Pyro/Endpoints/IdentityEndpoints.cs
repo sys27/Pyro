@@ -3,6 +3,7 @@
 
 using System.Net.Mime;
 using MediatR;
+using Pyro.Contracts.Requests;
 using Pyro.Contracts.Requests.Identity;
 using Pyro.Contracts.Responses.Identity;
 using Pyro.Domain.Identity.Commands;
@@ -28,10 +29,11 @@ internal static class IdentityEndpoints
 
         usersBuilder.MapGet("/", async (
                 IMediator mediator,
+                [AsParameters] PageRequest<string> request,
                 CancellationToken cancellationToken) =>
             {
-                var request = new GetUsers();
-                var users = await mediator.Send(request, cancellationToken);
+                var query = request.ToGetUsers();
+                var users = await mediator.Send(query, cancellationToken);
                 var result = users.ToResponse();
 
                 return Results.Ok(result);

@@ -2,12 +2,14 @@
 // Licensed under the GPL-3.0 license. See LICENSE file in the project root for full license information.
 
 using Pyro.Domain.Identity.Models;
+using Pyro.Domain.Identity.Queries;
 
 namespace Pyro.Domain.Identity;
 
 public interface IUserRepository
 {
     Task<IReadOnlyList<User>> GetUsers(
+        GetUsers request,
         CancellationToken cancellationToken = default);
 
     Task<User?> GetUserById(

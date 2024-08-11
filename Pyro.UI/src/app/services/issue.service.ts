@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { catchError, Observable, of } from 'rxjs';
 import { Endpoints } from '../endpoints';
@@ -8,9 +8,23 @@ import { PyroResponse, ResponseError } from '../models/response';
 export class IssueService {
     public constructor(private readonly httpClient: HttpClient) {}
 
-    public getIssues(repositoryName: string): Observable<PyroResponse<Issue[]>> {
+    public getIssues(
+        repositoryName: string,
+        before?: string,
+        after?: string,
+    ): Observable<PyroResponse<Issue[]>> {
+        let params = new HttpParams().set('size', 20);
+
+        if (before) {
+            params = params.set('before', before);
+        }
+
+        if (after) {
+            params = params.set('after', after);
+        }
+
         return this.httpClient
-            .get<Issue[]>(Endpoints.Issues(repositoryName))
+            .get<Issue[]>(Endpoints.Issues(repositoryName), { params: params })
             .pipe(catchError((error: ResponseError) => of(error)));
     }
 
@@ -92,6 +106,7 @@ export class IssueService {
 }
 
 export interface Issue {
+    id: string;
     issueNumber: number;
     title: string;
     author: User;

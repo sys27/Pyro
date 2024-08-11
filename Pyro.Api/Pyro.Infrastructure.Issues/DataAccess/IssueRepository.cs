@@ -3,6 +3,7 @@
 
 using Microsoft.EntityFrameworkCore;
 using Pyro.Domain.Issues;
+using Pyro.Domain.Issues.Queries;
 using Pyro.Domain.Shared.Exceptions;
 
 namespace Pyro.Infrastructure.Issues.DataAccess;
@@ -15,19 +16,41 @@ internal class IssueRepository : IIssueRepository
         => this.dbContext = dbContext;
 
     public async Task<IReadOnlyList<Issue>> GetIssues(
-        string repositoryName,
+        GetIssues query,
         CancellationToken cancellationToken = default)
     {
-        var issues = await dbContext
+        var issues = dbContext
             .Set<Issue>()
             .Include(x => x.Assignee)
             .Include(x => x.Author)
-            .Where(x => x.Repository.Name == repositoryName)
-            .OrderByDescending(x => x.CreatedAt)
-            .AsNoTracking()
-            .ToListAsync(cancellationToken);
+            .Where(x => x.Repository.Name == query.RepositoryName)
+            .AsNoTracking();
 
-        return issues;
+        if (query.Before is not null)
+        {
+            issues = issues
+                .Where(x => query.Before == null || x.Id > query.Before)
+                .OrderBy(x => x.Id)
+                .Take(query.Size)
+                .OrderByDescending(x => x.Id);
+        }
+        else if (query.After is not null)
+        {
+            issues = issues
+                .Where(x => query.After == null || x.Id < query.After)
+                .OrderByDescending(x => x.Id)
+                .Take(query.Size);
+        }
+        else
+        {
+            issues = issues
+                .OrderByDescending(x => x.Id)
+                .Take(query.Size);
+        }
+
+        var result = await issues.ToListAsync(cancellationToken);
+
+        return result;
     }
 
     public Task<Issue?> GetIssue(
