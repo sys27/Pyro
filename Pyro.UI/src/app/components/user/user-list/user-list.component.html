@@ -3,7 +3,6 @@
     <h1>Users</h1>
 
     <p-table
-      *ngIf="users$ | async as users"
       [value]="users"
       styleClass="p-datatable-striped">
       <ng-template pTemplate="header">
@@ -29,5 +28,10 @@
         </tr>
       </ng-template>
     </p-table>
+
+    <paginator
+      [loader]="paginatorLoader"
+      [offsetSelector]="paginatorOffsetSelector"
+      (dataChanged)="paginatorDataChanged($event)" />
   </div>
 </div>

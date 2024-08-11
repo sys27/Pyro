@@ -1,8 +1,6 @@
-<div
-  *ngIf="issues$ | async as data"
-  class="m-4">
+<div class="m-4">
   <p-dataView
-    [value]="data"
+    [value]="issues"
     emptyMessage=" ">
     <ng-template pTemplate="header">
       <div class="flex flex-row-reverse">
@@ -43,4 +41,9 @@
       </div>
     </ng-template>
   </p-dataView>
+
+  <paginator
+    [loader]="paginatorLoader"
+    [offsetSelector]="paginatorOffsetSelector"
+    (dataChanged)="paginatorDataChanged($event)" />
 </div>

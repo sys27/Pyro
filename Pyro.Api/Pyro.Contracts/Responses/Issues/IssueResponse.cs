@@ -4,6 +4,7 @@
 namespace Pyro.Contracts.Responses.Issues;
 
 public record IssueResponse(
+    Guid Id,
     int IssueNumber,
     string Title,
     UserResponse Author,

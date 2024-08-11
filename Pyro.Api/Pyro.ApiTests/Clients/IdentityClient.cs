@@ -18,7 +18,7 @@ internal class IdentityClient : BaseClient
     }
 
     public async Task<IReadOnlyList<UserResponse>?> GetUsers()
-        => await Get<IReadOnlyList<UserResponse>>("/api/users");
+        => await Get<IReadOnlyList<UserResponse>>("/api/users?size=50");
 
     public async Task<UserResponse?> GetUser(string login)
         => await Get<UserResponse>($"/api/users/{login}");

@@ -48,9 +48,10 @@ internal static class GitRepositoryEndpoints
 
         repositories.MapGet("/", async (
                 IMediator mediator,
+                [AsParameters] PageRequest<string> request,
                 CancellationToken cancellationToken) =>
             {
-                var command = new GetGitRepositories();
+                var command = request.ToGetGitRepositories();
                 var gitRepository = await mediator.Send(command, cancellationToken);
                 var result = gitRepository.ToResponse();
 

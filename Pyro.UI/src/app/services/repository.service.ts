@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, catchError, of } from 'rxjs';
 import { Endpoints } from '../endpoints';
@@ -10,9 +10,22 @@ import { PyroResponse, ResponseError } from '../models/response';
 export class RepositoryService {
     public constructor(private readonly httpClient: HttpClient) {}
 
-    public getRepositories(): Observable<PyroResponse<RepositoryItem[]>> {
+    public getRepositories(
+        before?: string,
+        after?: string,
+    ): Observable<PyroResponse<RepositoryItem[]>> {
+        let params = new HttpParams().set('size', 20);
+
+        if (before) {
+            params = params.set('before', before);
+        }
+
+        if (after) {
+            params = params.set('after', after);
+        }
+
         return this.httpClient
-            .get<RepositoryItem[]>(Endpoints.Repositories)
+            .get<RepositoryItem[]>(Endpoints.Repositories, { params: params })
             .pipe(catchError((error: ResponseError) => of(error)));
     }
 

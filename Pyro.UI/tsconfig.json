@@ -24,6 +24,9 @@
       "dom"
     ],
     "paths": {
+      "@controls/*": [
+        "./src/app/controls/*"
+      ],
       "@services/*": [
         "./src/app/services/*"
       ],
