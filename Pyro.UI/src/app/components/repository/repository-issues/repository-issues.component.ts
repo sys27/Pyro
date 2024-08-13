@@ -1,42 +1,44 @@
 import { NgClass } from '@angular/common';
-import { Component, OnInit, signal } from '@angular/core';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { Component, input, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { PaginatorComponent, PaginatorState } from '@controls/paginator/paginator.component';
+import { ColorPipe } from '@pipes/color.pipe';
 import { Issue, IssueService } from '@services/issue.service';
 import { mapErrorToEmpty } from '@services/operators';
 import { ButtonModule } from 'primeng/button';
 import { DataViewModule } from 'primeng/dataview';
-import { map, Observable, of, switchMap } from 'rxjs';
+import { TagModule } from 'primeng/tag';
+import { Observable, of } from 'rxjs';
 
 @Component({
     selector: 'repo-issues',
     standalone: true,
-    imports: [ButtonModule, DataViewModule, NgClass, PaginatorComponent, RouterModule],
+    imports: [
+        ButtonModule,
+        ColorPipe,
+        DataViewModule,
+        NgClass,
+        PaginatorComponent,
+        RouterLink,
+        TagModule,
+    ],
     templateUrl: './repository-issues.component.html',
     styleUrls: ['./repository-issues.component.css'],
 })
-export class RepositoryIssuesComponent implements OnInit {
-    private repositoryName$: Observable<string> | undefined;
-    public issues = signal<Issue[]>([]);
+export class RepositoryIssuesComponent {
+    public readonly repositoryName = input.required<string>();
+    public readonly issues = signal<Issue[]>([]);
 
-    public constructor(
-        private readonly route: ActivatedRoute,
-        private readonly issueService: IssueService,
-    ) {}
-
-    public ngOnInit(): void {
-        this.repositoryName$ = this.route.parent?.params.pipe(map(params => params['name']));
-    }
+    public constructor(private readonly issueService: IssueService) {}
 
     public paginatorLoader = (state: PaginatorState): Observable<Issue[]> => {
-        if (!this.repositoryName$) {
+        if (!this.repositoryName()) {
             return of([]);
         }
 
-        return this.repositoryName$.pipe(
-            switchMap(name => this.issueService.getIssues(name, state.before, state.after)),
-            mapErrorToEmpty,
-        );
+        return this.issueService
+            .getIssues(this.repositoryName(), state.before, state.after)
+            .pipe(mapErrorToEmpty);
     };
 
     public paginatorOffsetSelector(item: Issue): string {

@@ -1,5 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Color } from '@models/color';
 import { catchError, Observable, of } from 'rxjs';
 import { Endpoints } from '../endpoints';
 import { PyroResponse, ResponseError } from '../models/response';
@@ -47,6 +48,7 @@ export class IssueService {
         let request = {
             title: issue.title,
             assigneeId: issue.assigneeId,
+            tags: issue.tags,
         };
 
         return this.httpClient.post<void>(Endpoints.Issues(repositoryName), request);
@@ -60,6 +62,7 @@ export class IssueService {
         let request = {
             title: issue.title,
             assigneeId: issue.assigneeId,
+            tags: issue.tags,
         };
 
         return this.httpClient.put<void>(
@@ -112,6 +115,13 @@ export interface Issue {
     author: User;
     createdAt: Date;
     assignee: User | null;
+    tags: Tag[];
+}
+
+export interface Tag {
+    id: string;
+    name: string;
+    color: Color;
 }
 
 export interface Comment {
@@ -129,11 +139,14 @@ export interface User {
 export interface CreateIssue {
     title: string;
     assigneeId: string | null;
+
+    tags: string[];
 }
 
 export interface UpdateIssue {
     title: string;
     assigneeId: string | null;
+    tags: string[];
 }
 
 export interface CreateIssueComment {

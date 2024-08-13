@@ -13,15 +13,19 @@ internal class GitRepositoryConfiguration : IEntityTypeConfiguration<GitReposito
     {
         builder.ToTable("GitRepositories", b => b.ExcludeFromMigrations());
 
-        builder.Property<Guid>("Id")
-            .IsRequired();
-
-        builder.HasKey("Id")
+        builder.HasKey(x => x.Id)
             .HasName("PK_GitRepository");
+
+        builder.Property(x => x.Id)
+            .IsRequired();
 
         builder.Property(x => x.Name)
             .HasMaxLength(50)
             .IsRequired();
+
+        builder.HasMany(x => x.Tags)
+            .WithOne()
+            .HasForeignKey("GitRepositoryId");
 
         builder.HasIndex(x => x.Name)
             .IsUnique()

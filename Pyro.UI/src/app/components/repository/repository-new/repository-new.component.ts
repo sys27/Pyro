@@ -5,7 +5,7 @@ import { NotificationEvent, NotificationService } from '@services/notification.s
 import { CreateRepository, RepositoryService } from '@services/repository.service';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-import { filter, Observable, Subject, switchMap, takeUntil } from 'rxjs';
+import { filter, finalize, Observable, Subject, switchMap, takeUntil } from 'rxjs';
 
 @Component({
     selector: 'repository-new',
@@ -15,7 +15,7 @@ import { filter, Observable, Subject, switchMap, takeUntil } from 'rxjs';
     styleUrls: ['./repository-new.component.css'],
 })
 export class RepositoryNewComponent implements OnInit, OnDestroy {
-    public form = this.formBuilder.nonNullable.group({
+    public readonly form = this.formBuilder.nonNullable.group({
         name: [
             '',
             [Validators.required, Validators.maxLength(20), Validators.pattern(/^[a-zA-Z0-9-_]+$/)],
@@ -23,8 +23,7 @@ export class RepositoryNewComponent implements OnInit, OnDestroy {
         description: ['', [Validators.maxLength(250)]],
         defaultBranch: ['', [Validators.required, Validators.maxLength(50)]],
     });
-    public isLoading = signal<boolean>(false);
-
+    public readonly isLoading = signal<boolean>(false);
     private readonly destroy$: Subject<void> = new Subject<void>();
     private repositoryInitialized$: Observable<string> | undefined;
 
@@ -58,10 +57,10 @@ export class RepositoryNewComponent implements OnInit, OnDestroy {
             .pipe(
                 switchMap(() => this.repositoryInitialized$!),
                 filter(name => name === this.form.value.name),
+                finalize(() => this.isLoading.set(false)),
             )
             .subscribe(name => {
-                this.isLoading.set(false);
-                this.router.navigate(['/repositories', this.form.value.name]);
+                this.router.navigate(['/repositories', name]);
             });
     }
 }

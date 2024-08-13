@@ -157,20 +157,29 @@ internal abstract class BaseClient : IDisposable
         return stream;
     }
 
-    public Task Post([StringSyntax("Uri")] string url, object? data = null)
-        => SendRequest(HttpMethod.Post, url, data);
+    public async Task Post([StringSyntax("Uri")] string url, object? data = null)
+    {
+        var response = await SendRequest(HttpMethod.Post, url, data);
+        response?.EnsureSuccessStatusCode();
+    }
 
     public Task<T?> Post<T>([StringSyntax("Uri")] string url, object? data = null)
         => SendRequest<T>(HttpMethod.Post, url, data);
 
-    public Task Put([StringSyntax("Uri")] string url, object? data = null)
-        => SendRequest(HttpMethod.Put, url, data);
+    public async Task Put([StringSyntax("Uri")] string url, object? data = null)
+    {
+        var response = await SendRequest(HttpMethod.Put, url, data);
+        response?.EnsureSuccessStatusCode();
+    }
 
     public Task<T?> Put<T>([StringSyntax("Uri")] string url, object? data = null)
         => SendRequest<T>(HttpMethod.Put, url, data);
 
-    public Task Delete([StringSyntax("Uri")] string url)
-        => SendRequest(HttpMethod.Delete, url);
+    public async Task Delete([StringSyntax("Uri")] string url)
+    {
+        var response = await SendRequest(HttpMethod.Delete, url);
+        response?.EnsureSuccessStatusCode();
+    }
 
     public async Task Login(string username, string password)
     {
@@ -194,10 +203,11 @@ internal abstract class BaseClient : IDisposable
     public T Share<T>()
         where T : BaseClient, new()
     {
-        var obj = new T();
-
-        obj.client = client;
-        obj.user = user;
+        var obj = new T
+        {
+            client = client,
+            user = user,
+        };
 
         return obj;
     }

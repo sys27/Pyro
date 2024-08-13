@@ -33,6 +33,11 @@ internal class GitRepositoryConfiguration : IEntityTypeConfiguration<GitReposito
         builder.Property(x => x.Status)
             .IsRequired();
 
+        builder.HasMany(x => x.Tags)
+            .WithOne(x => x.GitRepository)
+            .HasForeignKey("GitRepositoryId")
+            .OnDelete(DeleteBehavior.Cascade);
+
         builder.HasIndex(x => x.Name)
             .IsUnique()
             .HasDatabaseName("IX_GitRepository_Name");

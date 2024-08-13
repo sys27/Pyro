@@ -1,0 +1,32 @@
+<div class="flex align-items-center justify-content-center">
+  <form
+    class="w-full"
+    [formGroup]="form"
+    (ngSubmit)="onSubmit()">
+    <h1>New Tag</h1>
+
+    <div class="field">
+      <label for="name">Name:</label>
+      <input
+        id="name"
+        type="text"
+        class="w-full"
+        pInputText
+        formControlName="name" />
+    </div>
+
+    <div class="field">
+      <label for="color">Color:</label>
+      <p-colorPicker
+        formControlName="color"
+        format="rgb" />
+    </div>
+
+    <div class="field">
+      <p-button
+        label="Save"
+        type="submit"
+        [disabled]="form.invalid" />
+    </div>
+  </form>
+</div>

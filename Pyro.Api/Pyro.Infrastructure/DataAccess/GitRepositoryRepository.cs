@@ -56,6 +56,7 @@ internal class GitRepositoryRepository : IGitRepositoryRepository
         CancellationToken cancellationToken = default)
     {
         var gitRepository = await dbContext.Set<GitRepository>()
+            .Include(x => x.Tags)
             .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
 
         return gitRepository;
@@ -66,6 +67,7 @@ internal class GitRepositoryRepository : IGitRepositoryRepository
         CancellationToken cancellationToken = default)
     {
         var gitRepository = await dbContext.Set<GitRepository>()
+            .Include(x => x.Tags)
             .FirstOrDefaultAsync(x => x.Name == name, cancellationToken);
 
         return gitRepository;

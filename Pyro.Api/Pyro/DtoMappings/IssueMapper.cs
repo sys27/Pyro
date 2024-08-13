@@ -2,6 +2,7 @@
 // Licensed under the GPL-3.0 license. See LICENSE file in the project root for full license information.
 
 using Pyro.Contracts.Requests.Issues;
+using Pyro.Contracts.Responses;
 using Pyro.Contracts.Responses.Issues;
 using Pyro.Domain.Issues;
 using Pyro.Domain.Issues.Queries;
@@ -29,4 +30,16 @@ public static partial class IssueMapper
 
     [MapProperty(nameof(GetUsersRequest.Name), nameof(GetIssues.RepositoryName))]
     public static partial GetIssues ToGetIssues(this GetUsersRequest request);
+
+    [UserMapping(Default = true)]
+    public static ColorResponse ToResponse(this int color)
+    {
+        var r = (byte)((color & 0xFF0000) >> 16);
+        var g = (byte)((color & 0x00FF00) >> 8);
+        var b = (byte)(color & 0x0000FF);
+
+        return new ColorResponse(r, g, b);
+    }
+
+    public static partial TagResponse ToResponse(this Tag request);
 }

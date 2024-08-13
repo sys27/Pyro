@@ -20,12 +20,19 @@
             <div
               class="p-3"
               [ngClass]="{ 'border-top-1 surface-border': !first }">
-              <div class="pb-2">
+              <div class="pb-2 flex flex-row gap-2">
                 <a
                   [routerLink]="issue.issueNumber"
                   class="text-lg font-bold no-underline"
                   >{{ issue.title }}</a
                 >
+
+                @for (tag of issue.tags; track tag.id) {
+                  <p-tag
+                    [value]="tag.name"
+                    [rounded]="true"
+                    [style]="{ background: tag.color | color }" />
+                }
               </div>
               <div class="grid grid-nogutter text-sm text-400">
                 <div class="col-10">

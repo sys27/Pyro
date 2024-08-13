@@ -1,63 +1,71 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, computed, input, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IssueService, User } from '@services/issue.service';
 import { mapErrorToEmpty, mapErrorToNull } from '@services/operators';
+import { Tag, TagService } from '@services/tag.service';
 import { ButtonModule } from 'primeng/button';
 import { DropdownModule } from 'primeng/dropdown';
 import { InputTextModule } from 'primeng/inputtext';
-import { filter, map, Observable, shareReplay, switchMap, take, withLatestFrom } from 'rxjs';
+import { MultiSelectModule } from 'primeng/multiselect';
+import { finalize, Observable, shareReplay, take } from 'rxjs';
 
 @Component({
     selector: 'repo-issue-new',
     standalone: true,
-    imports: [AsyncPipe, ButtonModule, DropdownModule, InputTextModule, ReactiveFormsModule],
+    imports: [
+        AsyncPipe,
+        ButtonModule,
+        DropdownModule,
+        InputTextModule,
+        MultiSelectModule,
+        ReactiveFormsModule,
+    ],
     templateUrl: './repository-issue-new.component.html',
     styleUrl: './repository-issue-new.component.css',
 })
 export class RepositoryIssueNewComponent implements OnInit {
-    private repositoryName$: Observable<string> | undefined;
-    private issueNumber$: Observable<number | undefined> | undefined;
-    public isEditMode$: Observable<boolean> | undefined;
+    public readonly repositoryName = input.required<string>();
+    public readonly issueNumber = input<number>();
+    public readonly isEditMode = computed<boolean>(() => !!this.issueNumber());
     public users$: Observable<User[]> | undefined;
-
-    public form = this.formBuilder.group({
+    public tags$: Observable<Tag[]> | undefined;
+    public readonly form = this.formBuilder.group({
         title: ['', [Validators.required, Validators.maxLength(200)]],
         assigneeId: new FormControl<string | null>(null),
+        tagIds: new FormControl<string[]>([]),
     });
-
-    public isLoading = signal<boolean>(false);
+    public readonly isLoading = signal<boolean>(false);
 
     public constructor(
         private readonly formBuilder: FormBuilder,
         private readonly router: Router,
         private readonly route: ActivatedRoute,
         private readonly issueService: IssueService,
+        private readonly tagService: TagService,
     ) {}
 
     public ngOnInit(): void {
-        this.repositoryName$ = this.route.parent?.params.pipe(map(params => params['name']));
-        this.issueNumber$ = this.route.params.pipe(map(params => params['issueNumber']));
-        this.isEditMode$ = this.issueNumber$.pipe(map(issueNumber => !!issueNumber));
         this.users$ = this.issueService.getUsers().pipe(mapErrorToEmpty, shareReplay(1));
+        this.tags$ = this.tagService
+            .getTags(this.repositoryName())
+            .pipe(mapErrorToEmpty, shareReplay(1));
 
-        this.isEditMode$
-            .pipe(
-                filter(isEditMode => isEditMode),
-                withLatestFrom(this.repositoryName$!, this.issueNumber$!),
-                switchMap(([_, name, number]) => this.issueService.getIssue(name, number!)),
-                mapErrorToNull,
-                take(1),
-            )
-            .subscribe(issue => {
-                if (issue) {
-                    this.form.setValue({
-                        title: issue.title,
-                        assigneeId: issue.assignee?.id || null,
-                    });
-                }
-            });
+        if (this.isEditMode()) {
+            this.issueService
+                .getIssue(this.repositoryName(), this.issueNumber()!)
+                .pipe(mapErrorToNull, take(1))
+                .subscribe(issue => {
+                    if (issue) {
+                        this.form.setValue({
+                            title: issue.title,
+                            assigneeId: issue.assignee?.id || null,
+                            tagIds: issue.tags.map(tag => tag.id),
+                        });
+                    }
+                });
+        }
     }
 
     public onSubmit(): void {
@@ -68,34 +76,25 @@ export class RepositoryIssueNewComponent implements OnInit {
         let issue = {
             title: this.form.value.title!,
             assigneeId: this.form.value.assigneeId!,
+            tags: this.form.value.tagIds || [],
         };
 
         this.isLoading.set(true);
 
-        this.isEditMode$
-            ?.pipe(
-                withLatestFrom(this.repositoryName$!, this.issueNumber$!),
-                switchMap(([isEdit, name, issueNumber]) => {
-                    let result;
-
-                    if (isEdit) {
-                        result = this.issueService.updateIssue(name, issueNumber!, issue);
-                    } else {
-                        result = this.issueService.createIssue(name, issue);
-                    }
-
-                    return result.pipe(map(() => [isEdit, name, issueNumber!]));
-                }),
-                take(1),
-            )
-            .subscribe(([isEdit, name, issueNumber]) => {
-                if (isEdit) {
-                    this.router.navigate(['repositories', name, 'issues', issueNumber]);
-                } else {
-                    this.router.navigate(['repositories', name, 'issues']);
-                }
-
-                this.isLoading.set(false);
-            });
+        if (this.isEditMode()) {
+            this.issueService
+                .updateIssue(this.repositoryName(), this.issueNumber()!, issue)
+                .pipe(finalize(() => this.isLoading.set(false)))
+                .subscribe(() => {
+                    this.router.navigate(['../'], { relativeTo: this.route });
+                });
+        } else {
+            this.issueService
+                .createIssue(this.repositoryName(), issue)
+                .pipe(finalize(() => this.isLoading.set(false)))
+                .subscribe(() => {
+                    this.router.navigate(['../'], { relativeTo: this.route });
+                });
+        }
     }
 }

@@ -66,6 +66,34 @@ namespace Pyro.Infrastructure.Migrations
                     b.ToTable("GitRepositories", (string)null);
                 });
 
+            modelBuilder.Entity("Pyro.Domain.GitRepositories.Tag", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Color")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("GitRepositoryId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id")
+                        .HasName("PK_Tag");
+
+                    b.HasIndex("GitRepositoryId");
+
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Tag_Name");
+
+                    b.ToTable("Tags", (string)null);
+                });
+
             modelBuilder.Entity("Pyro.Domain.UserProfiles.UserAvatar", b =>
                 {
                     b.Property<Guid>("Id")
@@ -141,6 +169,17 @@ namespace Pyro.Infrastructure.Migrations
                     b.ToTable("OutboxMessages", (string)null);
                 });
 
+            modelBuilder.Entity("Pyro.Domain.GitRepositories.Tag", b =>
+                {
+                    b.HasOne("Pyro.Domain.GitRepositories.GitRepository", "GitRepository")
+                        .WithMany("Tags")
+                        .HasForeignKey("GitRepositoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("GitRepository");
+                });
+
             modelBuilder.Entity("Pyro.Domain.UserProfiles.UserAvatar", b =>
                 {
                     b.HasOne("Pyro.Domain.UserProfiles.UserProfile", null)
@@ -148,6 +187,11 @@ namespace Pyro.Infrastructure.Migrations
                         .HasForeignKey("Pyro.Domain.UserProfiles.UserAvatar", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Pyro.Domain.GitRepositories.GitRepository", b =>
+                {
+                    b.Navigation("Tags");
                 });
 
             modelBuilder.Entity("Pyro.Domain.UserProfiles.UserProfile", b =>

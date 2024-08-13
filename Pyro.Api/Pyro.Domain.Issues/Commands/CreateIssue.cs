@@ -8,7 +8,11 @@ using Pyro.Domain.Shared.Exceptions;
 
 namespace Pyro.Domain.Issues.Commands;
 
-public record CreateIssue(string RepositoryName, string Title, Guid? AssigneeId) : IRequest<Issue>;
+public record CreateIssue(
+    string RepositoryName,
+    string Title,
+    Guid? AssigneeId,
+    IReadOnlyList<Guid> Tags) : IRequest<Issue>;
 
 public class CreateIssueValidator : AbstractValidator<CreateIssue>
 {
@@ -21,44 +25,61 @@ public class CreateIssueValidator : AbstractValidator<CreateIssue>
         RuleFor(x => x.Title)
             .NotEmpty()
             .MaximumLength(200);
+
+        RuleFor(x => x.Tags)
+            .ForEach(x => x.NotEmpty());
     }
 }
 
 public class CreateIssueHandler : IRequestHandler<CreateIssue, Issue>
 {
     private readonly ICurrentUserProvider currentUserProvider;
-    private readonly IIssueRepository repository;
+    private readonly IIssueRepository issueRepository;
+    private readonly IGitRepositoryRepository gitRepositoryRepository;
     private readonly TimeProvider timeProvider;
 
     public CreateIssueHandler(
         ICurrentUserProvider currentUserProvider,
-        IIssueRepository repository,
+        IIssueRepository issueRepository,
+        IGitRepositoryRepository gitRepositoryRepository,
         TimeProvider timeProvider)
     {
         this.currentUserProvider = currentUserProvider;
-        this.repository = repository;
+        this.issueRepository = issueRepository;
+        this.gitRepositoryRepository = gitRepositoryRepository;
         this.timeProvider = timeProvider;
     }
 
     public async Task<Issue> Handle(CreateIssue request, CancellationToken cancellationToken = default)
     {
         var currentUser = currentUserProvider.GetCurrentUser();
-        var author = await repository.GetUser(currentUser.Id, cancellationToken) ??
-                     throw new NotFoundException($"User (Id: {currentUser.Id}) not found");
+        var repository = await gitRepositoryRepository.GetRepository(request.RepositoryName, cancellationToken) ??
+                         throw new NotFoundException($"The repository (Name: {request.RepositoryName}) not found");
+        var author = await issueRepository.GetUser(currentUser.Id, cancellationToken) ??
+                     throw new NotFoundException($"The user (Id: {currentUser.Id}) not found");
         var assignee = request.AssigneeId.HasValue
-            ? await repository.GetUser(request.AssigneeId.Value, cancellationToken)
+            ? await issueRepository.GetUser(request.AssigneeId.Value, cancellationToken)
             : null;
 
         var issue = new Issue
         {
             Title = request.Title,
-            Repository = new GitRepository(request.RepositoryName),
+            Repository = repository,
             Author = author,
             CreatedAt = timeProvider.GetUtcNow(),
         };
         issue.AssignTo(assignee);
 
-        await repository.AddIssue(issue, cancellationToken);
+        foreach (var tagId in request.Tags)
+        {
+            var tag = repository.GetTag(tagId);
+            if (tag is null)
+                continue;
+
+            issue.AddTag(tag);
+        }
+
+        await issueRepository.AddIssue(issue, cancellationToken);
 
         return issue;
     }

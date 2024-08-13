@@ -69,7 +69,11 @@ public class CreateIssueCommentHandlerTests
             Id = Guid.NewGuid(),
             IssueNumber = command.IssueNumber,
             Title = "title",
-            Repository = new GitRepository(command.RepositoryName),
+            Repository = new GitRepository
+            {
+                Id = Guid.NewGuid(),
+                Name = "test",
+            },
             Author = author,
             CreatedAt = DateTimeOffset.Now,
         };

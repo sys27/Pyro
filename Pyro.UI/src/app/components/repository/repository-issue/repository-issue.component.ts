@@ -1,11 +1,13 @@
 import { AsyncPipe, DatePipe } from '@angular/common';
 import { Component, input, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
+import { ColorPipe } from '@pipes/color.pipe';
 import { AuthService } from '@services/auth.service';
 import { Comment, Issue, IssueService } from '@services/issue.service';
 import { mapErrorToEmpty, mapErrorToNull } from '@services/operators';
 import { ButtonModule } from 'primeng/button';
 import { DividerModule } from 'primeng/divider';
+import { TagModule } from 'primeng/tag';
 import {
     BehaviorSubject,
     combineLatest,
@@ -15,7 +17,7 @@ import {
     switchMap,
     withLatestFrom,
 } from 'rxjs';
-import { MarkdownPipe } from '../../../markdown.pipe';
+import { MarkdownPipe } from '../../../pipes/markdown.pipe';
 import { CommentNewComponent } from './comment-new/comment-new.component';
 import { CommentViewComponent } from './comment-view/comment-view.component';
 
@@ -25,18 +27,20 @@ import { CommentViewComponent } from './comment-view/comment-view.component';
     imports: [
         AsyncPipe,
         ButtonModule,
+        ColorPipe,
         CommentNewComponent,
         CommentViewComponent,
         DatePipe,
         DividerModule,
         MarkdownPipe,
         RouterModule,
+        TagModule,
     ],
     templateUrl: './repository-issue.component.html',
     styleUrl: './repository-issue.component.css',
 })
 export class RepositoryIssueComponent implements OnInit, OnDestroy {
-    public repositoryName$: Observable<string> | undefined;
+    public readonly repositoryName = input.required<string>();
     public readonly issueNumber = input.required<number>();
     public issue$: Observable<Issue | null> | undefined;
     public comments$: Observable<Comment[]> | undefined;
@@ -44,26 +48,21 @@ export class RepositoryIssueComponent implements OnInit, OnDestroy {
     private readonly commentAddedTrigger$ = new BehaviorSubject<void>(undefined);
 
     public constructor(
-        private readonly route: ActivatedRoute,
         private readonly issueService: IssueService,
         private readonly authService: AuthService,
     ) {}
 
     public ngOnInit(): void {
-        this.repositoryName$ = this.route.parent?.params.pipe(map(params => params['name']));
-        this.issue$ = this.repositoryName$?.pipe(
-            switchMap(name => this.issueService.getIssue(name, this.issueNumber())),
-            mapErrorToNull,
-            shareReplay(1),
-        );
+        this.issue$ = this.issueService
+            .getIssue(this.repositoryName(), this.issueNumber())
+            .pipe(mapErrorToNull, shareReplay(1));
         this.comments$ = combineLatest([this.issue$!, this.commentAddedTrigger$]).pipe(
-            withLatestFrom(this.repositoryName$!),
-            switchMap(([[issue, _], name]) => {
+            switchMap(([issue, name]) => {
                 if (!issue) {
                     return [];
                 }
 
-                return this.issueService.getIssueComments(name, issue.issueNumber);
+                return this.issueService.getIssueComments(this.repositoryName(), issue.issueNumber);
             }),
             mapErrorToEmpty,
             shareReplay(1),

@@ -27,7 +27,7 @@ export class UserNewComponent implements OnInit {
     public user: User | undefined;
     public roles: Role[] | undefined;
 
-    public form = this.formBuilder.nonNullable.group({
+    public readonly form = this.formBuilder.nonNullable.group({
         login: ['', [Validators.required, Validators.maxLength(32)]],
         password: ['', [Validators.required, Validators.minLength(8)]],
         roles: new FormControl<Role[]>([], Validators.required),

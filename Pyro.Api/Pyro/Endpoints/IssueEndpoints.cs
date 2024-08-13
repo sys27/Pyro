@@ -16,9 +16,20 @@ internal static class IssueEndpoints
 {
     public static IEndpointRouteBuilder MapIssueEndpoints(this IEndpointRouteBuilder app)
     {
+        app.MapIssueUsers();
+
         var issuesBuilder = app.MapGroup("/repositories/{name}/issues")
             .WithTags("Issues");
 
+        issuesBuilder
+            .MapIssues()
+            .MapIssueComments();
+
+        return app;
+    }
+
+    private static IEndpointRouteBuilder MapIssues(this IEndpointRouteBuilder issuesBuilder)
+    {
         issuesBuilder.MapGet("/", async (
                 IMediator mediator,
                 [AsParameters] GetUsersRequest request,
@@ -71,7 +82,11 @@ internal static class IssueEndpoints
                 CreateIssueRequest request,
                 CancellationToken cancellationToken) =>
             {
-                var command = new CreateIssue(name, request.Title, request.AssigneeId);
+                var command = new CreateIssue(
+                    name,
+                    request.Title,
+                    request.AssigneeId,
+                    request.Tags);
                 var issue = await mediator.Send(command, cancellationToken);
                 await unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -96,7 +111,12 @@ internal static class IssueEndpoints
                 UpdateIssueRequest request,
                 CancellationToken cancellationToken) =>
             {
-                var command = new UpdateIssue(name, number, request.Title, request.AssigneeId);
+                var command = new UpdateIssue(
+                    name,
+                    number,
+                    request.Title,
+                    request.AssigneeId,
+                    request.Tags);
                 var issue = await mediator.Send(command, cancellationToken);
                 await unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -136,27 +156,11 @@ internal static class IssueEndpoints
             .WithName("Delete Issue")
             .WithOpenApi();
 
-        app.MapGet("/repositories/issues/users", async (
-                IMediator mediator,
-                CancellationToken cancellationToken) =>
-            {
-                var query = new GetUsers();
-                var users = await mediator.Send(query, cancellationToken);
-                var result = users.ToResponse();
+        return issuesBuilder;
+    }
 
-                return Results.Ok(result);
-            })
-            .RequirePermission(IssueView)
-            .WithTags("Issues")
-            .Produces<IReadOnlyList<UserResponse>>()
-            .ProducesValidationProblem()
-            .Produces(401)
-            .Produces(403)
-            .Produces(404)
-            .ProducesProblem(500)
-            .WithName("Get Issue Users")
-            .WithOpenApi();
-
+    private static IEndpointRouteBuilder MapIssueComments(this IEndpointRouteBuilder issuesBuilder)
+    {
         var commentsBuilder = issuesBuilder.MapGroup("/{number:int}/comments")
             .WithTags("Issue Comments");
 
@@ -255,6 +259,32 @@ internal static class IssueEndpoints
             .Produces(404)
             .ProducesProblem(500)
             .WithName("Delete Issue Comment")
+            .WithOpenApi();
+
+        return issuesBuilder;
+    }
+
+    private static IEndpointRouteBuilder MapIssueUsers(this IEndpointRouteBuilder app)
+    {
+        app.MapGet("/repositories/issues/users", async (
+                IMediator mediator,
+                CancellationToken cancellationToken) =>
+            {
+                var query = new GetUsers();
+                var users = await mediator.Send(query, cancellationToken);
+                var result = users.ToResponse();
+
+                return Results.Ok(result);
+            })
+            .RequirePermission(IssueView)
+            .WithTags("Issues")
+            .Produces<IReadOnlyList<UserResponse>>()
+            .ProducesValidationProblem()
+            .Produces(401)
+            .Produces(403)
+            .Produces(404)
+            .ProducesProblem(500)
+            .WithName("Get Issue Users")
             .WithOpenApi();
 
         return app;

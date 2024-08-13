@@ -1,9 +1,9 @@
 import { HttpErrorResponse, HttpInterceptorFn, HttpStatusCode } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { ResponseError } from '@models/response';
 import { MessageService } from 'primeng/api';
 import { catchError, throwError } from 'rxjs';
-import { ResponseError } from '../models/response';
 
 export const errorHandlingInterceptor: HttpInterceptorFn = (req, next) => {
     let router = inject(Router);

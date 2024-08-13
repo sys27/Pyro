@@ -33,4 +33,8 @@
     <Using Include="NUnit.Framework"/>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Pyro.Domain\Pyro.Domain.csproj" />
+  </ItemGroup>
+
 </Project>

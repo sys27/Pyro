@@ -39,7 +39,11 @@ public class UpdateIssueCommentHandlerTests
             Id = Guid.NewGuid(),
             IssueNumber = issueNumber,
             Title = "title",
-            Repository = new GitRepository(repositoryName),
+            Repository = new GitRepository
+            {
+                Id = Guid.NewGuid(),
+                Name = "test",
+            },
             Author = author,
             CreatedAt = DateTimeOffset.Now,
         };
@@ -69,7 +73,11 @@ public class UpdateIssueCommentHandlerTests
             Id = Guid.NewGuid(),
             IssueNumber = issueNumber,
             Title = "title",
-            Repository = new GitRepository(repositoryName),
+            Repository = new GitRepository
+            {
+                Id = Guid.NewGuid(),
+                Name = "test",
+            },
             Author = author,
             CreatedAt = DateTimeOffset.Now,
         };
@@ -102,7 +110,11 @@ public class UpdateIssueCommentHandlerTests
             Id = Guid.NewGuid(),
             IssueNumber = issueNumber,
             Title = "title",
-            Repository = new GitRepository(repositoryName),
+            Repository = new GitRepository
+            {
+                Id = Guid.NewGuid(),
+                Name = "test",
+            },
             Author = author,
             CreatedAt = DateTimeOffset.Now,
         };

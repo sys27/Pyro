@@ -15,7 +15,7 @@ import { Observable } from 'rxjs';
     styleUrl: './user-list.component.css',
 })
 export class UserListComponent {
-    public users = signal<UserItem[]>([]);
+    public readonly users = signal<UserItem[]>([]);
 
     public constructor(private readonly userService: UserService) {}
 

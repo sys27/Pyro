@@ -18,26 +18,24 @@
 
     <div class="col-12 grid">
       <div class="col-10">
-        @if (repositoryName$ | async; as repositoryName) {
-          @if (comments$ | async; as comments) {
-            <div class="flex flex-column gap-2">
-              @for (comment of comments; track comment.id) {
-                <comment-view
-                  [comment]="comment"
-                  [repositoryName]="repositoryName"
-                  [issueNumber]="issueNumber()"
-                  (commentAdded)="commentAdded()" />
-              }
-            </div>
-          }
-
-          <div class="mt-2">
-            <comment-new
-              [repositoryName]="repositoryName"
-              [issueNumber]="issueNumber()"
-              (commentAdded)="commentAdded()" />
+        @if (comments$ | async; as comments) {
+          <div class="flex flex-column gap-2">
+            @for (comment of comments; track comment.id) {
+              <comment-view
+                [comment]="comment"
+                [repositoryName]="repositoryName()"
+                [issueNumber]="issueNumber()"
+                (commentAdded)="commentAdded()" />
+            }
           </div>
         }
+
+        <div class="mt-2">
+          <comment-new
+            [repositoryName]="repositoryName()"
+            [issueNumber]="issueNumber()"
+            (commentAdded)="commentAdded()" />
+        </div>
       </div>
       <div class="col-2">
         <div>
@@ -63,6 +61,20 @@
         <div>
           <div>Created At:</div>
           <div>{{ issue.createdAt | date: 'short' }}</div>
+        </div>
+
+        <p-divider />
+
+        <div>
+          <div>Tags:</div>
+          <div class="flex flex-column gap-2">
+            @for (tag of issue.tags; track tag.id) {
+              <p-tag
+                [value]="tag.name"
+                [rounded]="true"
+                [style]="{ background: tag.color | color }" />
+            }
+          </div>
         </div>
       </div>
     </div>

@@ -46,6 +46,7 @@ internal static class ProblemDetailsExtensions
                 };
             });
 
+            options.MapToStatusCode<NotFoundException>(StatusCodes.Status404NotFound);
             options.MapToStatusCode<Exception>(StatusCodes.Status500InternalServerError);
         });
 

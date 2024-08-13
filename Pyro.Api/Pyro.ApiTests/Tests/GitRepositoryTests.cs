@@ -4,17 +4,20 @@
 using Bogus;
 using Pyro.ApiTests.Clients;
 using Pyro.Contracts.Requests;
+using Pyro.Contracts.Requests.Issues;
 using Pyro.Contracts.Responses;
 
 namespace Pyro.ApiTests.Tests;
 
 public class GitRepositoryTests
 {
+    private Faker faker;
     private PyroClient client;
 
     [OneTimeSetUp]
     public async Task SetUp()
     {
+        faker = new Faker();
         client = new PyroClient(Api.BaseAddress);
         await client.Login();
     }
@@ -35,13 +38,18 @@ public class GitRepositoryTests
         await GetTree(repository.Name);
         await GetFile(repository.Name);
         await GetRepositories();
+
+        var tag = await CreateTag(repository.Name);
+        tag = await UpdateTag(repository.Name, tag.Id);
+        await GetTag(repository.Name, tag.Id);
+        await GetTags(repository.Name, tag);
     }
 
     private async Task<string> CreateGitRepository()
     {
         var createRequest = new CreateGitRepositoryRequest(
-            new Faker().Lorem.Word(),
-            new Faker().Lorem.Sentence(),
+            faker.Lorem.Word(),
+            faker.Lorem.Sentence(),
             "master");
         var repository = await client.CreateGitRepository(createRequest);
 
@@ -109,5 +117,56 @@ public class GitRepositoryTests
         var repositories = await client.GetGitRepositories();
 
         Assert.That(repositories, Is.Not.Empty);
+    }
+
+    private async Task<TagResponse> CreateTag(string repositoryName)
+    {
+        var request = new CreateTagRequest(faker.Lorem.Word(), ColorRequest.FromHex(faker.Internet.Color()));
+        var tag = await client.CreateTag(repositoryName, request);
+
+        Assert.That(tag, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(tag.Name, Is.EqualTo(request.Name));
+            Assert.That(tag.Color.R, Is.EqualTo(request.Color.R));
+            Assert.That(tag.Color.G, Is.EqualTo(request.Color.G));
+            Assert.That(tag.Color.B, Is.EqualTo(request.Color.B));
+        });
+
+        return tag;
+    }
+
+    private async Task<TagResponse> UpdateTag(string repositoryName, Guid id)
+    {
+        var request = new UpdateTagRequest(faker.Lorem.Word(), ColorRequest.FromHex(faker.Internet.Color()));
+        var tag = await client.UpdateTag(repositoryName, id, request);
+
+        Assert.That(tag, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.That(tag.Name, Is.EqualTo(request.Name));
+            Assert.That(tag.Color.R, Is.EqualTo(request.Color.R));
+            Assert.That(tag.Color.G, Is.EqualTo(request.Color.G));
+            Assert.That(tag.Color.B, Is.EqualTo(request.Color.B));
+        });
+
+        return tag;
+    }
+
+    private async Task GetTag(string repositoryName, Guid id)
+    {
+        var tag = await client.GetTag(repositoryName, id);
+
+        Assert.That(tag, Is.Not.Null);
+        Assert.That(tag.Id, Is.EqualTo(id));
+    }
+
+    private async Task GetTags(string repositoryName, TagResponse tag)
+    {
+        var tags = await client.GetTags(repositoryName);
+
+        Assert.That(tags, Is.Not.Empty);
+        Assert.That(tags, Has.Count.EqualTo(1));
+        Assert.That(tags, Has.One.EqualTo(tag));
     }
 }

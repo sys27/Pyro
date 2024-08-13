@@ -1,12 +1,12 @@
 import { AsyncPipe, DatePipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { AccessToken, AccessTokenService } from '@services/access-token.service';
 import { mapErrorToEmpty } from '@services/operators';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
-import { Observable, shareReplay } from 'rxjs';
+import { BehaviorSubject, Observable, shareReplay, switchMap } from 'rxjs';
 
 @Component({
     selector: 'access-token-list',
@@ -15,8 +15,9 @@ import { Observable, shareReplay } from 'rxjs';
     templateUrl: './access-token-list.component.html',
     styleUrl: './access-token-list.component.css',
 })
-export class AccessTokenListComponent implements OnInit {
-    public accessTokens$: Observable<AccessToken[] | null> | undefined;
+export class AccessTokenListComponent implements OnInit, OnDestroy {
+    public accessTokens$: Observable<AccessToken[]> | undefined;
+    private readonly refresh$ = new BehaviorSubject<void>(undefined);
 
     public constructor(
         private readonly service: AccessTokenService,
@@ -24,7 +25,13 @@ export class AccessTokenListComponent implements OnInit {
     ) {}
 
     public ngOnInit(): void {
-        this.loadAccessTokens();
+        this.accessTokens$ = this.refresh$.pipe(
+            switchMap(() => this.service.getAccessTokens().pipe(mapErrorToEmpty, shareReplay(1))),
+        );
+    }
+
+    public ngOnDestroy(): void {
+        this.refresh$.complete();
     }
 
     public deleteAccessToken(tokenName: string): void {
@@ -35,11 +42,7 @@ export class AccessTokenListComponent implements OnInit {
                 detail: `Access token ${tokenName} deleted`,
             });
 
-            this.loadAccessTokens();
+            this.refresh$.next();
         });
-    }
-
-    private loadAccessTokens(): void {
-        this.accessTokens$ = this.service.getAccessTokens().pipe(mapErrorToEmpty, shareReplay(1));
     }
 }

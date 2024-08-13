@@ -7,4 +7,7 @@ export { RepositoryListComponent } from './repository-list/repository-list.compo
 export { RepositoryNewComponent } from './repository-new/repository-new.component';
 export { RepositoryPullRequqestsComponent } from './repository-prs/repository-prs.component';
 export { RepositorySettingsComponent } from './repository-settings/repository-settings.component';
+export { TagListComponent } from './repository-settings/tag-list/tag-list.component';
+export { TagEditComponent } from './repository-settings/tag-edit/tag-edit.component';
+export { TagNewComponent } from './repository-settings/tag-new/tag-new.component';
 export { RepositoryComponent } from './repository.component';
