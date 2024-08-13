@@ -46,7 +46,7 @@ RUN npm ci
 COPY Pyro.UI .
 RUN npm run build
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0.7-alpine3.20 AS final
+FROM mcr.microsoft.com/dotnet/aspnet:8.0.8-alpine3.20 AS final
 EXPOSE 80
 
 ENV ASPNETCORE_ENVIRONMENT="Production"
