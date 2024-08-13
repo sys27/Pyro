@@ -30,6 +30,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<DbContext, IssuesDbContext>(sp => sp.GetRequiredService<IssuesDbContext>());
 
         return services
-            .AddScoped<IIssueRepository, IssueRepository>();
+            .AddScoped<IIssueRepository, IssueRepository>()
+            .AddScoped<IGitRepositoryRepository, GitRepositoryRepository>();
     }
 }

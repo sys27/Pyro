@@ -4,7 +4,7 @@ import { AuthService } from '@services/auth.service';
 import { Comment } from '@services/issue.service';
 import { PanelModule } from 'primeng/panel';
 import { map, Observable } from 'rxjs';
-import { MarkdownPipe } from '../../../../markdown.pipe';
+import { MarkdownPipe } from '../../../../pipes/markdown.pipe';
 import { CommentNewComponent } from '../comment-new/comment-new.component';
 
 @Component({
@@ -15,12 +15,12 @@ import { CommentNewComponent } from '../comment-new/comment-new.component';
     styleUrl: './comment-view.component.css',
 })
 export class CommentViewComponent implements OnInit {
-    public comment = input.required<Comment>();
-    public repositoryName = input.required<string>();
-    public issueNumber = input.required<number>();
+    public readonly comment = input.required<Comment>();
+    public readonly repositoryName = input.required<string>();
+    public readonly issueNumber = input.required<number>();
     public isEditMode: boolean = false;
     public canEditIssue$: Observable<boolean> | undefined;
-    public commentAdded = output<Comment>();
+    public readonly commentAdded = output<Comment>();
 
     public constructor(private readonly authService: AuthService) {}
 

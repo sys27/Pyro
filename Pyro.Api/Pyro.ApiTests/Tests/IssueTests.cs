@@ -10,12 +10,14 @@ namespace Pyro.ApiTests.Tests;
 
 public class IssueTests
 {
+    private Faker faker;
     private PyroClient pyroClient;
     private IssueClient issueClient;
 
     [OneTimeSetUp]
     public async Task SetUp()
     {
+        faker = new Faker();
         pyroClient = new PyroClient(Api.BaseAddress);
         issueClient = pyroClient.Share<IssueClient>();
         await issueClient.Login();
@@ -30,7 +32,7 @@ public class IssueTests
     }
 
     [Test]
-    public async Task CreateGetUpdateIssue()
+    public async Task Tests()
     {
         var name = await CreateRepository();
         var number = await CreateIssue(name);
@@ -49,44 +51,69 @@ public class IssueTests
     private async Task<string> CreateRepository()
     {
         var createRequest = new CreateGitRepositoryRequest(
-            new Faker().Lorem.Word(),
-            new Faker().Lorem.Sentence(),
+            faker.Lorem.Word(),
+            faker.Lorem.Sentence(),
             "master");
         var repository = await pyroClient.CreateGitRepository(createRequest) ??
                          throw new Exception("Repository not created");
 
+        for (var i = 0; i < 3; i++)
+        {
+            var createTagRequest = new CreateTagRequest(faker.Lorem.Word(), ColorRequest.FromHex(faker.Internet.Color()));
+            _ = await pyroClient.CreateTag(repository.Name, createTagRequest) ??
+                throw new Exception("Tag not created");
+        }
+
         return repository.Name;
     }
 
-    private async Task<int> CreateIssue(string name)
+    private async Task<int> CreateIssue(string repositoryName)
     {
+        var tags = await pyroClient.GetTags(repositoryName);
+        if (tags is null || tags.Count == 0)
+            throw new Exception("Tags not found");
+
+        var tag = new Randomizer().ArrayElement(tags.ToArray());
+
         var createRequest = new CreateIssueRequest(
-            new Faker().Lorem.Sentence(),
-            null);
-        var issue = await issueClient.CreateIssue(name, createRequest);
+            faker.Lorem.Sentence(),
+            null,
+            [tag.Id]);
+        var issue = await issueClient.CreateIssue(repositoryName, createRequest);
 
         Assert.That(issue, Is.Not.Null);
         Assert.Multiple(() =>
         {
             Assert.That(issue.Title, Is.EqualTo(createRequest.Title));
             Assert.That(issue.Assignee?.Id, Is.EqualTo(createRequest.AssigneeId));
+            Assert.That(issue.Tags, Has.Count.EqualTo(1));
+            Assert.That(issue.Tags, Has.One.EqualTo(tag));
         });
 
         return issue.IssueNumber;
     }
 
-    private async Task UpdateIssue(string name, int number)
+    private async Task UpdateIssue(string repositoryName, int number)
     {
+        var tags = await pyroClient.GetTags(repositoryName);
+        if (tags is null || tags.Count == 0)
+            throw new Exception("Tags not found");
+
+        var tag = new Randomizer().ArrayElement(tags.ToArray());
+
         var updateRequest = new UpdateIssueRequest(
-            new Faker().Lorem.Sentence(),
-            Guid.Parse("F9BA057A-35B0-4D10-8326-702D8F7EC966"));
-        var issue = await issueClient.UpdateIssue(name, number, updateRequest);
+            faker.Lorem.Sentence(),
+            Guid.Parse("F9BA057A-35B0-4D10-8326-702D8F7EC966"),
+            [tag.Id]);
+        var issue = await issueClient.UpdateIssue(repositoryName, number, updateRequest);
 
         Assert.That(issue, Is.Not.Null);
         Assert.Multiple(() =>
         {
             Assert.That(issue.Title, Is.EqualTo(updateRequest.Title));
             Assert.That(issue.Assignee?.Id, Is.EqualTo(updateRequest.AssigneeId));
+            Assert.That(issue.Tags, Has.Count.EqualTo(1));
+            Assert.That(issue.Tags, Has.One.EqualTo(tag));
         });
     }
 
@@ -111,7 +138,7 @@ public class IssueTests
 
     private async Task<Guid> CreateComment(string name, int number)
     {
-        var createRequest = new CreateIssueCommentRequest(new Faker().Lorem.Sentence());
+        var createRequest = new CreateIssueCommentRequest(faker.Lorem.Sentence());
         var comment = await issueClient.CreateComment(name, number, createRequest);
 
         Assert.That(comment, Is.Not.Null);
@@ -122,7 +149,7 @@ public class IssueTests
 
     private async Task UpdateComment(string name, int number, Guid commentId)
     {
-        var updateRequest = new UpdateIssueCommentRequest(new Faker().Lorem.Sentence());
+        var updateRequest = new UpdateIssueCommentRequest(faker.Lorem.Sentence());
         var comment = await issueClient.UpdateComment(name, number, commentId, updateRequest);
 
         Assert.That(comment, Is.Not.Null);

@@ -1,9 +1,9 @@
 import { HttpClient, HttpContext } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { CurrentUser } from '@models/current-user';
+import { ResponseError } from '@models/response';
 import { BehaviorSubject, Observable, catchError, of, switchMap } from 'rxjs';
 import { Endpoints } from '../endpoints';
-import { CurrentUser } from '../models/current-user';
-import { ResponseError } from '../models/response';
 import { ALLOW_ANONYMOUS } from './auth.interceptor';
 
 @Injectable({

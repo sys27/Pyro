@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, input } from '@angular/core';
+import { Component } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { TabMenuModule } from 'primeng/tabmenu';
 
@@ -11,9 +11,7 @@ import { TabMenuModule } from 'primeng/tabmenu';
     styleUrl: './repository.component.css',
 })
 export class RepositoryComponent {
-    public readonly repositoryName = input.required<string>({ alias: 'name' });
-
-    public menu: MenuItem[] = [
+    public readonly menu: MenuItem[] = [
         { label: 'Code', icon: 'pi pi-code', routerLink: 'code' },
         { label: 'Issues', icon: 'pi pi-ticket', routerLink: 'issues' },
         { label: 'Pull Requests', icon: 'pi pi-file-import', routerLink: 'pull-requests' },

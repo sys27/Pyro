@@ -17,6 +17,7 @@ public static partial class GitMapper
     [MapperIgnoreSource(nameof(GitRepository.Id))]
     [MapperIgnoreSource(nameof(GitRepository.DomainEvents))]
     [MapperIgnoreSource(nameof(GitRepository.IsNew))]
+    [MapperIgnoreSource(nameof(GitRepository.Tags))]
     public static partial GitRepositoryResponse ToResponse(this GitRepository gitRepository);
 
     public static partial GitRepositoryStatusResponse ToResponse(this GitRepositoryStatus gitRepository);
@@ -38,4 +39,19 @@ public static partial class GitMapper
     public static partial IReadOnlyList<BranchItemResponse> ToResponse(this IReadOnlyList<BranchItem> user);
 
     public static partial GetGitRepositories ToGetGitRepositories(this PageRequest<string> request);
+
+    [UserMapping(Default = true)]
+    public static ColorResponse ToResponse(this int color)
+    {
+        var r = (byte)((color & 0xFF0000) >> 16);
+        var g = (byte)((color & 0x00FF00) >> 8);
+        var b = (byte)(color & 0x0000FF);
+
+        return new ColorResponse(r, g, b);
+    }
+
+    [MapperIgnoreSource(nameof(Tag.GitRepository))]
+    public static partial TagResponse ToResponse(this Tag request);
+
+    public static partial IReadOnlyList<TagResponse> ToResponse(this IReadOnlyList<Tag> request);
 }

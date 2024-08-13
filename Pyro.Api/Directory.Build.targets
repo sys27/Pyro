@@ -6,7 +6,6 @@
     <AnalysisLevel>latest</AnalysisLevel>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <EnablePackageValidation>true</EnablePackageValidation>
-    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <CodeAnalysisRuleSet>..\Rules.ruleset</CodeAnalysisRuleSet>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <!-- TODO: -->

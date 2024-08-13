@@ -12,7 +12,7 @@ internal class IssueConfiguration : IEntityTypeConfiguration<Issue>
 {
     public void Configure(EntityTypeBuilder<Issue> builder)
     {
-        builder.ToTable("Issue");
+        builder.ToTable("Issues");
 
         builder.HasIndex(["RepositoryId", nameof(Issue.IssueNumber)])
             .IsUnique()
@@ -59,5 +59,41 @@ internal class IssueConfiguration : IEntityTypeConfiguration<Issue>
             .WithMany()
             .HasForeignKey("AssigneeId")
             .OnDelete(DeleteBehavior.NoAction);
+
+        builder.HasMany(x => x.Tags)
+            .WithMany()
+            .UsingEntity<IssueTag>(
+                r => r.HasOne(x => x.Tag)
+                    .WithMany()
+                    .HasForeignKey("TagId")
+                    .HasPrincipalKey(x => x.Id)
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .IsRequired(),
+                l => l.HasOne(x => x.Issue)
+                    .WithMany()
+                    .HasForeignKey("IssueId")
+                    .HasPrincipalKey(x => x.Id)
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .IsRequired(),
+                j =>
+                {
+                    j.ToTable("IssueTags");
+
+                    j.HasKey("IssueId", "TagId");
+
+                    j.Property(x => x.IssueId)
+                        .IsRequired();
+
+                    j.Property(x => x.TagId)
+                        .IsRequired();
+                });
     }
+}
+
+public class IssueTag
+{
+    public required Guid IssueId { get; set; }
+    public required Issue Issue { get; set; }
+    public required Guid TagId { get; set; }
+    public required Tag Tag { get; set; }
 }

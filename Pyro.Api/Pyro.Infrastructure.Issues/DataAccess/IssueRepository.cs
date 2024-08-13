@@ -4,7 +4,6 @@
 using Microsoft.EntityFrameworkCore;
 using Pyro.Domain.Issues;
 using Pyro.Domain.Issues.Queries;
-using Pyro.Domain.Shared.Exceptions;
 
 namespace Pyro.Infrastructure.Issues.DataAccess;
 
@@ -23,6 +22,7 @@ internal class IssueRepository : IIssueRepository
             .Set<Issue>()
             .Include(x => x.Assignee)
             .Include(x => x.Author)
+            .Include(x => x.Tags)
             .Where(x => x.Repository.Name == query.RepositoryName)
             .AsNoTracking();
 
@@ -63,6 +63,7 @@ internal class IssueRepository : IIssueRepository
             .Include(x => x.Assignee)
             .Include(x => x.Author)
             .Include(x => x.Comments.OrderBy(c => c.CreatedAt))
+            .Include(x => x.Tags)
             .FirstOrDefaultAsync(
                 i => i.Repository.Name == repositoryName &&
                      i.IssueNumber == number,
@@ -71,31 +72,18 @@ internal class IssueRepository : IIssueRepository
         return issue;
     }
 
-    private async Task<GitRepository?> GetRepository(
-        string repositoryName,
-        CancellationToken cancellationToken = default)
-    {
-        var repository = await dbContext
-            .Set<GitRepository>()
-            .FirstOrDefaultAsync(r => r.Name == repositoryName, cancellationToken);
-
-        return repository;
-    }
-
     public async Task AddIssue(
         Issue issue,
         CancellationToken cancellationToken = default)
     {
-        var repository = await GetRepository(issue.Repository.Name, cancellationToken) ??
-                         throw new NotFoundException("Repository not found");
-
-        dbContext.Entry(issue).Navigation(nameof(Issue.Repository)).CurrentValue = repository;
-
         await dbContext.Set<Issue>().AddAsync(issue, cancellationToken);
     }
 
     public void DeleteIssue(Issue issue)
-        => dbContext.Set<Issue>().Remove(issue);
+    {
+        issue.ClearTags();
+        dbContext.Set<Issue>().Remove(issue);
+    }
 
     public async Task<User?> GetUser(
         Guid id,

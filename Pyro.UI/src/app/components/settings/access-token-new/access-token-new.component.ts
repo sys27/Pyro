@@ -14,13 +14,13 @@ import { InputTextModule } from 'primeng/inputtext';
     styleUrls: ['./access-token-new.component.css'],
 })
 export class AccessTokenNewComponent {
-    public form = this.formBuilder.nonNullable.group({
+    public readonly form = this.formBuilder.nonNullable.group({
         name: ['', Validators.compose([Validators.required, Validators.maxLength(50)])],
         expiresAt: [new Date(), Validators.required],
         token: [''],
     });
-    public minDate: Date = new Date();
-    public isViewMode = signal<boolean>(false);
+    public readonly minDate: Date = new Date();
+    public readonly isViewMode = signal<boolean>(false);
 
     public constructor(
         private readonly formBuilder: FormBuilder,

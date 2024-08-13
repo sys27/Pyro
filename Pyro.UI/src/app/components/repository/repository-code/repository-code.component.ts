@@ -1,5 +1,5 @@
 import { AsyncPipe, DatePipe, SlicePipe } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, input, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MarkdownService } from '@services/markdown.service';
@@ -14,15 +14,15 @@ import { TabViewModule } from 'primeng/tabview';
 import { ToolbarModule } from 'primeng/toolbar';
 import {
     BehaviorSubject,
-    Observable,
-    Subject,
     combineLatest,
     distinctUntilChanged,
     filter,
     from,
     map,
+    Observable,
     of,
     shareReplay,
+    Subject,
     switchMap,
     takeUntil,
     withLatestFrom,
@@ -49,9 +49,10 @@ import {
     styleUrls: ['./repository-code.component.css'],
 })
 export class RepositoryCodeComponent implements OnInit, OnDestroy {
+    public readonly repositoryName = input.required<string>();
     public branchOrPath$: Observable<string[]> | undefined;
     public repository$: Observable<Repository | null> | undefined;
-    public selectedBranch$ = new BehaviorSubject<BranchItem | undefined>(undefined);
+    public readonly selectedBranch$ = new BehaviorSubject<BranchItem | undefined>(undefined);
     public directoryView$: Observable<TreeView | null> | undefined;
     public branches$: Observable<BranchItem[]> | undefined;
     public readmeName$: Observable<string | null> | undefined;
@@ -60,7 +61,7 @@ export class RepositoryCodeComponent implements OnInit, OnDestroy {
     public licenseFile$: Observable<string | null> | undefined;
     public displayTabView$: Observable<boolean> | undefined;
 
-    public directoryViewPlaceholder: any[] = Array.from({ length: 10 }).map(() => ({}));
+    public readonly directoryViewPlaceholder: any[] = Array.from({ length: 10 }).map(() => ({}));
 
     private readonly destroy$ = new Subject<void>();
 
@@ -72,13 +73,10 @@ export class RepositoryCodeComponent implements OnInit, OnDestroy {
     ) {}
 
     public ngOnInit(): void {
-        this.branchOrPath$ = this.route.params.pipe(map(params => Object.values(params)));
-        this.repository$ = this.route.parent?.params.pipe(
-            map(params => params['name']),
-            switchMap(repositoryName => this.repositoryService.getRepository(repositoryName)),
-            mapErrorToNull,
-            shareReplay(1),
-        );
+        this.branchOrPath$ = this.route.data.pipe(map(data => data['branchOrPath']));
+        this.repository$ = this.repositoryService
+            .getRepository(this.repositoryName())
+            .pipe(mapErrorToNull, shareReplay(1));
         this.branches$ = this.repository$?.pipe(
             filter(repository => repository != null),
             switchMap(repository => this.repositoryService.getBranches(repository!.name)),
@@ -140,11 +138,16 @@ export class RepositoryCodeComponent implements OnInit, OnDestroy {
 
     public selectBranch(branch: BranchItem): void {
         this.selectedBranch$.next(branch);
-        this.repository$?.subscribe(repository => {
-            this.router.navigate(['repositories', repository?.name, 'code', branch.name], {
-                replaceUrl: true,
+        this.repository$
+            ?.pipe(
+                filter(x => x !== null),
+                takeUntil(this.destroy$),
+            )
+            .subscribe(repository => {
+                this.router.navigate(['repositories', repository.name, 'code', branch.name], {
+                    replaceUrl: true,
+                });
             });
-        });
     }
 
     private hasFile(files: string[]): Observable<string | null> | undefined {

@@ -20,7 +20,6 @@ namespace Pyro.Infrastructure.Issues.Migrations
             modelBuilder.Entity("Pyro.Domain.Issues.GitRepository", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
@@ -78,7 +77,7 @@ namespace Pyro.Infrastructure.Issues.Migrations
                         .IsUnique()
                         .HasDatabaseName("IX_Issue_RepositoryId_Number");
 
-                    b.ToTable("Issue", (string)null);
+                    b.ToTable("Issues", (string)null);
                 });
 
             modelBuilder.Entity("Pyro.Domain.Issues.IssueComment", b =>
@@ -108,6 +107,37 @@ namespace Pyro.Infrastructure.Issues.Migrations
                     b.HasIndex("IssueId");
 
                     b.ToTable("IssueComments", (string)null);
+                });
+
+            modelBuilder.Entity("Pyro.Domain.Issues.Tag", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Color")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("GitRepositoryId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id")
+                        .HasName("PK_Tag");
+
+                    b.HasIndex("GitRepositoryId");
+
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Tag_Name");
+
+                    b.ToTable("Tags", null, t =>
+                        {
+                            t.ExcludeFromMigrations();
+                        });
                 });
 
             modelBuilder.Entity("Pyro.Domain.Issues.User", b =>
@@ -144,6 +174,21 @@ namespace Pyro.Infrastructure.Issues.Migrations
                         .HasName("PK_IssueNumberTracker");
 
                     b.ToTable("IssueNumberTracker", (string)null);
+                });
+
+            modelBuilder.Entity("Pyro.Infrastructure.Issues.DataAccess.Configurations.IssueTag", b =>
+                {
+                    b.Property<Guid>("IssueId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("TagId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("IssueId", "TagId");
+
+                    b.HasIndex("TagId");
+
+                    b.ToTable("IssueTags", (string)null);
                 });
 
             modelBuilder.Entity("Pyro.Domain.Issues.Issue", b =>
@@ -191,6 +236,15 @@ namespace Pyro.Infrastructure.Issues.Migrations
                     b.Navigation("Issue");
                 });
 
+            modelBuilder.Entity("Pyro.Domain.Issues.Tag", b =>
+                {
+                    b.HasOne("Pyro.Domain.Issues.GitRepository", null)
+                        .WithMany("Tags")
+                        .HasForeignKey("GitRepositoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Pyro.Infrastructure.Issues.DataAccess.Configurations.IssueNumberTrackerConfiguration+IssueNumberTracker", b =>
                 {
                     b.HasOne("Pyro.Domain.Issues.GitRepository", null)
@@ -199,6 +253,30 @@ namespace Pyro.Infrastructure.Issues.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("FK_IssueNumberTracker_Repository");
+                });
+
+            modelBuilder.Entity("Pyro.Infrastructure.Issues.DataAccess.Configurations.IssueTag", b =>
+                {
+                    b.HasOne("Pyro.Domain.Issues.Issue", "Issue")
+                        .WithMany()
+                        .HasForeignKey("IssueId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Pyro.Domain.Issues.Tag", "Tag")
+                        .WithMany()
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Issue");
+
+                    b.Navigation("Tag");
+                });
+
+            modelBuilder.Entity("Pyro.Domain.Issues.GitRepository", b =>
+                {
+                    b.Navigation("Tags");
                 });
 
             modelBuilder.Entity("Pyro.Domain.Issues.Issue", b =>

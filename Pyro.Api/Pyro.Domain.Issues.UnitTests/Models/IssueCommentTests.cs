@@ -17,7 +17,11 @@ public class IssueCommentTests
             Id = Guid.NewGuid(),
             IssueNumber = 1,
             Title = "title",
-            Repository = new GitRepository("test"),
+            Repository = new GitRepository
+            {
+                Id = Guid.NewGuid(),
+                Name = "test",
+            },
             Author = user,
             CreatedAt = DateTimeOffset.Now,
         };
@@ -44,7 +48,11 @@ public class IssueCommentTests
             Id = Guid.NewGuid(),
             IssueNumber = 1,
             Title = "title",
-            Repository = new GitRepository("test"),
+            Repository = new GitRepository
+            {
+                Id = Guid.NewGuid(),
+                Name = "test",
+            },
             Author = user,
             CreatedAt = DateTimeOffset.Now,
         };

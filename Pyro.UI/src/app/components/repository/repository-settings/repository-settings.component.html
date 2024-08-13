@@ -1,1 +1,16 @@
-<h1>Settings</h1>
+<div class="flex align-items-center justify-content-center">
+  <div class="grid w-8">
+    <div class="col-12">
+      <h1>Settings</h1>
+
+      <div class="grid w-full">
+        <div class="col-3">
+          <p-panelMenu [model]="menuItems" />
+        </div>
+        <div class="col-9">
+          <router-outlet></router-outlet>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

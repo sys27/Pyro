@@ -1,4 +1,4 @@
-import { Routes } from '@angular/router';
+import { ResolveFn, Routes, UrlMatcher } from '@angular/router';
 import { authGuard } from './auth.guard';
 import { LoginComponent } from './components/login/login.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
@@ -13,6 +13,9 @@ import {
     RepositoryNewComponent,
     RepositoryPullRequqestsComponent,
     RepositorySettingsComponent,
+    TagEditComponent,
+    TagListComponent,
+    TagNewComponent,
 } from './components/repository';
 import {
     AccessTokenListComponent,
@@ -21,23 +24,28 @@ import {
     SettingsComponent,
 } from './components/settings';
 import { UserEditComponent, UserListComponent, UserNewComponent } from './components/user';
-import { urlMatcher } from './url.matcher';
 
 export const routes: Routes = [
     { path: 'repositories', component: RepositoryListComponent, canActivate: [authGuard] },
     { path: 'repositories/new', component: RepositoryNewComponent, canActivate: [authGuard] },
     {
-        path: 'repositories/:name',
+        path: 'repositories/:repositoryName',
         component: RepositoryComponent,
         canActivate: [authGuard],
         children: [
             {
-                matcher: urlMatcher('code'),
+                matcher: prefixMatcher('code'),
+                resolve: {
+                    branchOrPath: branchOrPathResolver('code'),
+                },
                 component: RepositoryCodeComponent,
                 canActivate: [authGuard],
             },
             {
-                matcher: urlMatcher('file'),
+                matcher: prefixMatcher('file'),
+                resolve: {
+                    branchOrPath: branchOrPathResolver('file'),
+                },
                 component: RepositoryFileComponent,
                 canActivate: [authGuard],
             },
@@ -70,6 +78,12 @@ export const routes: Routes = [
                 path: 'settings',
                 component: RepositorySettingsComponent,
                 canActivate: [authGuard],
+                children: [
+                    { path: 'tags/new', component: TagNewComponent, canActivate: [authGuard] },
+                    { path: 'tags/:tagId', component: TagEditComponent, canActivate: [authGuard] },
+                    { path: 'tags', component: TagListComponent, canActivate: [authGuard] },
+                    { path: '', redirectTo: 'tags', pathMatch: 'full' },
+                ],
             },
             { path: '', redirectTo: 'code', pathMatch: 'full' },
         ],
@@ -104,3 +118,20 @@ export const routes: Routes = [
     { path: '', redirectTo: 'repositories', pathMatch: 'full' },
     { path: '**', component: NotFoundComponent },
 ];
+
+function prefixMatcher(prefix: string): UrlMatcher {
+    return segments => {
+        if (segments.length > 0 && segments[0].path === prefix) {
+            return {
+                consumed: segments,
+            };
+        }
+
+        return null;
+    };
+}
+
+function branchOrPathResolver(prefix: string): ResolveFn<string[]> {
+    return route =>
+        route.url.filter(segment => segment.path != prefix).map(segment => segment.path);
+}

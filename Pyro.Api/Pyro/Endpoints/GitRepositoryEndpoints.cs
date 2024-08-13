@@ -5,7 +5,9 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using Pyro.Contracts.Requests;
+using Pyro.Contracts.Requests.Issues;
 using Pyro.Contracts.Responses;
+using Pyro.Domain.GitRepositories.Commands;
 using Pyro.Domain.GitRepositories.Queries;
 using Pyro.DtoMappings;
 using Pyro.Infrastructure.Shared.DataAccess;
@@ -20,10 +22,19 @@ internal static class GitRepositoryEndpoints
 {
     public static IEndpointRouteBuilder MapGitRepositoryEndpoints(this IEndpointRouteBuilder app)
     {
-        var repositories = app.MapGroup("/repositories")
+        var repositoryBuilder = app.MapGroup("/repositories")
             .WithTags("Repositories");
 
-        repositories.MapGet("/{name}", async (
+        repositoryBuilder
+            .MapRepositories()
+            .MapTags();
+
+        return app;
+    }
+
+    private static IEndpointRouteBuilder MapRepositories(this IEndpointRouteBuilder repositoryBuilder)
+    {
+        repositoryBuilder.MapGet("/{name}", async (
                 IMediator mediator,
                 string name,
                 CancellationToken cancellationToken) =>
@@ -46,7 +57,7 @@ internal static class GitRepositoryEndpoints
             .WithName("Get Repository")
             .WithOpenApi();
 
-        repositories.MapGet("/", async (
+        repositoryBuilder.MapGet("/", async (
                 IMediator mediator,
                 [AsParameters] PageRequest<string> request,
                 CancellationToken cancellationToken) =>
@@ -65,7 +76,7 @@ internal static class GitRepositoryEndpoints
             .WithName("Get Repositories")
             .WithOpenApi();
 
-        repositories.MapPost("/", async (
+        repositoryBuilder.MapPost("/", async (
                 IMediator mediator,
                 UnitOfWork unitOfWork,
                 CreateGitRepositoryRequest request,
@@ -88,7 +99,7 @@ internal static class GitRepositoryEndpoints
             .WithName("Create Repository")
             .WithOpenApi();
 
-        repositories.MapGet("/{name}/branches", async (
+        repositoryBuilder.MapGet("/{name}/branches", async (
                 IMediator mediator,
                 string name,
                 CancellationToken cancellationToken) =>
@@ -107,7 +118,7 @@ internal static class GitRepositoryEndpoints
             .WithName("Get Branches")
             .WithOpenApi();
 
-        repositories.MapGet("/{name}/tree/{**branchOrPath}", async (
+        repositoryBuilder.MapGet("/{name}/tree/{**branchOrPath}", async (
                 IMediator mediator,
                 string name,
                 string? branchOrPath,
@@ -130,7 +141,7 @@ internal static class GitRepositoryEndpoints
             .WithName("Get Tree")
             .WithOpenApi();
 
-        repositories.MapGet("/{name}/file/{**branchAndPath}", async (
+        repositoryBuilder.MapGet("/{name}/file/{**branchAndPath}", async (
                 IMediator mediator,
                 [FromServices] IContentTypeProvider contentTypeProvider,
                 string name,
@@ -155,6 +166,129 @@ internal static class GitRepositoryEndpoints
             .Produces(404)
             .ProducesProblem(500)
             .WithName("Get File")
+            .WithOpenApi();
+
+        return repositoryBuilder;
+    }
+
+    private static IEndpointRouteBuilder MapTags(this IEndpointRouteBuilder app)
+    {
+        var tagsBuilder = app.MapGroup("/{name}/tags")
+            .WithTags("Repository Tags");
+
+        tagsBuilder.MapGet("/", async (
+                IMediator mediator,
+                string name,
+                CancellationToken cancellationToken) =>
+            {
+                var query = new GetTags(name);
+                var tags = await mediator.Send(query, cancellationToken);
+                var result = tags.ToResponse();
+
+                return result;
+            })
+            .RequirePermission(IssueView)
+            .Produces<IReadOnlyList<TagResponse>>()
+            .ProducesValidationProblem()
+            .Produces(401)
+            .Produces(403)
+            .Produces(404)
+            .ProducesProblem(500)
+            .WithName("Get Tags")
+            .WithOpenApi();
+
+        tagsBuilder.MapGet("/{id:guid}", async (
+                IMediator mediator,
+                [FromRoute] string name,
+                [FromRoute] Guid id,
+                CancellationToken cancellationToken) =>
+            {
+                var query = new GetTag(name, id);
+                var tag = await mediator.Send(query, cancellationToken);
+                var result = tag.ToResponse();
+
+                return result;
+            })
+            .RequirePermission(IssueView)
+            .Produces<TagResponse>()
+            .ProducesValidationProblem()
+            .Produces(401)
+            .Produces(403)
+            .Produces(404)
+            .ProducesProblem(500)
+            .WithName("Get Tag")
+            .WithOpenApi();
+
+        tagsBuilder.MapPost("/", async (
+                IMediator mediator,
+                UnitOfWork unitOfWork,
+                [FromRoute] string name,
+                [FromBody] CreateTagRequest request,
+                CancellationToken cancellationToken) =>
+            {
+                var command = new CreateTag(name, request.Name, request.Color.ToInt());
+                var tag = await mediator.Send(command, cancellationToken);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
+
+                var result = tag.ToResponse();
+
+                return Results.Created($"/repositories/{name}/tags/{tag.Name}", result);
+            })
+            .RequirePermission(IssueEdit)
+            .Produces<TagResponse>(201)
+            .ProducesValidationProblem()
+            .Produces(401)
+            .Produces(403)
+            .ProducesProblem(500)
+            .WithName("Create Tag")
+            .WithOpenApi();
+
+        tagsBuilder.MapPut("/{id:guid}", async (
+                IMediator mediator,
+                UnitOfWork unitOfWork,
+                [FromRoute] string name,
+                [FromRoute] Guid id,
+                [FromBody] UpdateTagRequest request,
+                CancellationToken cancellationToken) =>
+            {
+                var command = new UpdateTag(name, id, request.Name, request.Color.ToInt());
+                var updatedTag = await mediator.Send(command, cancellationToken);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
+
+                var result = updatedTag.ToResponse();
+
+                return Results.Ok(result);
+            })
+            .RequirePermission(RepositoryEdit)
+            .Produces<TagResponse>()
+            .ProducesValidationProblem()
+            .Produces(401)
+            .Produces(403)
+            .ProducesProblem(500)
+            .WithName("Update Tag")
+            .WithOpenApi();
+
+        tagsBuilder.MapDelete("/{id:guid}", async (
+                IMediator mediator,
+                UnitOfWork unitOfWork,
+                string name,
+                Guid id,
+                CancellationToken cancellationToken) =>
+            {
+                var command = new DeleteTag(name, id);
+                await mediator.Send(command, cancellationToken);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
+
+                return Results.Ok();
+            })
+            .RequirePermission(IssueEdit)
+            .Produces(200)
+            .ProducesValidationProblem()
+            .Produces(401)
+            .Produces(403)
+            .Produces(404)
+            .ProducesProblem(500)
+            .WithName("Delete Tag")
             .WithOpenApi();
 
         return app;

@@ -14,9 +14,8 @@ import { PasswordModule } from 'primeng/password';
     styleUrl: './login.component.css',
 })
 export class LoginComponent {
-    public returnUrl = input<string>('/');
-
-    public formGroup = this.formBuilder.nonNullable.group({
+    public readonly returnUrl = input<string>('/');
+    public readonly formGroup = this.formBuilder.nonNullable.group({
         login: ['', [Validators.required]],
         password: ['', Validators.required],
     });
@@ -27,7 +26,7 @@ export class LoginComponent {
         private readonly authService: AuthService,
     ) {}
 
-    private sanitizeReturnUrl(returnUrl: string): string {
+    private static sanitizeReturnUrl(returnUrl: string): string {
         returnUrl ??= '/';
 
         const currentUrl = window.location.origin;
@@ -53,7 +52,7 @@ export class LoginComponent {
                 return;
             }
 
-            this.router.navigateByUrl(this.sanitizeReturnUrl(this.returnUrl()));
+            this.router.navigateByUrl(LoginComponent.sanitizeReturnUrl(this.returnUrl()));
         });
     }
 }

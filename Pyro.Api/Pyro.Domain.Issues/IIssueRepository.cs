@@ -26,6 +26,5 @@ public interface IIssueRepository
         Guid id,
         CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<User>> GetUsers(
-        CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<User>> GetUsers(CancellationToken cancellationToken = default);
 }

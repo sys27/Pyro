@@ -1,13 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, input } from '@angular/core';
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import { mapErrorToEmpty, mapErrorToNull } from '@services/operators';
+import { Role, UpdateUser, UserService } from '@services/user.service';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { InputTextModule } from 'primeng/inputtext';
 import { ListboxModule } from 'primeng/listbox';
 import { MultiSelectModule } from 'primeng/multiselect';
-import { mapErrorToEmpty, mapErrorToNull } from '@services/operators';
-import { Role, UpdateUser, UserService } from '@services/user.service';
 
 @Component({
     selector: 'user',
@@ -25,11 +25,9 @@ import { Role, UpdateUser, UserService } from '@services/user.service';
     styleUrl: './user-edit.component.css',
 })
 export class UserEditComponent implements OnInit {
-    public login = input.required<string>();
-
+    public readonly login = input.required<string>();
     public roles: Role[] | undefined;
-
-    public form = this.formBuilder.nonNullable.group({
+    public readonly form = this.formBuilder.nonNullable.group({
         login: ['', [Validators.required]],
         isLocked: [false, Validators.required],
         roles: new FormControl<Role[]>([]),
