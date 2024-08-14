@@ -1,5 +1,4 @@
-import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { PaginatorComponent, PaginatorState } from '@controls/paginator/paginator.component';
 import { mapErrorToEmpty } from '@services/operators';
@@ -11,12 +10,12 @@ import { Observable } from 'rxjs';
 @Component({
     selector: 'user-list',
     standalone: true,
-    imports: [CommonModule, PaginatorComponent, RouterModule, TableModule, ButtonModule],
+    imports: [ButtonModule, PaginatorComponent, RouterModule, TableModule],
     templateUrl: './user-list.component.html',
     styleUrl: './user-list.component.css',
 })
 export class UserListComponent {
-    public users: UserItem[] = [];
+    public users = signal<UserItem[]>([]);
 
     public constructor(private readonly userService: UserService) {}
 
@@ -29,6 +28,6 @@ export class UserListComponent {
     }
 
     public paginatorDataChanged(items: UserItem[]): void {
-        this.users = items;
+        this.users.set(items);
     }
 }

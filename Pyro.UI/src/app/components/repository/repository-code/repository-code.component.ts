@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { AsyncPipe, DatePipe, SlicePipe } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -32,13 +32,15 @@ import {
     selector: 'repo-code',
     standalone: true,
     imports: [
+        AsyncPipe,
         ButtonModule,
-        CommonModule,
+        DatePipe,
         DeferModule,
         DropdownModule,
         FormsModule,
         RouterModule,
         SkeletonModule,
+        SlicePipe,
         TableModule,
         TabViewModule,
         ToolbarModule,

@@ -1,5 +1,4 @@
-import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { PaginatorComponent, PaginatorState } from '@controls/paginator/paginator.component';
 import { mapErrorToEmpty } from '@services/operators';
@@ -10,12 +9,12 @@ import { Observable } from 'rxjs';
 @Component({
     selector: 'repo-list',
     standalone: true,
-    imports: [CommonModule, PaginatorComponent, RouterModule, TableModule],
+    imports: [PaginatorComponent, RouterModule, TableModule],
     templateUrl: './repository-list.component.html',
     styleUrl: './repository-list.component.css',
 })
 export class RepositoryListComponent {
-    public repositories: RepositoryItem[] = [];
+    public repositories = signal<RepositoryItem[]>([]);
 
     public constructor(private readonly repoService: RepositoryService) {}
 
@@ -28,6 +27,6 @@ export class RepositoryListComponent {
     }
 
     public paginatorDataChanged(items: RepositoryItem[]): void {
-        this.repositories = items;
+        this.repositories.set(items);
     }
 }

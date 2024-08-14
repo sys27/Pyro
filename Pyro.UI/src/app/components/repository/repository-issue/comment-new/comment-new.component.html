@@ -27,13 +27,13 @@
         severity="secondary"
         label="Cancel"
         (onClick)="cancel()"
-        [loading]="isLoading" />
+        [loading]="isLoading()" />
       <p-button
         severity="success"
         label="Comment"
         type="submit"
         [disabled]="form.invalid"
-        [loading]="isLoading" />
+        [loading]="isLoading()" />
     </div>
   </form>
 </p-panel>

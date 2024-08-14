@@ -1,70 +1,70 @@
-<div
-  *ngIf="issue$ | async as issue"
-  class="grid m-4">
-  <div class="col-12 text-2xl">
-    <div class="flex flex-row gap-2">
-      <span class="text-bold">{{ issue.title }}</span>
-      <span class="text-400">#{{ issue.issueNumber }}</span>
-      <div class="flex-grow-1"></div>
-      <div>
-        <p-button
-          routerLink="edit"
-          label="Edit"
-          icon="pi pi-pencil"
-          [disabled]="!(canEditIssue$ | async)"
-          [outlined]="true" />
+@if (issue$ | async; as issue) {
+  <div class="grid m-4">
+    <div class="col-12 text-2xl">
+      <div class="flex flex-row gap-2">
+        <span class="text-bold">{{ issue.title }}</span>
+        <span class="text-400">#{{ issue.issueNumber }}</span>
+        <div class="flex-grow-1"></div>
+        <div>
+          <p-button
+            routerLink="edit"
+            label="Edit"
+            icon="pi pi-pencil"
+            [disabled]="!(canEditIssue$ | async)"
+            [outlined]="true" />
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 grid">
+      <div class="col-10">
+        @if (repositoryName$ | async; as repositoryName) {
+          @if (comments$ | async; as comments) {
+            <div class="flex flex-column gap-2">
+              @for (comment of comments; track comment.id) {
+                <comment-view
+                  [comment]="comment"
+                  [repositoryName]="repositoryName"
+                  [issueNumber]="issueNumber()"
+                  (commentAdded)="commentAdded()" />
+              }
+            </div>
+          }
+
+          <div class="mt-2">
+            <comment-new
+              [repositoryName]="repositoryName"
+              [issueNumber]="issueNumber()"
+              (commentAdded)="commentAdded()" />
+          </div>
+        }
+      </div>
+      <div class="col-2">
+        <div>
+          <div>Assignee:</div>
+          <div class="flex flex-row gap-2">
+            <span class="pi pi-user"></span>
+            <span>{{ issue.assignee?.name ?? 'Unassigned' }}</span>
+          </div>
+        </div>
+
+        <p-divider />
+
+        <div>
+          <div>Author:</div>
+          <div class="flex flex-row gap-2">
+            <span class="pi pi-user"></span>
+            <span>{{ issue.author.name }}</span>
+          </div>
+        </div>
+
+        <p-divider />
+
+        <div>
+          <div>Created At:</div>
+          <div>{{ issue.createdAt | date: 'short' }}</div>
+        </div>
       </div>
     </div>
   </div>
-
-  <div class="col-12 grid">
-    <div class="col-10">
-      <div
-        *ngIf="comments$ | async as comments"
-        class="flex flex-column gap-2">
-        <div *ngFor="let comment of comments">
-          <comment-view
-            *ngIf="repositoryName$ | async as repositoryName"
-            [comment]="comment"
-            [repositoryName]="repositoryName"
-            [issueNumber]="issueNumber()"
-            (commentAdded)="commentAdded()" />
-        </div>
-      </div>
-
-      <div class="mt-2">
-        <comment-new
-          *ngIf="repositoryName$ | async as repositoryName"
-          [repositoryName]="repositoryName"
-          [issueNumber]="issueNumber()"
-          (commentAdded)="commentAdded()" />
-      </div>
-    </div>
-    <div class="col-2">
-      <div>
-        <div>Assignee:</div>
-        <div class="flex flex-row gap-2">
-          <span class="pi pi-user"></span>
-          <span>{{ issue.assignee?.name ?? 'Unassigned' }}</span>
-        </div>
-      </div>
-
-      <p-divider />
-
-      <div>
-        <div>Author:</div>
-        <div class="flex flex-row gap-2">
-          <span class="pi pi-user"></span>
-          <span>{{ issue.author.name }}</span>
-        </div>
-      </div>
-
-      <p-divider />
-
-      <div>
-        <div>Created At:</div>
-        <div>{{ issue.createdAt | date: 'short' }}</div>
-      </div>
-    </div>
-  </div>
-</div>
+}

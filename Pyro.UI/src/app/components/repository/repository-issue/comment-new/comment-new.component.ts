@@ -1,5 +1,5 @@
-import { CommonModule } from '@angular/common';
-import { Component, input, OnInit, output } from '@angular/core';
+import { AsyncPipe, CommonModule } from '@angular/common';
+import { Component, input, OnInit, output, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Comment, IssueService } from '@services/issue.service';
 import { mapErrorToNull } from '@services/operators';
@@ -14,8 +14,8 @@ import { MarkdownPipe } from '../../../../markdown.pipe';
     selector: 'comment-new',
     standalone: true,
     imports: [
+        AsyncPipe,
         ButtonModule,
-        CommonModule,
         DividerModule,
         InputTextModule,
         MarkdownPipe,
@@ -30,7 +30,7 @@ export class CommentNewComponent implements OnInit {
     public repositoryName = input.required<string>();
     public issueNumber = input.required<number>();
     public comment = input<Comment>();
-    public isLoading: boolean = false;
+    public isLoading = signal<boolean>(false);
     public form = this.formBuilder.group({
         comment: ['', [Validators.required, Validators.maxLength(2000)]],
     });
@@ -66,7 +66,7 @@ export class CommentNewComponent implements OnInit {
             content: content,
         };
 
-        this.isLoading = true;
+        this.isLoading.set(true);
         this.form.disable();
 
         let httpCall = this.isEditMode
@@ -83,7 +83,7 @@ export class CommentNewComponent implements OnInit {
               );
 
         httpCall.pipe(mapErrorToNull).subscribe(comment => {
-            this.isLoading = false;
+            this.isLoading.set(false);
             this.form.enable();
 
             if (comment) {

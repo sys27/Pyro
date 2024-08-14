@@ -40,22 +40,22 @@
     </p-iconField>
 
     <p-button
-      [icon]="themeIcon"
+      [icon]="themeIcon()"
       [outlined]="true"
       (onClick)="toggleThemeClick()" />
 
-    <p-splitButton
-      *ngIf="authService.currentUser | async as user; else showLogin"
-      icon="pi pi-user"
-      [outlined]="true"
-      [model]="loginMenuItems"
-      (onClick)="profileOnClick()" />
-    <ng-template #showLogin>
+    @if (authService.currentUser | async) {
+      <p-splitButton
+        icon="pi pi-user"
+        [outlined]="true"
+        [model]="loginMenuItems"
+        (onClick)="profileOnClick()" />
+    } @else {
       <p-button
         icon="pi pi-sign-in"
         routerLink="/login"
         [outlined]="true" />
-    </ng-template>
+    }
   </div>
 </p-toolbar>
 <router-outlet></router-outlet>
