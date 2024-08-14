@@ -1,6 +1,6 @@
 <div class="m-4">
   <p-dataView
-    [value]="issues"
+    [value]="issues()"
     emptyMessage=" ">
     <ng-template pTemplate="header">
       <div class="flex flex-row-reverse">
@@ -15,29 +15,29 @@
       pTemplate="list"
       let-issues>
       <div class="grid grid-nogutter">
-        <div
-          *ngFor="let issue of issues; let first = first"
-          class="col-12">
-          <div
-            class="p-3"
-            [ngClass]="{ 'border-top-1 surface-border': !first }">
-            <div class="pb-2">
-              <a
-                [routerLink]="issue.issueNumber"
-                class="text-lg font-bold no-underline"
-                >{{ issue.title }}</a
-              >
-            </div>
-            <div class="grid grid-nogutter text-sm text-400">
-              <div class="col-10">
-                <span>#{{ issue.issueNumber }} created by {{ issue.author.name }}</span>
+        @for (issue of issues; track issue.id; let first = $first) {
+          <div class="col-12">
+            <div
+              class="p-3"
+              [ngClass]="{ 'border-top-1 surface-border': !first }">
+              <div class="pb-2">
+                <a
+                  [routerLink]="issue.issueNumber"
+                  class="text-lg font-bold no-underline"
+                  >{{ issue.title }}</a
+                >
               </div>
-              <div class="col-2 text-right">
-                <span>{{ issue.assignee?.name ?? 'Unassigned' }}</span>
+              <div class="grid grid-nogutter text-sm text-400">
+                <div class="col-10">
+                  <span>#{{ issue.issueNumber }} created by {{ issue.author.name }}</span>
+                </div>
+                <div class="col-2 text-right">
+                  <span>{{ issue.assignee?.name ?? 'Unassigned' }}</span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        }
       </div>
     </ng-template>
   </p-dataView>

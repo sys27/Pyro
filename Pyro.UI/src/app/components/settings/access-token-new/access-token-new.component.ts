@@ -1,16 +1,15 @@
-import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AccessTokenService, CreateAccessToken } from '@services/access-token.service';
+import { mapErrorToNull } from '@services/operators';
 import { ButtonModule } from 'primeng/button';
 import { CalendarModule } from 'primeng/calendar';
 import { InputTextModule } from 'primeng/inputtext';
-import { AccessTokenService, CreateAccessToken } from '@services/access-token.service';
-import { mapErrorToNull } from '@services/operators';
 
 @Component({
     selector: 'access-token-new',
     standalone: true,
-    imports: [ButtonModule, CalendarModule, CommonModule, InputTextModule, ReactiveFormsModule],
+    imports: [ButtonModule, CalendarModule, InputTextModule, ReactiveFormsModule],
     templateUrl: './access-token-new.component.html',
     styleUrls: ['./access-token-new.component.css'],
 })
@@ -21,7 +20,7 @@ export class AccessTokenNewComponent {
         token: [''],
     });
     public minDate: Date = new Date();
-    public isViewMode: boolean = false;
+    public isViewMode = signal<boolean>(false);
 
     public constructor(
         private readonly formBuilder: FormBuilder,
@@ -42,7 +41,7 @@ export class AccessTokenNewComponent {
                 }
 
                 this.form.disable();
-                this.isViewMode = true;
+                this.isViewMode.set(true);
                 this.form.controls.token.setValue(response.token);
             });
     }

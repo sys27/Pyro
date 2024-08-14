@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { mapErrorToNull } from '@services/operators';
@@ -8,7 +8,7 @@ import { Observable, combineLatest, from, map, of, shareReplay, switchMap } from
 @Component({
     selector: 'repository-file',
     standalone: true,
-    imports: [CommonModule],
+    imports: [AsyncPipe],
     templateUrl: './repository-file.component.html',
     styleUrls: ['./repository-file.component.css'],
 })

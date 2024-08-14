@@ -1,5 +1,5 @@
-import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { AsyncPipe } from '@angular/common';
+import { Component, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IssueService, User } from '@services/issue.service';
@@ -12,7 +12,7 @@ import { filter, map, Observable, shareReplay, switchMap, take, withLatestFrom }
 @Component({
     selector: 'repo-issue-new',
     standalone: true,
-    imports: [ButtonModule, CommonModule, DropdownModule, InputTextModule, ReactiveFormsModule],
+    imports: [AsyncPipe, ButtonModule, DropdownModule, InputTextModule, ReactiveFormsModule],
     templateUrl: './repository-issue-new.component.html',
     styleUrl: './repository-issue-new.component.css',
 })
@@ -27,7 +27,7 @@ export class RepositoryIssueNewComponent implements OnInit {
         assigneeId: new FormControl<string | null>(null),
     });
 
-    public isLoading: boolean = false;
+    public isLoading = signal<boolean>(false);
 
     public constructor(
         private readonly formBuilder: FormBuilder,
@@ -70,7 +70,7 @@ export class RepositoryIssueNewComponent implements OnInit {
             assigneeId: this.form.value.assigneeId!,
         };
 
-        this.isLoading = true;
+        this.isLoading.set(true);
 
         this.isEditMode$
             ?.pipe(
@@ -95,7 +95,7 @@ export class RepositoryIssueNewComponent implements OnInit {
                     this.router.navigate(['repositories', name, 'issues']);
                 }
 
-                this.isLoading = false;
+                this.isLoading.set(false);
             });
     }
 }

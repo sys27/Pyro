@@ -1,5 +1,5 @@
-import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { NgClass } from '@angular/common';
+import { Component, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { PaginatorComponent, PaginatorState } from '@controls/paginator/paginator.component';
 import { Issue, IssueService } from '@services/issue.service';
@@ -11,13 +11,13 @@ import { map, Observable, of, switchMap } from 'rxjs';
 @Component({
     selector: 'repo-issues',
     standalone: true,
-    imports: [ButtonModule, CommonModule, DataViewModule, PaginatorComponent, RouterModule],
+    imports: [ButtonModule, DataViewModule, NgClass, PaginatorComponent, RouterModule],
     templateUrl: './repository-issues.component.html',
     styleUrls: ['./repository-issues.component.css'],
 })
 export class RepositoryIssuesComponent implements OnInit {
     private repositoryName$: Observable<string> | undefined;
-    public issues: Issue[] = [];
+    public issues = signal<Issue[]>([]);
 
     public constructor(
         private readonly route: ActivatedRoute,
@@ -44,6 +44,6 @@ export class RepositoryIssuesComponent implements OnInit {
     }
 
     public paginatorDataChanged(items: Issue[]): void {
-        this.issues = items;
+        this.issues.set(items);
     }
 }

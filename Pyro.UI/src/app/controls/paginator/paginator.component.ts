@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Component, input, OnDestroy, OnInit, output } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import {
@@ -17,7 +17,7 @@ import {
 @Component({
     selector: 'paginator',
     standalone: true,
-    imports: [ButtonModule, CommonModule],
+    imports: [AsyncPipe, ButtonModule],
     templateUrl: './paginator.component.html',
     styleUrl: './paginator.component.css',
 })

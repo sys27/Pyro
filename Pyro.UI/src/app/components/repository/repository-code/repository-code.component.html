@@ -1,110 +1,109 @@
 <div class="grid">
-  <div
-    *ngIf="directoryView$ | async as view; else empty"
-    class="col">
-    <p-toolbar>
-      <div
-        *ngIf="branches$ | async as branches"
-        class="p-toolbar-group-start">
-        <p-dropdown
-          [options]="branches"
-          optionLabel="name"
-          [ngModel]="selectedBranch$ | async"
-          (ngModelChange)="selectBranch($event)" />
-      </div>
-      <div class="p-toolbar-group-end">
-        <p-button
-          label="Clone"
-          severity="success" />
-      </div>
-    </p-toolbar>
+  @if (directoryView$ | async; as view) {
+    <div class="col">
+      <p-toolbar>
+        @if (branches$ | async; as branches) {
+          <div class="p-toolbar-group-start">
+            <p-dropdown
+              [options]="branches"
+              optionLabel="name"
+              [ngModel]="selectedBranch$ | async"
+              (ngModelChange)="selectBranch($event)" />
+          </div>
+        }
 
-    <p-toolbar>
-      <div class="p-toolbar-group-start gap-2">
-        <span class="pi pi-user"></span>
-        <span class="font-medium">{{ view.commit.author.name }}</span>
-        <span class="text-400">{{ view.commit.message }}</span>
-      </div>
-      <div class="p-toolbar-group-end gap-2">
-        <span class="text-400">{{ view.commit.hash | slice: 0 : 6 }}</span>
-        <span class="text-400">{{ view.commit.date | date: 'shortDate' }}</span>
-        <span class="pi pi-history"></span>
-        <span>{{ view.commitsCount }} commits</span>
-      </div>
-    </p-toolbar>
+        <div class="p-toolbar-group-end">
+          <p-button
+            label="Clone"
+            severity="success" />
+        </div>
+      </p-toolbar>
 
-    <p-table
-      [value]="view.items"
-      selectionMode="single"
-      styleClass="p-datatable-striped">
-      <ng-template pTemplate="header">
-        <tr>
-          <th style="width: 1%"></th>
-          <th style="width: 19%"></th>
-          <th style="width: 75%"></th>
-          <th style="width: 5%"></th>
-        </tr>
-      </ng-template>
-      <ng-template
-        pTemplate="body"
-        let-item>
-        <tr>
-          <td>
-            <span
-              *ngIf="item.isDirectory; else fileIcon"
-              class="pi pi-folder"></span>
-            <ng-template #fileIcon>
-              <span class="pi pi-file"></span>
-            </ng-template>
-          </td>
-          <td>
-            <a
-              class="grid-item-link"
-              *ngIf="item.isDirectory; else file"
-              [routerLink]="item.name">
-              {{ item.name }}
-            </a>
-            <ng-template #file>
-              <a
-                class="grid-item-link"
-                [routerLink]="[
-                  '/repositories',
-                  (repository$ | async)?.name,
-                  'file',
-                  (branchOrPath$ | async)?.join('/'),
-                  item.name,
-                ]">
-                {{ item.name }}
-              </a>
-            </ng-template>
-          </td>
-          <td class="text-400">{{ item.message }}</td>
-          <td class="text-400">{{ item.date | date: 'shortDate' }}</td>
-        </tr>
-      </ng-template>
-    </p-table>
+      <p-toolbar>
+        <div class="p-toolbar-group-start gap-2">
+          <span class="pi pi-user"></span>
+          <span class="font-medium">{{ view.commit.author.name }}</span>
+          <span class="text-400">{{ view.commit.message }}</span>
+        </div>
+        <div class="p-toolbar-group-end gap-2">
+          <span class="text-400">{{ view.commit.hash | slice: 0 : 6 }}</span>
+          <span class="text-400">{{ view.commit.date | date: 'shortDate' }}</span>
+          <span class="pi pi-history"></span>
+          <span>{{ view.commitsCount }} commits</span>
+        </div>
+      </p-toolbar>
 
-    <div
-      pDefer
-      *ngIf="displayTabView$ | async">
-      <ng-template>
-        <p-tabView>
-          <p-tabPanel
-            *ngIf="readmeName$ | async"
-            header="README">
-            <div [innerHTML]="readmeFile$ | async"></div>
-          </p-tabPanel>
-          <p-tabPanel
-            *ngIf="licenseName$ | async"
-            header="LICENSE">
-            <div [innerHTML]="licenseFile$ | async"></div>
-          </p-tabPanel>
-        </p-tabView>
-      </ng-template>
+      <p-table
+        [value]="view.items"
+        selectionMode="single"
+        styleClass="p-datatable-striped">
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 1%"></th>
+            <th style="width: 19%"></th>
+            <th style="width: 75%"></th>
+            <th style="width: 5%"></th>
+          </tr>
+        </ng-template>
+        <ng-template
+          pTemplate="body"
+          let-item>
+          <tr>
+            <td>
+              @if (item.isDirectory) {
+                <span class="pi pi-folder"></span>
+              } @else {
+                <span class="pi pi-file"></span>
+              }
+            </td>
+            <td>
+              @if (item.isDirectory) {
+                <a
+                  class="grid-item-link"
+                  [routerLink]="item.name">
+                  {{ item.name }}
+                </a>
+              } @else {
+                <a
+                  class="grid-item-link"
+                  [routerLink]="[
+                    '/repositories',
+                    (repository$ | async)?.name,
+                    'file',
+                    (branchOrPath$ | async)?.join('/'),
+                    item.name,
+                  ]">
+                  {{ item.name }}
+                </a>
+              }
+            </td>
+            <td class="text-400">{{ item.message }}</td>
+            <td class="text-400">{{ item.date | date: 'shortDate' }}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+
+      @if (displayTabView$ | async) {
+        <div pDefer>
+          <ng-template>
+            <p-tabView>
+              @if (readmeName$ | async) {
+                <p-tabPanel header="README">
+                  <div [innerHTML]="readmeFile$ | async"></div>
+                </p-tabPanel>
+              }
+
+              @if (licenseName$ | async) {
+                <p-tabPanel header="LICENSE">
+                  <div [innerHTML]="licenseFile$ | async"></div>
+                </p-tabPanel>
+              }
+            </p-tabView>
+          </ng-template>
+        </div>
+      }
     </div>
-  </div>
-
-  <ng-template #empty>
+  } @else {
     <div class="col">
       <p-toolbar>
         <div class="p-toolbar-group-start">
@@ -165,7 +164,7 @@
         </ng-template>
       </p-table>
     </div>
-  </ng-template>
+  }
 
   <div class="col-2">
     <div class="text-2xl">{{ (repository$ | async)?.name }}</div>

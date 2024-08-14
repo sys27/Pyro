@@ -1,20 +1,18 @@
-import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { mapErrorToEmpty } from '@services/operators';
+import { CreateUser, Role, User, UserService } from '@services/user.service';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { InputTextModule } from 'primeng/inputtext';
 import { ListboxModule } from 'primeng/listbox';
 import { MultiSelectModule } from 'primeng/multiselect';
-import { mapErrorToEmpty } from '@services/operators';
-import { CreateUser, Role, User, UserService } from '@services/user.service';
 
 @Component({
     selector: 'user-new',
     standalone: true,
     imports: [
-        CommonModule,
         ReactiveFormsModule,
         InputTextModule,
         MultiSelectModule,

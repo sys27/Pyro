@@ -26,25 +26,23 @@
         styleClass="w-full" />
     </div>
 
-    <div
-      *ngIf="isViewMode"
-      class="field">
-      <label for="token">Token:</label>
-      <input
-        id="token"
-        type="text"
-        class="w-full"
-        pInputText
-        formControlName="token" />
-    </div>
-
-    <div
-      *ngIf="!isViewMode"
-      class="field">
-      <p-button
-        label="Save"
-        type="submit"
-        [disabled]="!form.valid" />
-    </div>
+    @if (isViewMode()) {
+      <div class="field">
+        <label for="token">Token:</label>
+        <input
+          id="token"
+          type="text"
+          class="w-full"
+          pInputText
+          formControlName="token" />
+      </div>
+    } @else {
+      <div class="field">
+        <p-button
+          label="Save"
+          type="submit"
+          [disabled]="!form.valid" />
+      </div>
+    }
   </form>
 </div>

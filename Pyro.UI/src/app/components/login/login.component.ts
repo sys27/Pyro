@@ -1,15 +1,15 @@
 import { Component, input } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AuthService } from '@services/auth.service';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
-import { AuthService } from '@services/auth.service';
 
 @Component({
     selector: 'login',
     standalone: true,
-    imports: [ReactiveFormsModule, InputTextModule, PasswordModule, ButtonModule],
+    imports: [ButtonModule, InputTextModule, PasswordModule, ReactiveFormsModule],
     templateUrl: './login.component.html',
     styleUrl: './login.component.css',
 })

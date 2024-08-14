@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { AsyncPipe, DatePipe } from '@angular/common';
 import { Component, input, OnInit, output } from '@angular/core';
 import { AuthService } from '@services/auth.service';
 import { Comment } from '@services/issue.service';
@@ -10,7 +10,7 @@ import { CommentNewComponent } from '../comment-new/comment-new.component';
 @Component({
     selector: 'comment-view',
     standalone: true,
-    imports: [CommonModule, CommentNewComponent, MarkdownPipe, PanelModule],
+    imports: [AsyncPipe, CommentNewComponent, DatePipe, MarkdownPipe, PanelModule],
     templateUrl: './comment-view.component.html',
     styleUrl: './comment-view.component.css',
 })

@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { AsyncPipe, DatePipe } from '@angular/common';
 import { Component, input, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { AuthService } from '@services/auth.service';
@@ -23,10 +23,11 @@ import { CommentViewComponent } from './comment-view/comment-view.component';
     selector: 'repo-issue',
     standalone: true,
     imports: [
+        AsyncPipe,
         ButtonModule,
         CommentNewComponent,
         CommentViewComponent,
-        CommonModule,
+        DatePipe,
         DividerModule,
         MarkdownPipe,
         RouterModule,

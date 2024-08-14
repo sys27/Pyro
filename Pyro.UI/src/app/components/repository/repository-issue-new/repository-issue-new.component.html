@@ -17,14 +17,16 @@
 
     <div class="field">
       <label for="assignee">Assignee:</label>
-      <p-dropdown
-        *ngIf="users$ | async as users"
-        id="assignee"
-        formControlName="assigneeId"
-        [options]="users"
-        optionLabel="name"
-        optionValue="id"
-        styleClass="w-full" />
+
+      @if (users$ | async; as users) {
+        <p-dropdown
+          id="assignee"
+          formControlName="assigneeId"
+          [options]="users"
+          optionLabel="name"
+          optionValue="id"
+          styleClass="w-full" />
+      }
     </div>
 
     <div class="field">
@@ -32,7 +34,7 @@
         [label]="(isEditMode$ | async) ? 'Update' : 'Create'"
         type="submit"
         [disabled]="form.invalid"
-        [loading]="isLoading" />
+        [loading]="isLoading()" />
     </div>
   </form>
 </div>

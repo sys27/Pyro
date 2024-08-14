@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NotificationEvent, NotificationService } from '@services/notification.service';
@@ -23,7 +23,7 @@ export class RepositoryNewComponent implements OnInit, OnDestroy {
         description: ['', [Validators.maxLength(250)]],
         defaultBranch: ['', [Validators.required, Validators.maxLength(50)]],
     });
-    public isLoading: boolean = false;
+    public isLoading = signal<boolean>(false);
 
     private readonly destroy$: Subject<void> = new Subject<void>();
     private repositoryInitialized$: Observable<string> | undefined;
@@ -51,7 +51,7 @@ export class RepositoryNewComponent implements OnInit, OnDestroy {
             return;
         }
 
-        this.isLoading = true;
+        this.isLoading.set(true);
 
         this.repositoryService
             .createRepository(this.form.value as CreateRepository)
@@ -60,7 +60,7 @@ export class RepositoryNewComponent implements OnInit, OnDestroy {
                 filter(name => name === this.form.value.name),
             )
             .subscribe(name => {
-                this.isLoading = false;
+                this.isLoading.set(false);
                 this.router.navigate(['/repositories', this.form.value.name]);
             });
     }
