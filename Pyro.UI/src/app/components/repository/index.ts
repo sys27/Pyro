@@ -6,8 +6,8 @@ export { RepositoryIssuesComponent } from './repository-issues/repository-issues
 export { RepositoryListComponent } from './repository-list/repository-list.component';
 export { RepositoryNewComponent } from './repository-new/repository-new.component';
 export { RepositoryPullRequqestsComponent } from './repository-prs/repository-prs.component';
+export { LabelEditComponent } from './repository-settings/label-edit/label-edit.component';
+export { LabelListComponent } from './repository-settings/label-list/label-list.component';
+export { LabelNewComponent } from './repository-settings/label-new/label-new.component';
 export { RepositorySettingsComponent } from './repository-settings/repository-settings.component';
-export { TagListComponent } from './repository-settings/tag-list/tag-list.component';
-export { TagEditComponent } from './repository-settings/tag-edit/tag-edit.component';
-export { TagNewComponent } from './repository-settings/tag-new/tag-new.component';
 export { RepositoryComponent } from './repository.component';

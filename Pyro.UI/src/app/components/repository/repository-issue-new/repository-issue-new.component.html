@@ -31,16 +31,16 @@
     </div>
 
     <div class="field">
-      <label>Tags:</label>
+      <label>Labels:</label>
 
-      @if (tags$ | async; as tags) {
+      @if (labels$ | async; as labels) {
         <p-multiSelect
-          formControlName="tagIds"
-          [options]="tags"
+          formControlName="labelIds"
+          [options]="labels"
           optionLabel="name"
           optionValue="id"
           styleClass="w-full"
-          placeholder="Select Tags"
+          placeholder="Select Labels"
           [filter]="false" />
       }
     </div>

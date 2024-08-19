@@ -22,7 +22,7 @@ internal class IssueRepository : IIssueRepository
             .Set<Issue>()
             .Include(x => x.Assignee)
             .Include(x => x.Author)
-            .Include(x => x.Tags)
+            .Include(x => x.Labels)
             .Where(x => x.Repository.Name == query.RepositoryName)
             .AsNoTracking();
 
@@ -63,7 +63,7 @@ internal class IssueRepository : IIssueRepository
             .Include(x => x.Assignee)
             .Include(x => x.Author)
             .Include(x => x.Comments.OrderBy(c => c.CreatedAt))
-            .Include(x => x.Tags)
+            .Include(x => x.Labels)
             .FirstOrDefaultAsync(
                 i => i.Repository.Name == repositoryName &&
                      i.IssueNumber == number,
@@ -81,7 +81,7 @@ internal class IssueRepository : IIssueRepository
 
     public void DeleteIssue(Issue issue)
     {
-        issue.ClearTags();
+        issue.ClearLabels();
         dbContext.Set<Issue>().Remove(issue);
     }
 

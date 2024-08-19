@@ -86,7 +86,7 @@ internal static class IssueEndpoints
                     name,
                     request.Title,
                     request.AssigneeId,
-                    request.Tags);
+                    request.Labels);
                 var issue = await mediator.Send(command, cancellationToken);
                 await unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -116,7 +116,7 @@ internal static class IssueEndpoints
                     number,
                     request.Title,
                     request.AssigneeId,
-                    request.Tags);
+                    request.Labels);
                 var issue = await mediator.Send(command, cancellationToken);
                 await unitOfWork.SaveChangesAsync(cancellationToken);
 

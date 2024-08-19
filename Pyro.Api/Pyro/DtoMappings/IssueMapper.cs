@@ -41,5 +41,5 @@ public static partial class IssueMapper
         return new ColorResponse(r, g, b);
     }
 
-    public static partial TagResponse ToResponse(this Tag request);
+    public static partial LabelResponse ToResponse(this Label request);
 }

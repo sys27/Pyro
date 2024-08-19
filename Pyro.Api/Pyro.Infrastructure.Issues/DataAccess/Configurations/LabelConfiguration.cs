@@ -3,18 +3,18 @@
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Pyro.Domain.GitRepositories;
+using Pyro.Domain.Issues;
 
-namespace Pyro.Infrastructure.DataAccess.Configurations;
+namespace Pyro.Infrastructure.Issues.DataAccess.Configurations;
 
-internal class TagConfiguration : IEntityTypeConfiguration<Tag>
+internal class LabelConfiguration : IEntityTypeConfiguration<Label>
 {
-    public void Configure(EntityTypeBuilder<Tag> builder)
+    public void Configure(EntityTypeBuilder<Label> builder)
     {
-        builder.ToTable("Tags");
+        builder.ToTable("Labels", b => b.ExcludeFromMigrations());
 
         builder.HasKey(x => x.Id)
-            .HasName("PK_Tag");
+            .HasName("PK_Label");
 
         builder.Property(x => x.Id)
             .IsRequired();
@@ -31,6 +31,6 @@ internal class TagConfiguration : IEntityTypeConfiguration<Tag>
 
         builder.HasIndex(x => x.Name)
             .IsUnique()
-            .HasDatabaseName("IX_Tag_Name");
+            .HasDatabaseName("IX_Label_Name");
     }
 }

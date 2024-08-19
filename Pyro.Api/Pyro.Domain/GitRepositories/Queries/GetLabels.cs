@@ -6,11 +6,11 @@ using MediatR;
 
 namespace Pyro.Domain.GitRepositories.Queries;
 
-public record GetTags(string RepositoryName) : IRequest<IReadOnlyList<Tag>>;
+public record GetLabels(string RepositoryName) : IRequest<IReadOnlyList<Label>>;
 
-public class GetTagsValidator : AbstractValidator<GetTags>
+public class GetLabelsValidator : AbstractValidator<GetLabels>
 {
-    public GetTagsValidator()
+    public GetLabelsValidator()
     {
         RuleFor(x => x.RepositoryName)
             .NotEmpty()
@@ -18,17 +18,17 @@ public class GetTagsValidator : AbstractValidator<GetTags>
     }
 }
 
-public class GetTagsHandler : IRequestHandler<GetTags, IReadOnlyList<Tag>>
+public class GetLabelsHandler : IRequestHandler<GetLabels, IReadOnlyList<Label>>
 {
     private readonly IGitRepositoryRepository repository;
 
-    public GetTagsHandler(IGitRepositoryRepository repository)
+    public GetLabelsHandler(IGitRepositoryRepository repository)
         => this.repository = repository;
 
-    public async Task<IReadOnlyList<Tag>> Handle(GetTags request, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<Label>> Handle(GetLabels request, CancellationToken cancellationToken = default)
     {
         var gitRepository = await repository.GetGitRepository(request.RepositoryName, cancellationToken);
 
-        return gitRepository?.Tags ?? [];
+        return gitRepository?.Labels ?? [];
     }
 }

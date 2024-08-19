@@ -7,11 +7,11 @@ using Pyro.Domain.Shared.Exceptions;
 
 namespace Pyro.Domain.GitRepositories.Commands;
 
-public record CreateTag(string RepositoryName, string Name, int Color) : IRequest<Tag>;
+public record CreateLabel(string RepositoryName, string Name, int Color) : IRequest<Label>;
 
-public class CreateTagValidator : AbstractValidator<CreateTag>
+public class CreateLabelValidator : AbstractValidator<CreateLabel>
 {
-    public CreateTagValidator()
+    public CreateLabelValidator()
     {
         RuleFor(x => x.RepositoryName)
             .NotEmpty()
@@ -27,20 +27,20 @@ public class CreateTagValidator : AbstractValidator<CreateTag>
     }
 }
 
-public class CreateTagHandler : IRequestHandler<CreateTag, Tag>
+public class CreateLabelHandler : IRequestHandler<CreateLabel, Label>
 {
     private readonly IGitRepositoryRepository repository;
 
-    public CreateTagHandler(IGitRepositoryRepository repository)
+    public CreateLabelHandler(IGitRepositoryRepository repository)
         => this.repository = repository;
 
-    public async Task<Tag> Handle(CreateTag request, CancellationToken cancellationToken = default)
+    public async Task<Label> Handle(CreateLabel request, CancellationToken cancellationToken = default)
     {
         var gitRepository = await repository.GetGitRepository(request.RepositoryName, cancellationToken) ??
                             throw new NotFoundException($"The '{request.RepositoryName}' repository not found");
 
-        var tag = gitRepository.AddTag(request.Name, request.Color);
+        var label = gitRepository.AddLabel(request.Name, request.Color);
 
-        return tag;
+        return label;
     }
 }

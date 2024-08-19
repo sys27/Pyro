@@ -2,20 +2,20 @@ import { Component, input, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Color } from '@models/color';
+import { LabelService } from '@services/label.service';
 import { mapErrorToNull } from '@services/operators';
-import { TagService } from '@services/tag.service';
 import { ButtonModule } from 'primeng/button';
 import { ColorPickerModule } from 'primeng/colorpicker';
 import { InputTextModule } from 'primeng/inputtext';
 
 @Component({
-    selector: 'tag-new',
+    selector: 'label-new',
     standalone: true,
     imports: [ButtonModule, ColorPickerModule, InputTextModule, ReactiveFormsModule],
-    templateUrl: './tag-new.component.html',
-    styleUrl: './tag-new.component.css',
+    templateUrl: './label-new.component.html',
+    styleUrl: './label-new.component.css',
 })
-export class TagNewComponent {
+export class LabelNewComponent {
     public readonly repositoryName = input.required<string>();
     public readonly form = this.formBuilder.nonNullable.group({
         name: ['', [Validators.required, Validators.maxLength(50)]],
@@ -27,7 +27,7 @@ export class TagNewComponent {
         private readonly formBuilder: FormBuilder,
         private readonly router: Router,
         private readonly route: ActivatedRoute,
-        private readonly tagService: TagService,
+        private readonly labelService: LabelService,
     ) {}
 
     public onSubmit(): void {
@@ -37,13 +37,13 @@ export class TagNewComponent {
 
         this.isLoading.set(true);
 
-        let tag = {
+        let label = {
             name: this.form.value.name!,
             color: this.form.value.color!,
         };
 
-        this.tagService
-            .createTag(this.repositoryName(), tag)
+        this.labelService
+            .createLabel(this.repositoryName(), label)
             .pipe(mapErrorToNull)
             .subscribe(response => {
                 if (response === null) {

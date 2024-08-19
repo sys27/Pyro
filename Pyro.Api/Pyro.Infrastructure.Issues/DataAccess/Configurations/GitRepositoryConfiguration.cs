@@ -23,7 +23,7 @@ internal class GitRepositoryConfiguration : IEntityTypeConfiguration<GitReposito
             .HasMaxLength(50)
             .IsRequired();
 
-        builder.HasMany(x => x.Tags)
+        builder.HasMany(x => x.Labels)
             .WithOne()
             .HasForeignKey("GitRepositoryId");
 

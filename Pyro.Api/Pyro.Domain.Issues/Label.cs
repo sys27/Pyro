@@ -5,7 +5,7 @@ using Pyro.Domain.Shared.Models;
 
 namespace Pyro.Domain.Issues;
 
-public class Tag : Entity
+public class Label : Entity
 {
     public required string Name { get; init; }
 

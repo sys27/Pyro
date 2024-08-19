@@ -6,66 +6,66 @@ import { Endpoints } from '../endpoints';
 import { PyroResponse, ResponseError } from '../models/response';
 
 @Injectable({ providedIn: 'root' })
-export class TagService {
+export class LabelService {
     public constructor(private readonly httpClient: HttpClient) {}
 
-    public getTags(repositoryName: string): Observable<PyroResponse<Tag[]>> {
+    public getLabels(repositoryName: string): Observable<PyroResponse<Label[]>> {
         return this.httpClient
-            .get<Tag[]>(Endpoints.Tags(repositoryName))
+            .get<Label[]>(Endpoints.Labels(repositoryName))
             .pipe(catchError((error: ResponseError) => of(error)));
     }
 
-    public getTag(repositoryName: string, id: string): Observable<PyroResponse<Tag>> {
+    public getLabel(repositoryName: string, id: string): Observable<PyroResponse<Label>> {
         return this.httpClient
-            .get<Tag>(`${Endpoints.Tags(repositoryName)}/${id}`)
+            .get<Label>(`${Endpoints.Labels(repositoryName)}/${id}`)
             .pipe(catchError((error: ResponseError) => of(error)));
     }
 
-    public createTag(repositoryName: string, tag: CreateTag): Observable<PyroResponse<Tag>> {
+    public createLabel(repositoryName: string, label: CreateLabel): Observable<PyroResponse<Label>> {
         let request = {
-            name: tag.name,
-            color: tag.color,
+            name: label.name,
+            color: label.color,
         };
 
         return this.httpClient
-            .post<Tag>(Endpoints.Tags(repositoryName), request)
+            .post<Label>(Endpoints.Labels(repositoryName), request)
             .pipe(catchError((error: ResponseError) => of(error)));
     }
 
-    public updateTag(
+    public updateLabel(
         repositoryName: string,
         id: string,
-        tag: UpdateTag,
-    ): Observable<PyroResponse<Tag>> {
+        label: UpdateLabel,
+    ): Observable<PyroResponse<Label>> {
         let request = {
-            name: tag.name,
-            color: tag.color,
+            name: label.name,
+            color: label.color,
         };
 
         return this.httpClient
-            .put<Tag>(`${Endpoints.Tags(repositoryName)}/${id}`, request)
+            .put<Label>(`${Endpoints.Labels(repositoryName)}/${id}`, request)
             .pipe(catchError((error: ResponseError) => of(error)));
     }
 
-    public deleteTag(repositoryName: string, id: string): Observable<PyroResponse<void>> {
+    public deleteLabel(repositoryName: string, id: string): Observable<PyroResponse<void>> {
         return this.httpClient
-            .delete<void>(`${Endpoints.Tags(repositoryName)}/${id}`)
+            .delete<void>(`${Endpoints.Labels(repositoryName)}/${id}`)
             .pipe(catchError((error: ResponseError) => of(error)));
     }
 }
 
-export interface Tag {
+export interface Label {
     id: string;
     name: string;
     color: Color;
 }
 
-export interface CreateTag {
+export interface CreateLabel {
     name: string;
     color: Color;
 }
 
-export interface UpdateTag {
+export interface UpdateLabel {
     name: string;
     color: Color;
 }

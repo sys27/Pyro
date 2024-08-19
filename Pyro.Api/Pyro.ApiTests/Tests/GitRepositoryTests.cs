@@ -39,10 +39,10 @@ public class GitRepositoryTests
         await GetFile(repository.Name);
         await GetRepositories();
 
-        var tag = await CreateTag(repository.Name);
-        tag = await UpdateTag(repository.Name, tag.Id);
-        await GetTag(repository.Name, tag.Id);
-        await GetTags(repository.Name, tag);
+        var label = await CreateLabel(repository.Name);
+        label = await UpdateLabel(repository.Name, label.Id);
+        await GetLabel(repository.Name, label.Id);
+        await GetLabels(repository.Name, label);
     }
 
     private async Task<string> CreateGitRepository()
@@ -119,54 +119,54 @@ public class GitRepositoryTests
         Assert.That(repositories, Is.Not.Empty);
     }
 
-    private async Task<TagResponse> CreateTag(string repositoryName)
+    private async Task<LabelResponse> CreateLabel(string repositoryName)
     {
-        var request = new CreateTagRequest(faker.Lorem.Word(), ColorRequest.FromHex(faker.Internet.Color()));
-        var tag = await client.CreateTag(repositoryName, request);
+        var request = new CreateLabelRequest(faker.Lorem.Word(), ColorRequest.FromHex(faker.Internet.Color()));
+        var label = await client.CreateLabel(repositoryName, request);
 
-        Assert.That(tag, Is.Not.Null);
+        Assert.That(label, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.That(tag.Name, Is.EqualTo(request.Name));
-            Assert.That(tag.Color.R, Is.EqualTo(request.Color.R));
-            Assert.That(tag.Color.G, Is.EqualTo(request.Color.G));
-            Assert.That(tag.Color.B, Is.EqualTo(request.Color.B));
+            Assert.That(label.Name, Is.EqualTo(request.Name));
+            Assert.That(label.Color.R, Is.EqualTo(request.Color.R));
+            Assert.That(label.Color.G, Is.EqualTo(request.Color.G));
+            Assert.That(label.Color.B, Is.EqualTo(request.Color.B));
         });
 
-        return tag;
+        return label;
     }
 
-    private async Task<TagResponse> UpdateTag(string repositoryName, Guid id)
+    private async Task<LabelResponse> UpdateLabel(string repositoryName, Guid id)
     {
-        var request = new UpdateTagRequest(faker.Lorem.Word(), ColorRequest.FromHex(faker.Internet.Color()));
-        var tag = await client.UpdateTag(repositoryName, id, request);
+        var request = new UpdateLabelRequest(faker.Lorem.Word(), ColorRequest.FromHex(faker.Internet.Color()));
+        var label = await client.UpdateLabel(repositoryName, id, request);
 
-        Assert.That(tag, Is.Not.Null);
+        Assert.That(label, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.That(tag.Name, Is.EqualTo(request.Name));
-            Assert.That(tag.Color.R, Is.EqualTo(request.Color.R));
-            Assert.That(tag.Color.G, Is.EqualTo(request.Color.G));
-            Assert.That(tag.Color.B, Is.EqualTo(request.Color.B));
+            Assert.That(label.Name, Is.EqualTo(request.Name));
+            Assert.That(label.Color.R, Is.EqualTo(request.Color.R));
+            Assert.That(label.Color.G, Is.EqualTo(request.Color.G));
+            Assert.That(label.Color.B, Is.EqualTo(request.Color.B));
         });
 
-        return tag;
+        return label;
     }
 
-    private async Task GetTag(string repositoryName, Guid id)
+    private async Task GetLabel(string repositoryName, Guid id)
     {
-        var tag = await client.GetTag(repositoryName, id);
+        var label = await client.GetLabel(repositoryName, id);
 
-        Assert.That(tag, Is.Not.Null);
-        Assert.That(tag.Id, Is.EqualTo(id));
+        Assert.That(label, Is.Not.Null);
+        Assert.That(label.Id, Is.EqualTo(id));
     }
 
-    private async Task GetTags(string repositoryName, TagResponse tag)
+    private async Task GetLabels(string repositoryName, LabelResponse label)
     {
-        var tags = await client.GetTags(repositoryName);
+        var labels = await client.GetLabels(repositoryName);
 
-        Assert.That(tags, Is.Not.Empty);
-        Assert.That(tags, Has.Count.EqualTo(1));
-        Assert.That(tags, Has.One.EqualTo(tag));
+        Assert.That(labels, Is.Not.Empty);
+        Assert.That(labels, Has.Count.EqualTo(1));
+        Assert.That(labels, Has.One.EqualTo(label));
     }
 }

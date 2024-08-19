@@ -7,11 +7,11 @@ using Pyro.Domain.Shared.Exceptions;
 
 namespace Pyro.Domain.GitRepositories.Commands;
 
-public record UpdateTag(string RepositoryName, Guid Id, string NewName, int NewColor) : IRequest<Tag>;
+public record UpdateLabel(string RepositoryName, Guid Id, string NewName, int NewColor) : IRequest<Label>;
 
-public class UpdateTagValidator : AbstractValidator<UpdateTag>
+public class UpdateLabelValidator : AbstractValidator<UpdateLabel>
 {
-    public UpdateTagValidator()
+    public UpdateLabelValidator()
     {
         RuleFor(x => x.RepositoryName)
             .NotEmpty()
@@ -30,24 +30,24 @@ public class UpdateTagValidator : AbstractValidator<UpdateTag>
     }
 }
 
-public class UpdateTagHandler : IRequestHandler<UpdateTag, Tag>
+public class UpdateLabelHandler : IRequestHandler<UpdateLabel, Label>
 {
     private readonly IGitRepositoryRepository repository;
 
-    public UpdateTagHandler(IGitRepositoryRepository repository)
+    public UpdateLabelHandler(IGitRepositoryRepository repository)
         => this.repository = repository;
 
-    public async Task<Tag> Handle(UpdateTag request, CancellationToken cancellationToken = default)
+    public async Task<Label> Handle(UpdateLabel request, CancellationToken cancellationToken = default)
     {
         var gitRepository = await repository.GetGitRepository(request.RepositoryName, cancellationToken) ??
                             throw new NotFoundException($"The '{request.RepositoryName}' repository not found");
 
-        var tag = gitRepository.GetTag(request.Id) ??
-                  throw new NotFoundException($"The tag (Id: {request.Id}) not found");
+        var label = gitRepository.GetLabel(request.Id) ??
+                    throw new NotFoundException($"The label (Id: {request.Id}) not found");
 
-        tag.Name = request.NewName;
-        tag.Color = request.NewColor;
+        label.Name = request.NewName;
+        label.Color = request.NewColor;
 
-        return tag;
+        return label;
     }
 }

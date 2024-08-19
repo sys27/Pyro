@@ -48,7 +48,7 @@ export class IssueService {
         let request = {
             title: issue.title,
             assigneeId: issue.assigneeId,
-            tags: issue.tags,
+            labels: issue.labels,
         };
 
         return this.httpClient.post<void>(Endpoints.Issues(repositoryName), request);
@@ -62,7 +62,7 @@ export class IssueService {
         let request = {
             title: issue.title,
             assigneeId: issue.assigneeId,
-            tags: issue.tags,
+            labels: issue.labels,
         };
 
         return this.httpClient.put<void>(
@@ -115,10 +115,10 @@ export interface Issue {
     author: User;
     createdAt: Date;
     assignee: User | null;
-    tags: Tag[];
+    labels: Label[];
 }
 
-export interface Tag {
+export interface Label {
     id: string;
     name: string;
     color: Color;
@@ -140,13 +140,13 @@ export interface CreateIssue {
     title: string;
     assigneeId: string | null;
 
-    tags: string[];
+    labels: string[];
 }
 
 export interface UpdateIssue {
     title: string;
     assigneeId: string | null;
-    tags: string[];
+    labels: string[];
 }
 
 export interface CreateIssueComment {

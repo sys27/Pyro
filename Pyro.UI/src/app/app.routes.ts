@@ -3,6 +3,9 @@ import { authGuard } from './auth.guard';
 import { LoginComponent } from './components/login/login.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import {
+    LabelEditComponent,
+    LabelListComponent,
+    LabelNewComponent,
     RepositoryCodeComponent,
     RepositoryComponent,
     RepositoryFileComponent,
@@ -13,9 +16,6 @@ import {
     RepositoryNewComponent,
     RepositoryPullRequqestsComponent,
     RepositorySettingsComponent,
-    TagEditComponent,
-    TagListComponent,
-    TagNewComponent,
 } from './components/repository';
 import {
     AccessTokenListComponent,
@@ -79,10 +79,14 @@ export const routes: Routes = [
                 component: RepositorySettingsComponent,
                 canActivate: [authGuard],
                 children: [
-                    { path: 'tags/new', component: TagNewComponent, canActivate: [authGuard] },
-                    { path: 'tags/:tagId', component: TagEditComponent, canActivate: [authGuard] },
-                    { path: 'tags', component: TagListComponent, canActivate: [authGuard] },
-                    { path: '', redirectTo: 'tags', pathMatch: 'full' },
+                    { path: 'labels/new', component: LabelNewComponent, canActivate: [authGuard] },
+                    {
+                        path: 'labels/:labelId',
+                        component: LabelEditComponent,
+                        canActivate: [authGuard],
+                    },
+                    { path: 'labels', component: LabelListComponent, canActivate: [authGuard] },
+                    { path: '', redirectTo: 'labels', pathMatch: 'full' },
                 ],
             },
             { path: '', redirectTo: 'code', pathMatch: 'full' },

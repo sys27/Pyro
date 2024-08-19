@@ -33,7 +33,7 @@ internal class GitRepositoryConfiguration : IEntityTypeConfiguration<GitReposito
         builder.Property(x => x.Status)
             .IsRequired();
 
-        builder.HasMany(x => x.Tags)
+        builder.HasMany(x => x.Labels)
             .WithOne(x => x.GitRepository)
             .HasForeignKey("GitRepositoryId")
             .OnDelete(DeleteBehavior.Cascade);

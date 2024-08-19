@@ -1,12 +1,12 @@
-@if (tags$ | async; as tags) {
+@if (labels$ | async; as labels) {
   <p-table
-    [value]="tags"
+    [value]="labels"
     selectionMode="single"
     styleClass="p-datatable-striped">
     <ng-template pTemplate="caption">
       <div class="flex flex-row-reverse">
         <p-button
-          label="New Tag"
+          label="New Label"
           icon="pi pi-plus"
           severity="success"
           [routerLink]="['new']" />
@@ -20,24 +20,24 @@
     </ng-template>
     <ng-template
       pTemplate="body"
-      let-tag>
+      let-label>
       <tr>
         <td>
           <span
             class="pi pi-tag"
-            [style.color]="tag.color | color"></span>
-          {{ tag.name }}
+            [style.color]="label.color | color"></span>
+          {{ label.name }}
         </td>
         <td>
           <div class="flex flex-row gap-2">
             <p-button
               icon="pi pi-pencil"
               [outlined]="true"
-              [routerLink]="tag.id" />
+              [routerLink]="label.id" />
             <p-button
               icon="pi pi-trash"
               [outlined]="true"
-              (onClick)="deleteTag(tag)" />
+              (onClick)="deleteLabel(label)" />
           </div>
         </td>
       </tr>

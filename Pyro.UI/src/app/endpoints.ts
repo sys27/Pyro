@@ -15,7 +15,7 @@ export class Endpoints {
         return `/api/repositories/${repositoryName}/issues`;
     }
 
-    public static Tags(repositoryName: string): string {
-        return `/api/repositories/${repositoryName}/tags`;
+    public static Labels(repositoryName: string): string {
+        return `/api/repositories/${repositoryName}/labels`;
     }
 }
