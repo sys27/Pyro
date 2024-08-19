@@ -85,15 +85,15 @@ public class CreateIssueHandlerTests
         {
             Id = Guid.NewGuid(),
             Name = "repo",
-            Tags =
+            Labels =
             [
-                new Tag
+                new Label
                 {
                     Id = Guid.NewGuid(),
                     Name = "Tag 1",
                     Color = 0,
                 },
-                new Tag
+                new Label
                 {
                     Id = Guid.NewGuid(),
                     Name = "Tag 2",
@@ -101,7 +101,7 @@ public class CreateIssueHandlerTests
                 }
             ],
         };
-        var command = new CreateIssue(repository.Name, "title", assignee?.Id, [repository.Tags[0].Id, Guid.NewGuid()]);
+        var command = new CreateIssue(repository.Name, "title", assignee?.Id, [repository.Labels[0].Id, Guid.NewGuid()]);
 
         var currentUserProvider = Substitute.For<ICurrentUserProvider>();
         currentUserProvider
@@ -137,8 +137,8 @@ public class CreateIssueHandlerTests
             Assert.That(issue.Author, Is.EqualTo(author));
             Assert.That(issue.CreatedAt, Is.EqualTo(now));
             Assert.That(issue.Assignee, Is.EqualTo(assignee));
-            Assert.That(issue.Tags.Count, Is.EqualTo(1));
-            Assert.That(issue.Tags[0], Is.EqualTo(repository.Tags[0]));
+            Assert.That(issue.Labels.Count, Is.EqualTo(1));
+            Assert.That(issue.Labels[0], Is.EqualTo(repository.Labels[0]));
         });
     }
 }

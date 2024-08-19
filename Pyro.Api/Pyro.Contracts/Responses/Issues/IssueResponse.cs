@@ -10,4 +10,4 @@ public record IssueResponse(
     UserResponse Author,
     DateTimeOffset CreatedAt,
     UserResponse? Assignee,
-    IReadOnlyList<TagResponse> Tags);
+    IReadOnlyList<LabelResponse> Labels);

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Pyro.Infrastructure.Issues.DataAccess;
 
@@ -10,9 +11,11 @@ using Pyro.Infrastructure.Issues.DataAccess;
 namespace Pyro.Infrastructure.Issues.Migrations
 {
     [DbContext(typeof(IssuesDbContext))]
-    partial class IssuesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240819170437_RenameTagsToLabels")]
+    partial class RenameTagsToLabels
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.6");

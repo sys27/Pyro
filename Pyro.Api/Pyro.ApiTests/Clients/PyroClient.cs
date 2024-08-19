@@ -35,18 +35,18 @@ internal class PyroClient : BaseClient
     public async Task<TreeViewResponse?> GetTree(string repositoryName)
         => await Get<TreeViewResponse>($"/api/repositories/{repositoryName}/tree/master");
 
-    public async Task<IReadOnlyList<TagResponse>?> GetTags(string repositoryName)
-        => await Get<IReadOnlyList<TagResponse>>($"/api/repositories/{repositoryName}/tags");
+    public async Task<IReadOnlyList<LabelResponse>?> GetLabels(string repositoryName)
+        => await Get<IReadOnlyList<LabelResponse>>($"/api/repositories/{repositoryName}/labels");
 
-    public async Task<TagResponse?> GetTag(string repositoryName, Guid id)
-        => await Get<TagResponse>($"/api/repositories/{repositoryName}/tags/{id}");
+    public async Task<LabelResponse?> GetLabel(string repositoryName, Guid id)
+        => await Get<LabelResponse>($"/api/repositories/{repositoryName}/labels/{id}");
 
-    public async Task<TagResponse?> CreateTag(string repositoryName, CreateTagRequest request)
-        => await Post<TagResponse>($"/api/repositories/{repositoryName}/tags", request);
+    public async Task<LabelResponse?> CreateLabel(string repositoryName, CreateLabelRequest request)
+        => await Post<LabelResponse>($"/api/repositories/{repositoryName}/labels", request);
 
-    public async Task<TagResponse?> UpdateTag(string repositoryName, Guid id, UpdateTagRequest request)
-        => await Put<TagResponse>($"/api/repositories/{repositoryName}/tags/{id}", request);
+    public async Task<LabelResponse?> UpdateLabel(string repositoryName, Guid id, UpdateLabelRequest request)
+        => await Put<LabelResponse>($"/api/repositories/{repositoryName}/labels/{id}", request);
 
-    public async Task DeleteTag(string repositoryName, Guid id)
-        => await Delete($"/api/repositories/{repositoryName}/tags/{id}");
+    public async Task DeleteLabel(string repositoryName, Guid id)
+        => await Delete($"/api/repositories/{repositoryName}/labels/{id}");
 }

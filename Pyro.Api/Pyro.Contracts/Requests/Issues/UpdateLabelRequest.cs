@@ -3,4 +3,4 @@
 
 namespace Pyro.Contracts.Requests.Issues;
 
-public record UpdateTagRequest(string Name, ColorRequest Color);
+public record UpdateLabelRequest(string Name, ColorRequest Color);

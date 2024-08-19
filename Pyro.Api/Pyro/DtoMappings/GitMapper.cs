@@ -17,7 +17,7 @@ public static partial class GitMapper
     [MapperIgnoreSource(nameof(GitRepository.Id))]
     [MapperIgnoreSource(nameof(GitRepository.DomainEvents))]
     [MapperIgnoreSource(nameof(GitRepository.IsNew))]
-    [MapperIgnoreSource(nameof(GitRepository.Tags))]
+    [MapperIgnoreSource(nameof(GitRepository.Labels))]
     public static partial GitRepositoryResponse ToResponse(this GitRepository gitRepository);
 
     public static partial GitRepositoryStatusResponse ToResponse(this GitRepositoryStatus gitRepository);
@@ -50,8 +50,8 @@ public static partial class GitMapper
         return new ColorResponse(r, g, b);
     }
 
-    [MapperIgnoreSource(nameof(Tag.GitRepository))]
-    public static partial TagResponse ToResponse(this Tag request);
+    [MapperIgnoreSource(nameof(Label.GitRepository))]
+    public static partial LabelResponse ToResponse(this Label request);
 
-    public static partial IReadOnlyList<TagResponse> ToResponse(this IReadOnlyList<Tag> request);
+    public static partial IReadOnlyList<LabelResponse> ToResponse(this IReadOnlyList<Label> request);
 }

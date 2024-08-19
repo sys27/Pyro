@@ -17,7 +17,7 @@ internal class GitRepositoryRepository : IGitRepositoryRepository
     {
         var repository = await dbContext
             .Set<GitRepository>()
-            .Include(x => x.Tags)
+            .Include(x => x.Labels)
             .FirstOrDefaultAsync(x => x.Name == name, cancellationToken);
 
         return repository;

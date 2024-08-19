@@ -7,11 +7,11 @@ using Pyro.Domain.Shared.Exceptions;
 
 namespace Pyro.Domain.GitRepositories.Queries;
 
-public record GetTag(string RepositoryName, Guid Id) : IRequest<Tag>;
+public record GetLabel(string RepositoryName, Guid Id) : IRequest<Label>;
 
-public class GetTagValidator : AbstractValidator<GetTag>
+public class GetLabelValidator : AbstractValidator<GetLabel>
 {
-    public GetTagValidator()
+    public GetLabelValidator()
     {
         RuleFor(x => x.RepositoryName)
             .NotEmpty()
@@ -22,21 +22,21 @@ public class GetTagValidator : AbstractValidator<GetTag>
     }
 }
 
-public class GetTagHandler : IRequestHandler<GetTag, Tag>
+public class GetLabelHandler : IRequestHandler<GetLabel, Label>
 {
     private readonly IGitRepositoryRepository repository;
 
-    public GetTagHandler(IGitRepositoryRepository repository)
+    public GetLabelHandler(IGitRepositoryRepository repository)
         => this.repository = repository;
 
-    public async Task<Tag> Handle(GetTag request, CancellationToken cancellationToken)
+    public async Task<Label> Handle(GetLabel request, CancellationToken cancellationToken)
     {
         var gitRepository = await repository.GetGitRepository(request.RepositoryName, cancellationToken) ??
                             throw new NotFoundException($"The repository (Name: {request.RepositoryName}) was not found.");
 
-        var tag = gitRepository.GetTag(request.Id) ??
-                  throw new NotFoundException($"The tag (Id: {request.Id}) was not found.");
+        var label = gitRepository.GetLabel(request.Id) ??
+                    throw new NotFoundException($"The label (Id: {request.Id}) was not found.");
 
-        return tag;
+        return label;
     }
 }

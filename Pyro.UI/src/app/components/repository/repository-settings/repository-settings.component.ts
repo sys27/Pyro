@@ -11,6 +11,6 @@ import { PanelMenuModule } from 'primeng/panelmenu';
 })
 export class RepositorySettingsComponent {
     public readonly menuItems: MenuItem[] = [
-        { label: 'Tags', icon: 'pi pi-tags', routerLink: ['tags'] },
+        { label: 'Labels', icon: 'pi pi-tags', routerLink: ['labels'] },
     ];
 }

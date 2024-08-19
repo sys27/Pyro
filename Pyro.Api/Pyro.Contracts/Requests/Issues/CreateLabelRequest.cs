@@ -1,8 +1,6 @@
 // Copyright (c) Dmytro Kyshchenko. All rights reserved.
 // Licensed under the GPL-3.0 license. See LICENSE file in the project root for full license information.
 
-using Pyro.Domain.Shared.Models;
+namespace Pyro.Contracts.Requests.Issues;
 
-namespace Pyro.Domain.GitRepositories;
-
-public record TagDeleted(Guid Id) : IDomainEvent;
+public record CreateLabelRequest(string Name, ColorRequest Color);

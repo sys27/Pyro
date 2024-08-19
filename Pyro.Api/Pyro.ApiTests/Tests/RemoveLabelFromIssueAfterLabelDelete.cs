@@ -8,13 +8,13 @@ using Pyro.Contracts.Requests.Issues;
 
 namespace Pyro.ApiTests.Tests;
 
-public class UntagIssueAfterDelete
+public class RemoveLabelFromIssueAfterLabelDelete
 {
     private Faker faker;
     private PyroClient pyroClient;
     private IssueClient issueClient;
     private string repositoryName;
-    private Guid tagId;
+    private Guid labelId;
 
     [OneTimeSetUp]
     public async Task SetUp()
@@ -33,18 +33,18 @@ public class UntagIssueAfterDelete
 
         repositoryName = repository.Name;
 
-        var createTagRequest = new CreateTagRequest(
+        var createLabelRequest = new CreateLabelRequest(
             faker.Lorem.Word(),
             ColorRequest.FromHex(faker.Internet.Color()));
-        var tag = await pyroClient.CreateTag(repository.Name, createTagRequest) ??
-                  throw new Exception("Tag not created");
+        var label = await pyroClient.CreateLabel(repository.Name, createLabelRequest) ??
+                    throw new Exception("Label not created");
 
-        tagId = tag.Id;
+        labelId = label.Id;
 
         var createIssueRequest = new CreateIssueRequest(
             faker.Lorem.Word(),
             null,
-            [tagId]);
+            [labelId]);
         var issue = await issueClient.CreateIssue(repository.Name, createIssueRequest) ??
                     throw new Exception("Issue not created");
     }
@@ -58,13 +58,13 @@ public class UntagIssueAfterDelete
     }
 
     [Test]
-    public async Task UntagTest()
+    public async Task RemoveLabelTest()
     {
-        await pyroClient.DeleteTag(repositoryName, tagId);
+        await pyroClient.DeleteLabel(repositoryName, labelId);
 
         var issues = await issueClient.GetIssues(repositoryName);
 
         Assert.That(issues, Is.Not.Empty);
-        Assert.That(issues, Has.All.Property("Tags").Empty);
+        Assert.That(issues, Has.All.Property("Labels").Empty);
     }
 }

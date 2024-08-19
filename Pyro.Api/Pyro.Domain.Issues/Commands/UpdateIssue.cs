@@ -13,7 +13,7 @@ public record UpdateIssue(
     int IssueNumber,
     string Title,
     Guid? AssigneeId,
-    IReadOnlyList<Guid> Tags) : IRequest<Issue>;
+    IReadOnlyList<Guid> Labels) : IRequest<Issue>;
 
 public class UpdateIssueValidator : AbstractValidator<UpdateIssue>
 {
@@ -23,7 +23,7 @@ public class UpdateIssueValidator : AbstractValidator<UpdateIssue>
             .NotEmpty()
             .MaximumLength(200);
 
-        RuleFor(x => x.Tags)
+        RuleFor(x => x.Labels)
             .ForEach(x => x.NotEmpty());
     }
 }
@@ -60,14 +60,14 @@ public class UpdateIssueHandler : IRequestHandler<UpdateIssue, Issue>
         issue.Title = request.Title;
         issue.AssignTo(assignee);
 
-        issue.ClearTags();
-        foreach (var tagId in request.Tags)
+        issue.ClearLabels();
+        foreach (var labelId in request.Labels)
         {
-            var tag = repository.GetTag(tagId);
-            if (tag is null)
+            var label = repository.GetLabel(labelId);
+            if (label is null)
                 continue;
 
-            issue.AddTag(tag);
+            issue.AddLabel(label);
         }
 
         return issue;

@@ -11,7 +11,7 @@ namespace Pyro.Domain.GitRepositories;
 /// </summary>
 public class GitRepository : DomainEntity
 {
-    private readonly List<Tag> tags = [];
+    private readonly List<Label> labels = [];
 
     public required string Name { get; init; }
 
@@ -24,38 +24,38 @@ public class GitRepository : DomainEntity
     public bool IsNew
         => Status == GitRepositoryStatus.New;
 
-    public IReadOnlyList<Tag> Tags
-        => tags;
+    public IReadOnlyList<Label> Labels
+        => labels;
 
     public void MarkAsInitialized()
         => Status = GitRepositoryStatus.Initialized;
 
-    public Tag? GetTag(Guid id)
-        => tags.FirstOrDefault(x => x.Id == id);
+    public Label? GetLabel(Guid id)
+        => labels.FirstOrDefault(x => x.Id == id);
 
-    public Tag AddTag(string name, int color)
+    public Label AddLabel(string name, int color)
     {
-        if (tags.Any(x => x.Name == name))
-            throw new DomainException($"Tag with name '{name}' already exists.");
+        if (labels.Any(x => x.Name == name))
+            throw new DomainException($"Label with name '{name}' already exists.");
 
-        var tag = new Tag
+        var label = new Label
         {
             Name = name,
             Color = color,
             GitRepository = this,
         };
-        tags.Add(tag);
+        labels.Add(label);
 
-        return tag;
+        return label;
     }
 
-    public void RemoveTag(Guid id)
+    public void RemoveLabel(Guid id)
     {
-        var tag = tags.FirstOrDefault(x => x.Id == id) ??
-                  throw new DomainException($"The tag (Id: {id}) does not exist.");
+        var label = labels.FirstOrDefault(x => x.Id == id) ??
+                    throw new DomainException($"The label (Id: {id}) does not exist.");
 
-        tags.Remove(tag);
+        labels.Remove(label);
 
-        PublishEvent(new TagDeleted(tag.Id));
+        PublishEvent(new LabelDeleted(label.Id));
     }
 }

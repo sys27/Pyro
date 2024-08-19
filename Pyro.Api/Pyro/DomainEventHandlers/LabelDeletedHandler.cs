@@ -9,16 +9,16 @@ using Pyro.Infrastructure.Issues.DataAccess.Configurations;
 
 namespace Pyro.DomainEventHandlers;
 
-public class TagDeletedHandler : INotificationHandler<TagDeleted>
+public class LabelDeletedHandler : INotificationHandler<LabelDeleted>
 {
     private readonly IssuesDbContext dbContext;
 
-    public TagDeletedHandler(IssuesDbContext dbContext)
+    public LabelDeletedHandler(IssuesDbContext dbContext)
         => this.dbContext = dbContext;
 
-    public async Task Handle(TagDeleted notification, CancellationToken cancellationToken)
+    public async Task Handle(LabelDeleted notification, CancellationToken cancellationToken)
         => await dbContext
-            .Set<IssueTag>()
-            .Where(x => x.TagId == notification.Id)
+            .Set<IssueLabel>()
+            .Where(x => x.LabelId == notification.Id)
             .ExecuteDeleteAsync(cancellationToken);
 }

@@ -3,4 +3,4 @@
 
 namespace Pyro.Contracts.Responses;
 
-public record TagResponse(Guid Id, string Name, ColorResponse Color);
+public record LabelResponse(Guid Id, string Name, ColorResponse Color);

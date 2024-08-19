@@ -6,11 +6,11 @@ using MediatR;
 
 namespace Pyro.Domain.GitRepositories.Commands;
 
-public record DeleteTag(string RepositoryName, Guid Id) : IRequest;
+public record DeleteLabel(string RepositoryName, Guid Id) : IRequest;
 
-public class DeleteTagValidator : AbstractValidator<DeleteTag>
+public class DeleteLabelValidator : AbstractValidator<DeleteLabel>
 {
-    public DeleteTagValidator()
+    public DeleteLabelValidator()
     {
         RuleFor(x => x.RepositoryName)
             .NotEmpty()
@@ -21,19 +21,19 @@ public class DeleteTagValidator : AbstractValidator<DeleteTag>
     }
 }
 
-public class DeleteTagHandler : IRequestHandler<DeleteTag>
+public class DeleteLabelHandler : IRequestHandler<DeleteLabel>
 {
     private readonly IGitRepositoryRepository repository;
 
-    public DeleteTagHandler(IGitRepositoryRepository repository)
+    public DeleteLabelHandler(IGitRepositoryRepository repository)
         => this.repository = repository;
 
-    public async Task Handle(DeleteTag request, CancellationToken cancellationToken = default)
+    public async Task Handle(DeleteLabel request, CancellationToken cancellationToken = default)
     {
         var gitRepository = await repository.GetGitRepository(request.RepositoryName, cancellationToken);
         if (gitRepository is null)
             return;
 
-        gitRepository.RemoveTag(request.Id);
+        gitRepository.RemoveLabel(request.Id);
     }
 }

@@ -9,8 +9,8 @@ public class GitRepository : Entity
 {
     public required string Name { get; init; }
 
-    public IReadOnlyList<Tag> Tags { get; init; } = new List<Tag>();
+    public IReadOnlyList<Label> Labels { get; init; } = new List<Label>();
 
-    public Tag? GetTag(Guid tagId)
-        => Tags.FirstOrDefault(x => x.Id == tagId);
+    public Label? GetLabel(Guid labelId)
+        => Labels.FirstOrDefault(x => x.Id == labelId);
 }

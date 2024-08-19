@@ -12,7 +12,7 @@ public record CreateIssue(
     string RepositoryName,
     string Title,
     Guid? AssigneeId,
-    IReadOnlyList<Guid> Tags) : IRequest<Issue>;
+    IReadOnlyList<Guid> Labels) : IRequest<Issue>;
 
 public class CreateIssueValidator : AbstractValidator<CreateIssue>
 {
@@ -26,7 +26,7 @@ public class CreateIssueValidator : AbstractValidator<CreateIssue>
             .NotEmpty()
             .MaximumLength(200);
 
-        RuleFor(x => x.Tags)
+        RuleFor(x => x.Labels)
             .ForEach(x => x.NotEmpty());
     }
 }
@@ -70,13 +70,13 @@ public class CreateIssueHandler : IRequestHandler<CreateIssue, Issue>
         };
         issue.AssignTo(assignee);
 
-        foreach (var tagId in request.Tags)
+        foreach (var labelId in request.Labels)
         {
-            var tag = repository.GetTag(tagId);
-            if (tag is null)
+            var label = repository.GetLabel(labelId);
+            if (label is null)
                 continue;
 
-            issue.AddTag(tag);
+            issue.AddLabel(label);
         }
 
         await issueRepository.AddIssue(issue, cancellationToken);

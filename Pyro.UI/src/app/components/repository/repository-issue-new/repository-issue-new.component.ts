@@ -3,8 +3,8 @@ import { Component, computed, input, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IssueService, User } from '@services/issue.service';
+import { Label, LabelService } from '@services/label.service';
 import { mapErrorToEmpty, mapErrorToNull } from '@services/operators';
-import { Tag, TagService } from '@services/tag.service';
 import { ButtonModule } from 'primeng/button';
 import { DropdownModule } from 'primeng/dropdown';
 import { InputTextModule } from 'primeng/inputtext';
@@ -30,11 +30,11 @@ export class RepositoryIssueNewComponent implements OnInit {
     public readonly issueNumber = input<number>();
     public readonly isEditMode = computed<boolean>(() => !!this.issueNumber());
     public users$: Observable<User[]> | undefined;
-    public tags$: Observable<Tag[]> | undefined;
+    public labels$: Observable<Label[]> | undefined;
     public readonly form = this.formBuilder.group({
         title: ['', [Validators.required, Validators.maxLength(200)]],
         assigneeId: new FormControl<string | null>(null),
-        tagIds: new FormControl<string[]>([]),
+        labelIds: new FormControl<string[]>([]),
     });
     public readonly isLoading = signal<boolean>(false);
 
@@ -43,13 +43,13 @@ export class RepositoryIssueNewComponent implements OnInit {
         private readonly router: Router,
         private readonly route: ActivatedRoute,
         private readonly issueService: IssueService,
-        private readonly tagService: TagService,
+        private readonly labelService: LabelService,
     ) {}
 
     public ngOnInit(): void {
         this.users$ = this.issueService.getUsers().pipe(mapErrorToEmpty, shareReplay(1));
-        this.tags$ = this.tagService
-            .getTags(this.repositoryName())
+        this.labels$ = this.labelService
+            .getLabels(this.repositoryName())
             .pipe(mapErrorToEmpty, shareReplay(1));
 
         if (this.isEditMode()) {
@@ -61,7 +61,7 @@ export class RepositoryIssueNewComponent implements OnInit {
                         this.form.setValue({
                             title: issue.title,
                             assigneeId: issue.assignee?.id || null,
-                            tagIds: issue.tags.map(tag => tag.id),
+                            labelIds: issue.labels.map(label => label.id),
                         });
                     }
                 });
@@ -76,7 +76,7 @@ export class RepositoryIssueNewComponent implements OnInit {
         let issue = {
             title: this.form.value.title!,
             assigneeId: this.form.value.assigneeId!,
-            tags: this.form.value.tagIds || [],
+            labels: this.form.value.labelIds || [],
         };
 
         this.isLoading.set(true);

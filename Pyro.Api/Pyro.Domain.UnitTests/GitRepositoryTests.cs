@@ -9,7 +9,7 @@ namespace Pyro.Domain.UnitTests;
 public class GitRepositoryTests
 {
     [Test]
-    public void AddTag()
+    public void AddLabel()
     {
         var repository = new GitRepository
         {
@@ -18,19 +18,19 @@ public class GitRepositoryTests
         };
 
         const string name = "Test";
-        var tag = repository.AddTag(name, 0);
+        var label = repository.AddLabel(name, 0);
 
         Assert.Multiple(() =>
         {
-            Assert.That(repository.Tags, Has.Count.EqualTo(1));
-            Assert.That(repository.Tags, Has.One.EqualTo(tag));
-            Assert.That(tag.Name, Is.EqualTo(name));
-            Assert.That(tag.Color, Is.EqualTo(0));
+            Assert.That(repository.Labels, Has.Count.EqualTo(1));
+            Assert.That(repository.Labels, Has.One.EqualTo(label));
+            Assert.That(label.Name, Is.EqualTo(name));
+            Assert.That(label.Color, Is.EqualTo(0));
         });
     }
 
     [Test]
-    public void AddTagSameTagTwice()
+    public void AddLabelSameLabelTwice()
     {
         var repository = new GitRepository
         {
@@ -39,13 +39,13 @@ public class GitRepositoryTests
         };
 
         const string name = "Test";
-        repository.AddTag(name, 0);
+        repository.AddLabel(name, 0);
 
-        Assert.Throws<DomainException>(() => repository.AddTag(name, 0));
+        Assert.Throws<DomainException>(() => repository.AddLabel(name, 0));
     }
 
     [Test]
-    public void RemoveTag()
+    public void RemoveLabel()
     {
         var repository = new GitRepository
         {
@@ -54,14 +54,14 @@ public class GitRepositoryTests
         };
 
         const string name = "Test";
-        var tag = repository.AddTag(name, 0);
-        repository.RemoveTag(tag.Id);
+        var label = repository.AddLabel(name, 0);
+        repository.RemoveLabel(label.Id);
 
-        Assert.That(repository.Tags, Is.Empty);
+        Assert.That(repository.Labels, Is.Empty);
     }
 
     [Test]
-    public void RemoveTagMissingTag()
+    public void RemoveLabelMissingLabel()
     {
         var repository = new GitRepository
         {
@@ -69,6 +69,6 @@ public class GitRepositoryTests
             DefaultBranch = "main",
         };
 
-        Assert.Throws<DomainException>(() => repository.RemoveTag(Guid.NewGuid()));
+        Assert.Throws<DomainException>(() => repository.RemoveLabel(Guid.NewGuid()));
     }
 }

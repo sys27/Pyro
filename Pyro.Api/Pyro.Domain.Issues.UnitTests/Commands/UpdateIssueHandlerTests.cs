@@ -112,21 +112,21 @@ public class UpdateIssueHandlerTests
         {
             Id = Guid.NewGuid(),
             Name = "test",
-            Tags =
+            Labels =
             [
-                new Tag
+                new Label
                 {
                     Id = Guid.NewGuid(),
                     Name = "Tag 1",
                     Color = 0,
                 },
-                new Tag
+                new Label
                 {
                     Id = Guid.NewGuid(),
                     Name = "Tag 2",
                     Color = 0,
                 },
-                new Tag
+                new Label
                 {
                     Id = Guid.NewGuid(),
                     Name = "Tag 3",
@@ -143,13 +143,13 @@ public class UpdateIssueHandlerTests
             Author = author,
             CreatedAt = DateTimeOffset.Now,
         };
-        issue.AddTag(gitRepository.Tags[0]);
+        issue.AddLabel(gitRepository.Labels[0]);
         var command = new UpdateIssue(
             gitRepository.Name,
             issue.IssueNumber,
             "updated",
             null,
-            [gitRepository.Tags[1].Id]);
+            [gitRepository.Labels[1].Id]);
 
         var currentUserProvider = Substitute.For<ICurrentUserProvider>();
         currentUserProvider
@@ -170,7 +170,7 @@ public class UpdateIssueHandlerTests
 
         Assert.That(updatedIssue, Is.Not.Null);
         Assert.That(updatedIssue.Title, Is.EqualTo(command.Title));
-        Assert.That(updatedIssue.Tags, Has.Count.EqualTo(1));
-        Assert.That(updatedIssue.Tags[0], Is.EqualTo(gitRepository.Tags[1]));
+        Assert.That(updatedIssue.Labels, Has.Count.EqualTo(1));
+        Assert.That(updatedIssue.Labels[0], Is.EqualTo(gitRepository.Labels[1]));
     }
 }

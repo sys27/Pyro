@@ -60,40 +60,41 @@ internal class IssueConfiguration : IEntityTypeConfiguration<Issue>
             .HasForeignKey("AssigneeId")
             .OnDelete(DeleteBehavior.NoAction);
 
-        builder.HasMany(x => x.Tags)
+        builder.HasMany(x => x.Labels)
             .WithMany()
-            .UsingEntity<IssueTag>(
-                r => r.HasOne(x => x.Tag)
+            .UsingEntity<IssueLabel>(
+                r => r.HasOne(x => x.Label)
                     .WithMany()
-                    .HasForeignKey("TagId")
+                    .HasForeignKey(x => x.LabelId)
                     .HasPrincipalKey(x => x.Id)
                     .OnDelete(DeleteBehavior.NoAction)
                     .IsRequired(),
                 l => l.HasOne(x => x.Issue)
                     .WithMany()
-                    .HasForeignKey("IssueId")
+                    .HasForeignKey(x => x.IssueId)
                     .HasPrincipalKey(x => x.Id)
                     .OnDelete(DeleteBehavior.NoAction)
                     .IsRequired(),
                 j =>
                 {
-                    j.ToTable("IssueTags");
+                    j.ToTable("IssueLabels");
 
-                    j.HasKey("IssueId", "TagId");
+                    j.HasKey(x => new { x.IssueId, x.LabelId })
+                        .HasName("PK_IssueLabel");
 
                     j.Property(x => x.IssueId)
                         .IsRequired();
 
-                    j.Property(x => x.TagId)
+                    j.Property(x => x.LabelId)
                         .IsRequired();
                 });
     }
 }
 
-public class IssueTag
+public class IssueLabel
 {
     public required Guid IssueId { get; set; }
     public required Issue Issue { get; set; }
-    public required Guid TagId { get; set; }
-    public required Tag Tag { get; set; }
+    public required Guid LabelId { get; set; }
+    public required Label Label { get; set; }
 }

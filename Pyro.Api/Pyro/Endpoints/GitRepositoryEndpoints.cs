@@ -27,7 +27,7 @@ internal static class GitRepositoryEndpoints
 
         repositoryBuilder
             .MapRepositories()
-            .MapTags();
+            .MapLabels();
 
         return app;
     }
@@ -171,111 +171,111 @@ internal static class GitRepositoryEndpoints
         return repositoryBuilder;
     }
 
-    private static IEndpointRouteBuilder MapTags(this IEndpointRouteBuilder app)
+    private static IEndpointRouteBuilder MapLabels(this IEndpointRouteBuilder app)
     {
-        var tagsBuilder = app.MapGroup("/{name}/tags")
-            .WithTags("Repository Tags");
+        var labelsBuilder = app.MapGroup("/{name}/labels")
+            .WithTags("Repository Labels");
 
-        tagsBuilder.MapGet("/", async (
+        labelsBuilder.MapGet("/", async (
                 IMediator mediator,
                 string name,
                 CancellationToken cancellationToken) =>
             {
-                var query = new GetTags(name);
-                var tags = await mediator.Send(query, cancellationToken);
-                var result = tags.ToResponse();
+                var query = new GetLabels(name);
+                var labels = await mediator.Send(query, cancellationToken);
+                var result = labels.ToResponse();
 
                 return result;
             })
             .RequirePermission(IssueView)
-            .Produces<IReadOnlyList<TagResponse>>()
+            .Produces<IReadOnlyList<LabelResponse>>()
             .ProducesValidationProblem()
             .Produces(401)
             .Produces(403)
             .Produces(404)
             .ProducesProblem(500)
-            .WithName("Get Tags")
+            .WithName("Get Labels")
             .WithOpenApi();
 
-        tagsBuilder.MapGet("/{id:guid}", async (
+        labelsBuilder.MapGet("/{id:guid}", async (
                 IMediator mediator,
                 [FromRoute] string name,
                 [FromRoute] Guid id,
                 CancellationToken cancellationToken) =>
             {
-                var query = new GetTag(name, id);
-                var tag = await mediator.Send(query, cancellationToken);
-                var result = tag.ToResponse();
+                var query = new GetLabel(name, id);
+                var label = await mediator.Send(query, cancellationToken);
+                var result = label.ToResponse();
 
                 return result;
             })
             .RequirePermission(IssueView)
-            .Produces<TagResponse>()
+            .Produces<LabelResponse>()
             .ProducesValidationProblem()
             .Produces(401)
             .Produces(403)
             .Produces(404)
             .ProducesProblem(500)
-            .WithName("Get Tag")
+            .WithName("Get Label")
             .WithOpenApi();
 
-        tagsBuilder.MapPost("/", async (
+        labelsBuilder.MapPost("/", async (
                 IMediator mediator,
                 UnitOfWork unitOfWork,
                 [FromRoute] string name,
-                [FromBody] CreateTagRequest request,
+                [FromBody] CreateLabelRequest request,
                 CancellationToken cancellationToken) =>
             {
-                var command = new CreateTag(name, request.Name, request.Color.ToInt());
-                var tag = await mediator.Send(command, cancellationToken);
+                var command = new CreateLabel(name, request.Name, request.Color.ToInt());
+                var label = await mediator.Send(command, cancellationToken);
                 await unitOfWork.SaveChangesAsync(cancellationToken);
 
-                var result = tag.ToResponse();
+                var result = label.ToResponse();
 
-                return Results.Created($"/repositories/{name}/tags/{tag.Name}", result);
+                return Results.Created($"/repositories/{name}/labels/{label.Name}", result);
             })
             .RequirePermission(IssueEdit)
-            .Produces<TagResponse>(201)
+            .Produces<LabelResponse>(201)
             .ProducesValidationProblem()
             .Produces(401)
             .Produces(403)
             .ProducesProblem(500)
-            .WithName("Create Tag")
+            .WithName("Create Label")
             .WithOpenApi();
 
-        tagsBuilder.MapPut("/{id:guid}", async (
+        labelsBuilder.MapPut("/{id:guid}", async (
                 IMediator mediator,
                 UnitOfWork unitOfWork,
                 [FromRoute] string name,
                 [FromRoute] Guid id,
-                [FromBody] UpdateTagRequest request,
+                [FromBody] UpdateLabelRequest request,
                 CancellationToken cancellationToken) =>
             {
-                var command = new UpdateTag(name, id, request.Name, request.Color.ToInt());
-                var updatedTag = await mediator.Send(command, cancellationToken);
+                var command = new UpdateLabel(name, id, request.Name, request.Color.ToInt());
+                var label = await mediator.Send(command, cancellationToken);
                 await unitOfWork.SaveChangesAsync(cancellationToken);
 
-                var result = updatedTag.ToResponse();
+                var result = label.ToResponse();
 
                 return Results.Ok(result);
             })
             .RequirePermission(RepositoryEdit)
-            .Produces<TagResponse>()
+            .Produces<LabelResponse>()
             .ProducesValidationProblem()
             .Produces(401)
             .Produces(403)
             .ProducesProblem(500)
-            .WithName("Update Tag")
+            .WithName("Update Label")
             .WithOpenApi();
 
-        tagsBuilder.MapDelete("/{id:guid}", async (
+        labelsBuilder.MapDelete("/{id:guid}", async (
                 IMediator mediator,
                 UnitOfWork unitOfWork,
                 string name,
                 Guid id,
                 CancellationToken cancellationToken) =>
             {
-                var command = new DeleteTag(name, id);
+                var command = new DeleteLabel(name, id);
                 await mediator.Send(command, cancellationToken);
                 await unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -288,7 +288,7 @@ internal static class GitRepositoryEndpoints
             .Produces(403)
             .Produces(404)
             .ProducesProblem(500)
-            .WithName("Delete Tag")
+            .WithName("Delete Label")
             .WithOpenApi();
 
         return app;

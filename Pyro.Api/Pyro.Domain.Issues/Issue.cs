@@ -8,7 +8,7 @@ namespace Pyro.Domain.Issues;
 public class Issue : Entity
 {
     private readonly List<IssueComment> comments = [];
-    private readonly List<Tag> tags = [];
+    private readonly List<Label> labels = [];
 
     public int IssueNumber { get; init; }
 
@@ -25,8 +25,8 @@ public class Issue : Entity
     public IReadOnlyList<IssueComment> Comments
         => comments;
 
-    public IReadOnlyList<Tag> Tags
-        => tags;
+    public IReadOnlyList<Label> Labels
+        => labels;
 
     public IssueComment? GetComment(Guid commentId)
         => comments.FirstOrDefault(x => x.Id == commentId);
@@ -52,14 +52,14 @@ public class Issue : Entity
     public void AssignTo(User? assignee)
         => Assignee = assignee;
 
-    public void AddTag(Tag tag)
+    public void AddLabel(Label label)
     {
-        if (tags.Any(x => x.Name == tag.Name))
+        if (labels.Any(x => x.Name == label.Name))
             return;
 
-        tags.Add(tag);
+        labels.Add(label);
     }
 
-    public void ClearTags()
-        => tags.Clear();
+    public void ClearLabels()
+        => labels.Clear();
 }

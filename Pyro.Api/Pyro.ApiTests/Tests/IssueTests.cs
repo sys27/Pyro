@@ -59,9 +59,11 @@ public class IssueTests
 
         for (var i = 0; i < 3; i++)
         {
-            var createTagRequest = new CreateTagRequest(faker.Lorem.Word(), ColorRequest.FromHex(faker.Internet.Color()));
-            _ = await pyroClient.CreateTag(repository.Name, createTagRequest) ??
-                throw new Exception("Tag not created");
+            var createLabelRequest = new CreateLabelRequest(
+                faker.Lorem.Word(),
+                ColorRequest.FromHex(faker.Internet.Color()));
+            _ = await pyroClient.CreateLabel(repository.Name, createLabelRequest) ??
+                throw new Exception("Label not created");
         }
 
         return repository.Name;
@@ -69,16 +71,16 @@ public class IssueTests
 
     private async Task<int> CreateIssue(string repositoryName)
     {
-        var tags = await pyroClient.GetTags(repositoryName);
-        if (tags is null || tags.Count == 0)
-            throw new Exception("Tags not found");
+        var labels = await pyroClient.GetLabels(repositoryName);
+        if (labels is null || labels.Count == 0)
+            throw new Exception("Labels not found");
 
-        var tag = new Randomizer().ArrayElement(tags.ToArray());
+        var label = new Randomizer().ArrayElement(labels.ToArray());
 
         var createRequest = new CreateIssueRequest(
             faker.Lorem.Sentence(),
             null,
-            [tag.Id]);
+            [label.Id]);
         var issue = await issueClient.CreateIssue(repositoryName, createRequest);
 
         Assert.That(issue, Is.Not.Null);
@@ -86,8 +88,8 @@ public class IssueTests
         {
             Assert.That(issue.Title, Is.EqualTo(createRequest.Title));
             Assert.That(issue.Assignee?.Id, Is.EqualTo(createRequest.AssigneeId));
-            Assert.That(issue.Tags, Has.Count.EqualTo(1));
-            Assert.That(issue.Tags, Has.One.EqualTo(tag));
+            Assert.That(issue.Labels, Has.Count.EqualTo(1));
+            Assert.That(issue.Labels, Has.One.EqualTo(label));
         });
 
         return issue.IssueNumber;
@@ -95,16 +97,16 @@ public class IssueTests
 
     private async Task UpdateIssue(string repositoryName, int number)
     {
-        var tags = await pyroClient.GetTags(repositoryName);
-        if (tags is null || tags.Count == 0)
-            throw new Exception("Tags not found");
+        var labels = await pyroClient.GetLabels(repositoryName);
+        if (labels is null || labels.Count == 0)
+            throw new Exception("Labels not found");
 
-        var tag = new Randomizer().ArrayElement(tags.ToArray());
+        var label = new Randomizer().ArrayElement(labels.ToArray());
 
         var updateRequest = new UpdateIssueRequest(
             faker.Lorem.Sentence(),
             Guid.Parse("F9BA057A-35B0-4D10-8326-702D8F7EC966"),
-            [tag.Id]);
+            [label.Id]);
         var issue = await issueClient.UpdateIssue(repositoryName, number, updateRequest);
 
         Assert.That(issue, Is.Not.Null);
@@ -112,8 +114,8 @@ public class IssueTests
         {
             Assert.That(issue.Title, Is.EqualTo(updateRequest.Title));
             Assert.That(issue.Assignee?.Id, Is.EqualTo(updateRequest.AssigneeId));
-            Assert.That(issue.Tags, Has.Count.EqualTo(1));
-            Assert.That(issue.Tags, Has.One.EqualTo(tag));
+            Assert.That(issue.Labels, Has.Count.EqualTo(1));
+            Assert.That(issue.Labels, Has.One.EqualTo(label));
         });
     }
 
