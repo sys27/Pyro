@@ -8,6 +8,16 @@ updates:
       - "sys27"
     reviewers:
       - "sys27"
+    groups:
+      ef-core:
+        patterns:
+          - "Microsoft.EntityFrameworkCore*"
+      jwt:
+        patterns:
+          - "JWT*"
+      aspnet:
+        patterns:
+          - "Microsoft.AspNetCore*"
 
   - package-ecosystem: "npm"
     directory: "Pyro.UI/"
