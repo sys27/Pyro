@@ -1,6 +1,8 @@
 // Copyright (c) Dmytro Kyshchenko. All rights reserved.
 // Licensed under the GPL-3.0 license. See LICENSE file in the project root for full license information.
 
+using System.Diagnostics.CodeAnalysis;
+using Pyro.Domain.Shared.Exceptions;
 using Pyro.Domain.Shared.Models;
 
 namespace Pyro.Domain.Issues;
@@ -9,12 +11,20 @@ public class Issue : Entity
 {
     private readonly List<IssueComment> comments = [];
     private readonly List<Label> labels = [];
+    private IssueStatus status;
 
     public int IssueNumber { get; init; }
 
     public required string Title { get; set; }
 
-    public required GitRepository Repository { get; init; }
+    public required IssueStatus Status
+    {
+        get => status;
+        [MemberNotNull(nameof(status))]
+        init => status = value;
+    }
+
+    public required Guid RepositoryId { get; init; }
 
     public required User Author { get; init; }
 
@@ -62,4 +72,22 @@ public class Issue : Entity
 
     public void ClearLabels()
         => labels.Clear();
+
+    public void TransitionTo(Guid statusId, GitRepository repository)
+    {
+        if (repository.Id != RepositoryId)
+            throw new DomainException("The issue does not belong to the repository");
+
+        if (Status.Id == statusId)
+            return;
+
+        var issueStatus = repository.GetIssueStatus(statusId);
+        if (issueStatus is null)
+            throw new NotFoundException($"The issue status (Id: {statusId}) not found");
+
+        if (!Status.CanTransitionTo(issueStatus))
+            throw new DomainException($"The issue cannot be transitioned from '{Status.Name}' to '{issueStatus.Name}'");
+
+        status = issueStatus;
+    }
 }

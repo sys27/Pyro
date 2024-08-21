@@ -21,10 +21,4 @@ public interface IIssueRepository
         CancellationToken cancellationToken = default);
 
     void DeleteIssue(Issue issue);
-
-    Task<User?> GetUser(
-        Guid id,
-        CancellationToken cancellationToken = default);
-
-    Task<IReadOnlyList<User>> GetUsers(CancellationToken cancellationToken = default);
 }

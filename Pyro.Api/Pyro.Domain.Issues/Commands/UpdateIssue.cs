@@ -13,6 +13,7 @@ public record UpdateIssue(
     int IssueNumber,
     string Title,
     Guid? AssigneeId,
+    Guid StatusId,
     IReadOnlyList<Guid> Labels) : IRequest<Issue>;
 
 public class UpdateIssueValidator : AbstractValidator<UpdateIssue>
@@ -22,6 +23,9 @@ public class UpdateIssueValidator : AbstractValidator<UpdateIssue>
         RuleFor(x => x.Title)
             .NotEmpty()
             .MaximumLength(200);
+
+        RuleFor(x => x.StatusId)
+            .NotEmpty();
 
         RuleFor(x => x.Labels)
             .ForEach(x => x.NotEmpty());
@@ -48,17 +52,18 @@ public class UpdateIssueHandler : IRequestHandler<UpdateIssue, Issue>
     {
         var issue = await issueRepository.GetIssue(request.RepositoryName, request.IssueNumber, cancellationToken) ??
                     throw new NotFoundException($"The issue ('{request.RepositoryName}' #{request.IssueNumber}) not found");
-        var repository = await gitRepositoryRepository.GetRepository(request.RepositoryName, cancellationToken) ??
-                         throw new NotFoundException($"The repository ('{request.RepositoryName}') not found");
-        var assignee = request.AssigneeId is not null
-            ? await issueRepository.GetUser(request.AssigneeId.Value, cancellationToken)
-            : null;
-
         if (issue.Author.Id != currentUserProvider.GetCurrentUser().Id)
             throw new DomainException("You can only update your own issues");
 
+        var repository = await gitRepositoryRepository.GetRepository(request.RepositoryName, cancellationToken) ??
+                         throw new NotFoundException($"The repository ('{request.RepositoryName}') not found");
+        var assignee = request.AssigneeId is not null
+            ? await gitRepositoryRepository.GetUser(request.AssigneeId.Value, cancellationToken)
+            : null;
+
         issue.Title = request.Title;
         issue.AssignTo(assignee);
+        issue.TransitionTo(request.StatusId, repository);
 
         issue.ClearLabels();
         foreach (var labelId in request.Labels)

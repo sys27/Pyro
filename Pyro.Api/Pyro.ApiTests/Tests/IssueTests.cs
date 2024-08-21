@@ -5,6 +5,8 @@ using Bogus;
 using Pyro.ApiTests.Clients;
 using Pyro.Contracts.Requests;
 using Pyro.Contracts.Requests.Issues;
+using Pyro.Contracts.Responses;
+using Pyro.Contracts.Responses.Issues;
 
 namespace Pyro.ApiTests.Tests;
 
@@ -34,24 +36,24 @@ public class IssueTests
     [Test]
     public async Task Tests()
     {
-        var name = await CreateRepository();
-        var number = await CreateIssue(name);
-        await UpdateIssue(name, number);
-        await GetIssue(name, number);
+        var repositoryName = await CreateRepository();
+        var number = await CreateIssue(repositoryName);
+        await UpdateIssue(repositoryName, number);
+        await GetIssue(repositoryName, number);
 
-        var commentId = await CreateComment(name, number);
-        await UpdateComment(name, number, commentId);
-        await DeleteComment(name, number, commentId);
-        await GetCommentsAfterCommentDelete(name, number);
+        var commentId = await CreateComment(repositoryName, number);
+        await UpdateComment(repositoryName, number, commentId);
+        await DeleteComment(repositoryName, number, commentId);
+        await GetCommentsAfterCommentDelete(repositoryName, number);
 
-        await DeleteIssue(name, number);
-        await GetIssuesAfterIssueDelete(name, number);
+        await DeleteIssue(repositoryName, number);
+        await GetIssuesAfterIssueDelete(repositoryName, number);
     }
 
     private async Task<string> CreateRepository()
     {
         var createRequest = new CreateGitRepositoryRequest(
-            faker.Lorem.Word(),
+            faker.Random.Hash(),
             faker.Lorem.Sentence(),
             "master");
         var repository = await pyroClient.CreateGitRepository(createRequest) ??
@@ -66,20 +68,59 @@ public class IssueTests
                 throw new Exception("Label not created");
         }
 
+        var statusIds = new List<Guid>(3);
+        for (var i = 0; i < 3; i++)
+        {
+            var createStatusRequest = new CreateIssueStatusRequest(
+                faker.Random.Hash(),
+                ColorRequest.FromHex(faker.Internet.Color()));
+            var status = await issueClient.CreateIssueStatus(repository.Name, createStatusRequest) ??
+                         throw new Exception("Status not created");
+
+            foreach (var statusId in statusIds)
+            {
+                var createTransitionRequest = new CreateIssueStatusTransitionRequest(statusId, status.Id);
+                _ = await issueClient.CreateIssueStatusTransition(repository.Name, createTransitionRequest) ??
+                    throw new Exception("Transition not created");
+
+                createTransitionRequest = new CreateIssueStatusTransitionRequest(status.Id, statusId);
+                _ = await issueClient.CreateIssueStatusTransition(repository.Name, createTransitionRequest) ??
+                    throw new Exception("Transition not created");
+            }
+
+            statusIds.Add(status.Id);
+        }
+
         return repository.Name;
     }
 
-    private async Task<int> CreateIssue(string repositoryName)
+    private async Task<LabelResponse> GetRandomLabel(string repositoryName)
     {
         var labels = await pyroClient.GetLabels(repositoryName);
         if (labels is null || labels.Count == 0)
             throw new Exception("Labels not found");
 
-        var label = new Randomizer().ArrayElement(labels.ToArray());
+        return new Randomizer().ArrayElement(labels.ToArray());
+    }
+
+    private async Task<IssueStatusResponse> GetRandomStatus(string repositoryName)
+    {
+        var statuses = await issueClient.GetIssueStatuses(repositoryName);
+        if (statuses is null || statuses.Count == 0)
+            throw new Exception("Statuses not found");
+
+        return new Randomizer().ArrayElement(statuses.ToArray());
+    }
+
+    private async Task<int> CreateIssue(string repositoryName)
+    {
+        var label = await GetRandomLabel(repositoryName);
+        var status = await GetRandomStatus(repositoryName);
 
         var createRequest = new CreateIssueRequest(
             faker.Lorem.Sentence(),
             null,
+            status.Id,
             [label.Id]);
         var issue = await issueClient.CreateIssue(repositoryName, createRequest);
 
@@ -90,6 +131,7 @@ public class IssueTests
             Assert.That(issue.Assignee?.Id, Is.EqualTo(createRequest.AssigneeId));
             Assert.That(issue.Labels, Has.Count.EqualTo(1));
             Assert.That(issue.Labels, Has.One.EqualTo(label));
+            Assert.That(issue.Status.Id, Is.EqualTo(status.Id));
         });
 
         return issue.IssueNumber;
@@ -97,15 +139,13 @@ public class IssueTests
 
     private async Task UpdateIssue(string repositoryName, int number)
     {
-        var labels = await pyroClient.GetLabels(repositoryName);
-        if (labels is null || labels.Count == 0)
-            throw new Exception("Labels not found");
-
-        var label = new Randomizer().ArrayElement(labels.ToArray());
+        var label = await GetRandomLabel(repositoryName);
+        var status = await GetRandomStatus(repositoryName);
 
         var updateRequest = new UpdateIssueRequest(
             faker.Lorem.Sentence(),
             Guid.Parse("F9BA057A-35B0-4D10-8326-702D8F7EC966"),
+            status.Id,
             [label.Id]);
         var issue = await issueClient.UpdateIssue(repositoryName, number, updateRequest);
 
@@ -116,6 +156,7 @@ public class IssueTests
             Assert.That(issue.Assignee?.Id, Is.EqualTo(updateRequest.AssigneeId));
             Assert.That(issue.Labels, Has.Count.EqualTo(1));
             Assert.That(issue.Labels, Has.One.EqualTo(label));
+            Assert.That(issue.Status.Id, Is.EqualTo(status.Id));
         });
     }
 

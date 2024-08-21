@@ -33,12 +33,21 @@ internal class IssueConfiguration : IEntityTypeConfiguration<Issue>
             .ValueGeneratedOnAdd()
             .HasValueGenerator<IssueNumberValueGenerator>();
 
-        builder.Property<Guid>("RepositoryId")
+        builder.Property<Guid>("StatusId")
             .IsRequired();
 
-        builder.HasOne(x => x.Repository)
+        builder.HasOne(x => x.Status)
             .WithMany()
-            .HasForeignKey("RepositoryId")
+            .HasForeignKey("StatusId")
+            .OnDelete(DeleteBehavior.NoAction)
+            .HasConstraintName("FK_Issue_Status");
+
+        builder.Property(x => x.RepositoryId)
+            .IsRequired();
+
+        builder.HasOne<GitRepository>()
+            .WithMany()
+            .HasForeignKey(x => x.RepositoryId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.Property<Guid>("AuthorId")

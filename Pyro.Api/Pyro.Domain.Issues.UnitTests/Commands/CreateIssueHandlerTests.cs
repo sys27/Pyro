@@ -15,23 +15,27 @@ public class CreateIssueHandlerTests
     public void MissingRepository()
     {
         var currentUser = new CurrentUser(Guid.NewGuid(), "TestUser", [], []);
-        var command = new CreateIssue("repo", "title", null, []);
+        var command = new CreateIssue("repo", "title", null, Guid.NewGuid(), []);
 
         var currentUserProvider = Substitute.For<ICurrentUserProvider>();
         currentUserProvider
             .GetCurrentUser()
             .Returns(currentUser);
         var issueRepository = Substitute.For<IIssueRepository>();
-        issueRepository
-            .GetUser(currentUser.Id, Arg.Any<CancellationToken>())
-            .Returns((User?)null);
         var gitRepositoryRepository = Substitute.For<IGitRepositoryRepository>();
         gitRepositoryRepository
             .GetRepository(command.RepositoryName, Arg.Any<CancellationToken>())
             .Returns((GitRepository?)null);
+        gitRepositoryRepository
+            .GetUser(currentUser.Id, Arg.Any<CancellationToken>())
+            .Returns((User?)null);
         var timeProvider = Substitute.For<TimeProvider>();
 
-        var handler = new CreateIssueHandler(currentUserProvider, issueRepository, gitRepositoryRepository, timeProvider);
+        var handler = new CreateIssueHandler(
+            currentUserProvider,
+            issueRepository,
+            gitRepositoryRepository,
+            timeProvider);
 
         Assert.ThrowsAsync<NotFoundException>(() => handler.Handle(command));
     }
@@ -40,17 +44,17 @@ public class CreateIssueHandlerTests
     public void IncorrectCurrentUser()
     {
         var currentUser = new CurrentUser(Guid.NewGuid(), "TestUser", [], []);
-        var command = new CreateIssue("repo", "title", null, []);
+        var command = new CreateIssue("repo", "title", null, Guid.NewGuid(), []);
 
         var currentUserProvider = Substitute.For<ICurrentUserProvider>();
         currentUserProvider
             .GetCurrentUser()
             .Returns(currentUser);
         var issueRepository = Substitute.For<IIssueRepository>();
-        issueRepository
+        var gitRepositoryRepository = Substitute.For<IGitRepositoryRepository>();
+        gitRepositoryRepository
             .GetUser(currentUser.Id, Arg.Any<CancellationToken>())
             .Returns((User?)null);
-        var gitRepositoryRepository = Substitute.For<IGitRepositoryRepository>();
         gitRepositoryRepository
             .GetRepository(command.RepositoryName, Arg.Any<CancellationToken>())
             .Returns(new GitRepository
@@ -61,6 +65,71 @@ public class CreateIssueHandlerTests
         var timeProvider = Substitute.For<TimeProvider>();
 
         var handler = new CreateIssueHandler(currentUserProvider, issueRepository, gitRepositoryRepository, timeProvider);
+
+        Assert.ThrowsAsync<NotFoundException>(() => handler.Handle(command));
+    }
+
+    [Test]
+    public void MissingStatus()
+    {
+        var currentUser = new CurrentUser(Guid.NewGuid(), "TestUser", [], []);
+        var assignee = new User(Guid.NewGuid(), "Assignee");
+        var author = new User(currentUser.Id, currentUser.Login);
+        var now = DateTimeOffset.Now;
+        var repository = new GitRepository
+        {
+            Id = Guid.NewGuid(),
+            Name = "repo",
+            Labels =
+            [
+                new Label
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Tag 1",
+                    Color = 0,
+                },
+                new Label
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Tag 2",
+                    Color = 0,
+                }
+            ],
+        };
+
+        var command = new CreateIssue(
+            repository.Name,
+            "title",
+            assignee.Id,
+            Guid.NewGuid(),
+            [repository.Labels[0].Id, Guid.NewGuid()]);
+
+        var currentUserProvider = Substitute.For<ICurrentUserProvider>();
+        currentUserProvider
+            .GetCurrentUser()
+            .Returns(currentUser);
+        var issueRepository = Substitute.For<IIssueRepository>();
+        var gitRepositoryRepository = Substitute.For<IGitRepositoryRepository>();
+        gitRepositoryRepository
+            .GetRepository(command.RepositoryName, Arg.Any<CancellationToken>())
+            .Returns(repository);
+        gitRepositoryRepository
+            .GetUser(author.Id, Arg.Any<CancellationToken>())
+            .Returns(author);
+        gitRepositoryRepository
+            .GetUser(assignee.Id, Arg.Any<CancellationToken>())
+            .Returns(assignee);
+
+        var timeProvider = Substitute.For<TimeProvider>();
+        timeProvider
+            .GetUtcNow()
+            .Returns(now);
+
+        var handler = new CreateIssueHandler(
+            currentUserProvider,
+            issueRepository,
+            gitRepositoryRepository,
+            timeProvider);
 
         Assert.ThrowsAsync<NotFoundException>(() => handler.Handle(command));
     }
@@ -101,39 +170,51 @@ public class CreateIssueHandlerTests
                 }
             ],
         };
-        var command = new CreateIssue(repository.Name, "title", assignee?.Id, [repository.Labels[0].Id, Guid.NewGuid()]);
+        repository.AddIssueStatus("Open", 0);
+
+        var command = new CreateIssue(
+            repository.Name,
+            "title",
+            assignee?.Id,
+            repository.IssueStatuses[0].Id,
+            [repository.Labels[0].Id, Guid.NewGuid()]);
 
         var currentUserProvider = Substitute.For<ICurrentUserProvider>();
         currentUserProvider
             .GetCurrentUser()
             .Returns(currentUser);
         var issueRepository = Substitute.For<IIssueRepository>();
-        issueRepository
-            .GetUser(author.Id, Arg.Any<CancellationToken>())
-            .Returns(author);
-        if (assignee is not null)
-        {
-            issueRepository
-                .GetUser(assignee.Id, Arg.Any<CancellationToken>())
-                .Returns(assignee);
-        }
-
         var gitRepositoryRepository = Substitute.For<IGitRepositoryRepository>();
         gitRepositoryRepository
             .GetRepository(command.RepositoryName, Arg.Any<CancellationToken>())
             .Returns(repository);
+        gitRepositoryRepository
+            .GetUser(author.Id, Arg.Any<CancellationToken>())
+            .Returns(author);
+        if (assignee is not null)
+        {
+            gitRepositoryRepository
+                .GetUser(assignee.Id, Arg.Any<CancellationToken>())
+                .Returns(assignee);
+        }
+
         var timeProvider = Substitute.For<TimeProvider>();
         timeProvider
             .GetUtcNow()
             .Returns(now);
 
-        var handler = new CreateIssueHandler(currentUserProvider, issueRepository, gitRepositoryRepository, timeProvider);
+        var handler = new CreateIssueHandler(
+            currentUserProvider,
+            issueRepository,
+            gitRepositoryRepository,
+            timeProvider);
+
         var issue = await handler.Handle(command);
 
         Assert.Multiple(() =>
         {
             Assert.That(issue.Title, Is.EqualTo(command.Title));
-            Assert.That(issue.Repository.Name, Is.EqualTo(command.RepositoryName));
+            Assert.That(issue.RepositoryId, Is.EqualTo(repository.Id));
             Assert.That(issue.Author, Is.EqualTo(author));
             Assert.That(issue.CreatedAt, Is.EqualTo(now));
             Assert.That(issue.Assignee, Is.EqualTo(assignee));

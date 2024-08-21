@@ -18,12 +18,19 @@ internal class IssueRepository : IIssueRepository
         GetIssues query,
         CancellationToken cancellationToken = default)
     {
+        var gitRepository = await dbContext
+            .Set<GitRepository>()
+            .FirstOrDefaultAsync(x => x.Name == query.RepositoryName, cancellationToken);
+        if (gitRepository is null)
+            return [];
+
         var issues = dbContext
             .Set<Issue>()
             .Include(x => x.Assignee)
             .Include(x => x.Author)
             .Include(x => x.Labels)
-            .Where(x => x.Repository.Name == query.RepositoryName)
+            .Include(x => x.Status)
+            .Where(x => x.RepositoryId == gitRepository.Id)
             .AsNoTracking();
 
         if (query.Before is not null)
@@ -53,19 +60,26 @@ internal class IssueRepository : IIssueRepository
         return result;
     }
 
-    public Task<Issue?> GetIssue(
+    public async Task<Issue?> GetIssue(
         string repositoryName,
         int number,
         CancellationToken cancellationToken = default)
     {
-        var issue = dbContext
+        var gitRepository = await dbContext
+            .Set<GitRepository>()
+            .FirstOrDefaultAsync(x => x.Name == repositoryName, cancellationToken);
+        if (gitRepository is null)
+            return null;
+
+        var issue = await dbContext
             .Set<Issue>()
             .Include(x => x.Assignee)
             .Include(x => x.Author)
             .Include(x => x.Comments.OrderBy(c => c.CreatedAt))
             .Include(x => x.Labels)
+            .Include(x => x.Status)
             .FirstOrDefaultAsync(
-                i => i.Repository.Name == repositoryName &&
+                i => i.RepositoryId == gitRepository.Id &&
                      i.IssueNumber == number,
                 cancellationToken);
 
@@ -83,26 +97,5 @@ internal class IssueRepository : IIssueRepository
     {
         issue.ClearLabels();
         dbContext.Set<Issue>().Remove(issue);
-    }
-
-    public async Task<User?> GetUser(
-        Guid id,
-        CancellationToken cancellationToken = default)
-    {
-        var user = await dbContext
-            .Set<User>()
-            .FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
-
-        return user;
-    }
-
-    public async Task<IReadOnlyList<User>> GetUsers(CancellationToken cancellationToken = default)
-    {
-        var users = await dbContext
-            .Set<User>()
-            .AsNoTracking()
-            .ToListAsync(cancellationToken);
-
-        return users;
     }
 }

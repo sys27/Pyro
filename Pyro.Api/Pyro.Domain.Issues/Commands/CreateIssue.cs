@@ -12,6 +12,7 @@ public record CreateIssue(
     string RepositoryName,
     string Title,
     Guid? AssigneeId,
+    Guid StatusId,
     IReadOnlyList<Guid> Labels) : IRequest<Issue>;
 
 public class CreateIssueValidator : AbstractValidator<CreateIssue>
@@ -25,6 +26,9 @@ public class CreateIssueValidator : AbstractValidator<CreateIssue>
         RuleFor(x => x.Title)
             .NotEmpty()
             .MaximumLength(200);
+
+        RuleFor(x => x.StatusId)
+            .NotEmpty();
 
         RuleFor(x => x.Labels)
             .ForEach(x => x.NotEmpty());
@@ -55,16 +59,19 @@ public class CreateIssueHandler : IRequestHandler<CreateIssue, Issue>
         var currentUser = currentUserProvider.GetCurrentUser();
         var repository = await gitRepositoryRepository.GetRepository(request.RepositoryName, cancellationToken) ??
                          throw new NotFoundException($"The repository (Name: {request.RepositoryName}) not found");
-        var author = await issueRepository.GetUser(currentUser.Id, cancellationToken) ??
+        var author = await gitRepositoryRepository.GetUser(currentUser.Id, cancellationToken) ??
                      throw new NotFoundException($"The user (Id: {currentUser.Id}) not found");
         var assignee = request.AssigneeId.HasValue
-            ? await issueRepository.GetUser(request.AssigneeId.Value, cancellationToken)
+            ? await gitRepositoryRepository.GetUser(request.AssigneeId.Value, cancellationToken)
             : null;
+        var status = repository.GetIssueStatus(request.StatusId) ??
+                     throw new NotFoundException($"The issue status (Id: {request.StatusId}) not found");
 
         var issue = new Issue
         {
             Title = request.Title,
-            Repository = repository,
+            Status = status,
+            RepositoryId = repository.Id,
             Author = author,
             CreatedAt = timeProvider.GetUtcNow(),
         };

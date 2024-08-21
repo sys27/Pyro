@@ -14,7 +14,7 @@ public class UpdateIssueHandlerTests
     [Test]
     public void MissingIssue()
     {
-        var command = new UpdateIssue("repo", 1, "title", null, []);
+        var command = new UpdateIssue("repo", 1, "title", null, Guid.NewGuid(), []);
 
         var currentUserProvider = Substitute.For<ICurrentUserProvider>();
         var issueRepository = Substitute.For<IIssueRepository>();
@@ -32,18 +32,27 @@ public class UpdateIssueHandlerTests
     public void MissingRepository()
     {
         var currentUser = new CurrentUser(Guid.NewGuid(), "User", [], []);
-        var command = new UpdateIssue("repo", 1, "title", null, []);
+        var gitRepository = new GitRepository
+        {
+            Id = Guid.NewGuid(),
+            Name = "test",
+        };
+        gitRepository.AddIssueStatus("Open", 0);
+        var command = new UpdateIssue("repo", 1, "title", null, gitRepository.IssueStatuses[0].Id, []);
         var issue = new Issue
         {
             Id = Guid.NewGuid(),
             IssueNumber = command.IssueNumber,
             Title = "title",
-            Repository = new GitRepository
+            Status = new IssueStatus
             {
                 Id = Guid.NewGuid(),
-                Name = "test",
+                Name = "Open",
+                Color = 0,
+                Repository = gitRepository,
             },
-            Author = new User(Guid.NewGuid(), "test"),
+            RepositoryId = gitRepository.Id,
+            Author = new User(currentUser.Id, currentUser.Login),
             CreatedAt = DateTimeOffset.Now,
         };
 
@@ -69,7 +78,7 @@ public class UpdateIssueHandlerTests
     public void CurrentUserCantUpdateIssue()
     {
         var currentUser = new CurrentUser(Guid.NewGuid(), "User", [], []);
-        var command = new UpdateIssue("repo", 1, "title", null, []);
+        var command = new UpdateIssue("repo", 1, "title", null, Guid.NewGuid(), []);
         var gitRepository = new GitRepository
         {
             Id = Guid.NewGuid(),
@@ -80,7 +89,14 @@ public class UpdateIssueHandlerTests
             Id = Guid.NewGuid(),
             IssueNumber = command.IssueNumber,
             Title = "title",
-            Repository = gitRepository,
+            Status = new IssueStatus
+            {
+                Id = Guid.NewGuid(),
+                Name = "Open",
+                Color = 0,
+                Repository = gitRepository,
+            },
+            RepositoryId = gitRepository.Id,
             Author = new User(Guid.NewGuid(), "test"),
             CreatedAt = DateTimeOffset.Now,
         };
@@ -134,12 +150,16 @@ public class UpdateIssueHandlerTests
                 },
             ],
         };
+        var open = gitRepository.AddIssueStatus("Open", 0);
+        var done = gitRepository.AddIssueStatus("Done", 0);
+        open.AddTransition(done);
         var issue = new Issue
         {
             Id = Guid.NewGuid(),
             IssueNumber = 1,
             Title = "title",
-            Repository = gitRepository,
+            Status = open,
+            RepositoryId = gitRepository.Id,
             Author = author,
             CreatedAt = DateTimeOffset.Now,
         };
@@ -149,6 +169,7 @@ public class UpdateIssueHandlerTests
             issue.IssueNumber,
             "updated",
             null,
+            done.Id,
             [gitRepository.Labels[1].Id]);
 
         var currentUserProvider = Substitute.For<ICurrentUserProvider>();
@@ -169,8 +190,12 @@ public class UpdateIssueHandlerTests
         var updatedIssue = await handler.Handle(command);
 
         Assert.That(updatedIssue, Is.Not.Null);
-        Assert.That(updatedIssue.Title, Is.EqualTo(command.Title));
-        Assert.That(updatedIssue.Labels, Has.Count.EqualTo(1));
-        Assert.That(updatedIssue.Labels[0], Is.EqualTo(gitRepository.Labels[1]));
+        Assert.Multiple(() =>
+        {
+            Assert.That(updatedIssue.Title, Is.EqualTo(command.Title));
+            Assert.That(updatedIssue.Labels, Has.Count.EqualTo(1));
+            Assert.That(updatedIssue.Labels[0], Is.EqualTo(gitRepository.Labels[1]));
+            Assert.That(updatedIssue.Status.Id, Is.EqualTo(command.StatusId));
+        });
     }
 }

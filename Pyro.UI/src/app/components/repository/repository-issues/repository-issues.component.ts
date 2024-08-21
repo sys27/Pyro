@@ -3,10 +3,12 @@ import { Component, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { PaginatorComponent, PaginatorState } from '@controls/paginator/paginator.component';
 import { ColorPipe } from '@pipes/color.pipe';
+import { LuminanceColorPipe } from '@pipes/luminance-color.pipe';
 import { Issue, IssueService } from '@services/issue.service';
 import { mapErrorToEmpty } from '@services/operators';
 import { ButtonModule } from 'primeng/button';
 import { DataViewModule } from 'primeng/dataview';
+import { DividerModule } from 'primeng/divider';
 import { TagModule } from 'primeng/tag';
 import { Observable, of } from 'rxjs';
 
@@ -17,6 +19,8 @@ import { Observable, of } from 'rxjs';
         ButtonModule,
         ColorPipe,
         DataViewModule,
+        DividerModule,
+        LuminanceColorPipe,
         NgClass,
         PaginatorComponent,
         RouterLink,

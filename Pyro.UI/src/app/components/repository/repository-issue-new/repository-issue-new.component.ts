@@ -1,7 +1,8 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, computed, input, OnInit, signal } from '@angular/core';
+import { Component, input, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { IssueStatus, IssueStatusService } from '@services/issue-status.service';
 import { IssueService, User } from '@services/issue.service';
 import { Label, LabelService } from '@services/label.service';
 import { mapErrorToEmpty, mapErrorToNull } from '@services/operators';
@@ -9,7 +10,7 @@ import { ButtonModule } from 'primeng/button';
 import { DropdownModule } from 'primeng/dropdown';
 import { InputTextModule } from 'primeng/inputtext';
 import { MultiSelectModule } from 'primeng/multiselect';
-import { finalize, Observable, shareReplay, take } from 'rxjs';
+import { finalize, Observable, shareReplay } from 'rxjs';
 import { WithValidationComponent } from '../../../controls/with-validation/with-validation.component';
 
 @Component({
@@ -29,14 +30,14 @@ import { WithValidationComponent } from '../../../controls/with-validation/with-
 })
 export class RepositoryIssueNewComponent implements OnInit {
     public readonly repositoryName = input.required<string>();
-    public readonly issueNumber = input<number>();
-    public readonly isEditMode = computed<boolean>(() => !!this.issueNumber());
     public users$: Observable<User[]> | undefined;
     public labels$: Observable<Label[]> | undefined;
+    public statuses$: Observable<IssueStatus[]> | undefined;
     public readonly form = this.formBuilder.group({
         title: ['', [Validators.required, Validators.maxLength(200)]],
         assigneeId: new FormControl<string | null>(null),
         labelIds: new FormControl<string[]>([]),
+        statusId: ['', Validators.required],
     });
     public readonly isLoading = signal<boolean>(false);
 
@@ -46,6 +47,7 @@ export class RepositoryIssueNewComponent implements OnInit {
         private readonly route: ActivatedRoute,
         private readonly issueService: IssueService,
         private readonly labelService: LabelService,
+        private readonly statusService: IssueStatusService,
     ) {}
 
     public ngOnInit(): void {
@@ -53,21 +55,9 @@ export class RepositoryIssueNewComponent implements OnInit {
         this.labels$ = this.labelService
             .getLabels(this.repositoryName())
             .pipe(mapErrorToEmpty, shareReplay(1));
-
-        if (this.isEditMode()) {
-            this.issueService
-                .getIssue(this.repositoryName(), this.issueNumber()!)
-                .pipe(mapErrorToNull, take(1))
-                .subscribe(issue => {
-                    if (issue) {
-                        this.form.setValue({
-                            title: issue.title,
-                            assigneeId: issue.assignee?.id || null,
-                            labelIds: issue.labels.map(label => label.id),
-                        });
-                    }
-                });
-        }
+        this.statuses$ = this.statusService
+            .getStatuses(this.repositoryName())
+            .pipe(mapErrorToEmpty, shareReplay(1));
     }
 
     public onSubmit(): void {
@@ -79,24 +69,23 @@ export class RepositoryIssueNewComponent implements OnInit {
             title: this.form.value.title!,
             assigneeId: this.form.value.assigneeId!,
             labels: this.form.value.labelIds || [],
+            statusId: this.form.value.statusId!,
         };
 
         this.isLoading.set(true);
 
-        if (this.isEditMode()) {
-            this.issueService
-                .updateIssue(this.repositoryName(), this.issueNumber()!, issue)
-                .pipe(finalize(() => this.isLoading.set(false)))
-                .subscribe(() => {
-                    this.router.navigate(['../'], { relativeTo: this.route });
-                });
-        } else {
-            this.issueService
-                .createIssue(this.repositoryName(), issue)
-                .pipe(finalize(() => this.isLoading.set(false)))
-                .subscribe(() => {
-                    this.router.navigate(['../'], { relativeTo: this.route });
-                });
-        }
+        this.issueService
+            .createIssue(this.repositoryName(), issue)
+            .pipe(
+                mapErrorToNull,
+                finalize(() => this.isLoading.set(false)),
+            )
+            .subscribe(response => {
+                if (response === null) {
+                    return;
+                }
+
+                this.router.navigate(['../'], { relativeTo: this.route });
+            });
     }
 }

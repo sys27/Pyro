@@ -1,0 +1,49 @@
+<div class="flex align-items-center justify-content-center">
+  <form
+    class="w-full"
+    [formGroup]="form"
+    (ngSubmit)="onSubmit()">
+    <h1>New Status Transition</h1>
+
+    <div class="field">
+      <with-validation>
+        <label for="from">From:</label>
+
+        @if (statuses$ | async; as statuses) {
+          <p-dropdown
+            id="from"
+            formControlName="fromId"
+            [options]="statuses"
+            optionLabel="name"
+            optionValue="id"
+            styleClass="w-full"
+            placeholder="Select Status" />
+        }
+      </with-validation>
+    </div>
+
+    <div class="field">
+      <with-validation>
+        <label for="to">To:</label>
+
+        @if (statuses$ | async; as statuses) {
+          <p-dropdown
+            id="to"
+            formControlName="toId"
+            [options]="statuses"
+            optionLabel="name"
+            optionValue="id"
+            styleClass="w-full"
+            placeholder="Select Status" />
+        }
+      </with-validation>
+    </div>
+
+    <div class="field">
+      <p-button
+        label="Save"
+        type="submit"
+        [disabled]="form.invalid" />
+    </div>
+  </form>
+</div>

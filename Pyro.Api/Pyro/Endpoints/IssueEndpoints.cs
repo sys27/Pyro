@@ -23,7 +23,9 @@ internal static class IssueEndpoints
 
         issuesBuilder
             .MapIssues()
-            .MapIssueComments();
+            .MapIssueComments()
+            .MapIssueStatuses()
+            .MapIssueStatusTransitions();
 
         return app;
     }
@@ -86,6 +88,7 @@ internal static class IssueEndpoints
                     name,
                     request.Title,
                     request.AssigneeId,
+                    request.StatusId,
                     request.Labels);
                 var issue = await mediator.Send(command, cancellationToken);
                 await unitOfWork.SaveChangesAsync(cancellationToken);
@@ -116,6 +119,7 @@ internal static class IssueEndpoints
                     number,
                     request.Title,
                     request.AssigneeId,
+                    request.StatusId,
                     request.Labels);
                 var issue = await mediator.Send(command, cancellationToken);
                 await unitOfWork.SaveChangesAsync(cancellationToken);
@@ -285,6 +289,208 @@ internal static class IssueEndpoints
             .Produces(404)
             .ProducesProblem(500)
             .WithName("Get Issue Users")
+            .WithOpenApi();
+
+        return app;
+    }
+
+    private static IEndpointRouteBuilder MapIssueStatuses(this IEndpointRouteBuilder app)
+    {
+        var statusBuilder = app.MapGroup("/statuses")
+            .WithTags("Issue Statuses");
+
+        statusBuilder.MapGet("/", async (
+                IMediator mediator,
+                string name,
+                CancellationToken cancellationToken) =>
+            {
+                var query = new GetIssueStatuses(name);
+                var statuses = await mediator.Send(query, cancellationToken);
+                var result = statuses.ToResponse();
+
+                return Results.Ok(result);
+            })
+            .RequirePermission(IssueView)
+            .Produces<IReadOnlyList<IssueStatusResponse>>()
+            .ProducesValidationProblem()
+            .Produces(401)
+            .Produces(403)
+            .Produces(404)
+            .ProducesProblem(500)
+            .WithName("Get Statuses")
+            .WithOpenApi();
+
+        statusBuilder.MapGet("/{id:guid}", async (
+                IMediator mediator,
+                string name,
+                Guid id,
+                CancellationToken cancellationToken) =>
+            {
+                var query = new GetIssueStatus(name, id);
+                var statuses = await mediator.Send(query, cancellationToken);
+                var result = statuses?.ToResponse();
+
+                return result is null
+                    ? Results.NotFound()
+                    : Results.Ok(result);
+            })
+            .RequirePermission(IssueView)
+            .Produces<IssueStatusResponse>()
+            .ProducesValidationProblem()
+            .Produces(401)
+            .Produces(403)
+            .Produces(404)
+            .ProducesProblem(500)
+            .WithName("Get Status")
+            .WithOpenApi();
+
+        statusBuilder.MapPost("/", async (
+                IMediator mediator,
+                UnitOfWork unitOfWork,
+                string name,
+                CreateIssueStatusRequest request,
+                CancellationToken cancellationToken) =>
+            {
+                var command = new CreateIssueStatus(name, request.Name, request.Color.ToInt());
+                var status = await mediator.Send(command, cancellationToken);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
+
+                var result = status.ToResponse();
+
+                return Results.Created($"/repositories/{name}/issues/statuses/{status.Id}", result);
+            })
+            .RequirePermission(IssueManage)
+            .Produces<IssueResponse>(201)
+            .ProducesValidationProblem()
+            .Produces(401)
+            .Produces(403)
+            .ProducesProblem(500)
+            .WithName("Create Status")
+            .WithOpenApi();
+
+        statusBuilder.MapPut("/{id:guid}", async (
+                IMediator mediator,
+                UnitOfWork unitOfWork,
+                string name,
+                Guid id,
+                UpdateIssueStatusRequest request,
+                CancellationToken cancellationToken) =>
+            {
+                var command = new UpdateIssueStatus(name, id, request.Name, request.Color.ToInt());
+                var status = await mediator.Send(command, cancellationToken);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
+
+                var result = status.ToResponse();
+
+                return Results.Ok(result);
+            })
+            .RequirePermission(IssueManage)
+            .Produces<IssueStatusResponse>()
+            .ProducesValidationProblem()
+            .Produces(401)
+            .Produces(403)
+            .ProducesProblem(500)
+            .WithName("Update Status")
+            .WithOpenApi();
+
+        statusBuilder.MapDelete("/{id:guid}", async (
+                IMediator mediator,
+                UnitOfWork unitOfWork,
+                string name,
+                Guid id,
+                CancellationToken cancellationToken) =>
+            {
+                var command = new DeleteIssueStatus(name, id);
+                await mediator.Send(command, cancellationToken);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
+
+                return Results.Ok();
+            })
+            .RequirePermission(IssueManage)
+            .Produces(200)
+            .ProducesValidationProblem()
+            .Produces(401)
+            .Produces(403)
+            .Produces(404)
+            .ProducesProblem(500)
+            .WithName("Delete Status")
+            .WithOpenApi();
+
+        return app;
+    }
+
+    private static IEndpointRouteBuilder MapIssueStatusTransitions(this IEndpointRouteBuilder app)
+    {
+        var transitionsBuilder = app.MapGroup("/statuses/transitions")
+            .WithTags("Issue Status Transitions");
+
+        transitionsBuilder.MapGet("/", async (
+                IMediator mediator,
+                string name,
+                CancellationToken cancellationToken) =>
+            {
+                var query = new GetAllIssueStatusTransitions(name);
+                var transitions = await mediator.Send(query, cancellationToken);
+                var result = transitions.ToResponse();
+
+                return Results.Ok(result);
+            })
+            .RequirePermission(IssueView)
+            .Produces<IReadOnlyList<IssueStatusTransitionResponse>>()
+            .ProducesValidationProblem()
+            .Produces(401)
+            .Produces(403)
+            .Produces(404)
+            .ProducesProblem(500)
+            .WithTags("Issue Status Transitions")
+            .WithName("Get All Status Transitions")
+            .WithOpenApi();
+
+        transitionsBuilder.MapPost("/", async (
+                IMediator mediator,
+                UnitOfWork unitOfWork,
+                string name,
+                CreateIssueStatusTransitionRequest request,
+                CancellationToken cancellationToken) =>
+            {
+                var command = new CreateIssueStatusTransition(name, request.FromId, request.ToId);
+                var transition = await mediator.Send(command, cancellationToken);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
+
+                var result = transition.ToResponse();
+
+                return Results.Created($"/repositories/{name}/issues/statuses/transitions/{transition.Id}", result);
+            })
+            .RequirePermission(IssueManage)
+            .Produces<IssueStatusTransitionResponse>(201)
+            .ProducesValidationProblem()
+            .Produces(401)
+            .Produces(403)
+            .ProducesProblem(500)
+            .WithName("Create Status Transition")
+            .WithOpenApi();
+
+        transitionsBuilder.MapDelete("/{id:guid}", async (
+                IMediator mediator,
+                UnitOfWork unitOfWork,
+                string name,
+                Guid id,
+                CancellationToken cancellationToken) =>
+            {
+                var command = new DeleteIssueStatusTransition(name, id);
+                await mediator.Send(command, cancellationToken);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
+
+                return Results.Ok();
+            })
+            .RequirePermission(IssueManage)
+            .Produces(200)
+            .ProducesValidationProblem()
+            .Produces(401)
+            .Produces(403)
+            .Produces(404)
+            .ProducesProblem(500)
+            .WithName("Delete Status Transition")
             .WithOpenApi();
 
         return app;

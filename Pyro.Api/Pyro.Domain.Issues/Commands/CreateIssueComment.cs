@@ -32,16 +32,19 @@ public class CreateIssueCommentValidator : AbstractValidator<CreateIssueComment>
 
 public class CreateIssueCommentHandler : IRequestHandler<CreateIssueComment, IssueComment>
 {
-    private readonly IIssueRepository repository;
+    private readonly IIssueRepository issueRepository;
+    private readonly IGitRepositoryRepository gitRepositoryRepository;
     private readonly ICurrentUserProvider currentUserProvider;
     private readonly TimeProvider timeProvider;
 
     public CreateIssueCommentHandler(
-        IIssueRepository repository,
+        IIssueRepository issueRepository,
+        IGitRepositoryRepository gitRepositoryRepository,
         ICurrentUserProvider currentUserProvider,
         TimeProvider timeProvider)
     {
-        this.repository = repository;
+        this.issueRepository = issueRepository;
+        this.gitRepositoryRepository = gitRepositoryRepository;
         this.currentUserProvider = currentUserProvider;
         this.timeProvider = timeProvider;
     }
@@ -51,10 +54,10 @@ public class CreateIssueCommentHandler : IRequestHandler<CreateIssueComment, Iss
         CancellationToken cancellationToken = default)
     {
         var currentUser = currentUserProvider.GetCurrentUser();
-        var author = await repository.GetUser(currentUser.Id, cancellationToken) ??
+        var author = await gitRepositoryRepository.GetUser(currentUser.Id, cancellationToken) ??
                      throw new NotFoundException($"User (Id: {currentUser.Id}) not found");
 
-        var issue = await repository.GetIssue(request.RepositoryName, request.IssueNumber, cancellationToken) ??
+        var issue = await issueRepository.GetIssue(request.RepositoryName, request.IssueNumber, cancellationToken) ??
                     throw new NotFoundException($"Issue ('{request.RepositoryName}' #{request.IssueNumber}) not found");
 
         var comment = issue.AddComment(request.Content, author, timeProvider.GetUtcNow());

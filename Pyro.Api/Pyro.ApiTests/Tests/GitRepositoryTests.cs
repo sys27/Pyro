@@ -48,7 +48,7 @@ public class GitRepositoryTests
     private async Task<string> CreateGitRepository()
     {
         var createRequest = new CreateGitRepositoryRequest(
-            faker.Lorem.Word(),
+            faker.Random.Hash(),
             faker.Lorem.Sentence(),
             "master");
         var repository = await client.CreateGitRepository(createRequest);
@@ -121,7 +121,7 @@ public class GitRepositoryTests
 
     private async Task<LabelResponse> CreateLabel(string repositoryName)
     {
-        var request = new CreateLabelRequest(faker.Lorem.Word(), ColorRequest.FromHex(faker.Internet.Color()));
+        var request = new CreateLabelRequest(faker.Random.Hash(), ColorRequest.FromHex(faker.Internet.Color()));
         var label = await client.CreateLabel(repositoryName, request);
 
         Assert.That(label, Is.Not.Null);
@@ -138,7 +138,7 @@ public class GitRepositoryTests
 
     private async Task<LabelResponse> UpdateLabel(string repositoryName, Guid id)
     {
-        var request = new UpdateLabelRequest(faker.Lorem.Word(), ColorRequest.FromHex(faker.Internet.Color()));
+        var request = new UpdateLabelRequest(faker.Random.Hash(), ColorRequest.FromHex(faker.Internet.Color()));
         var label = await client.UpdateLabel(repositoryName, id, request);
 
         Assert.That(label, Is.Not.Null);

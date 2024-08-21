@@ -31,14 +31,20 @@
                   <p-tag
                     [value]="label.name"
                     [rounded]="true"
-                    [style]="{ background: label.color | color }" />
+                    [style]="{ background: label.color | color, color: label.color | luminance }" />
                 }
               </div>
-              <div class="grid grid-nogutter text-sm text-400">
-                <div class="col-10">
+
+              <div class="flex flex-row gap-2 text-sm text-400">
+                <div class="flex-grow-1">
                   <span>#{{ issue.issueNumber }} created by {{ issue.author.name }}</span>
                 </div>
-                <div class="col-2 text-right">
+
+                <div>
+                  <span>{{ issue.status.name }}</span>
+                </div>
+
+                <div>
                   <span>{{ issue.assignee?.name ?? 'Unassigned' }}</span>
                 </div>
               </div>

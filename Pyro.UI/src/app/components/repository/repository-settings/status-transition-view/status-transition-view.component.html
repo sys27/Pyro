@@ -1,0 +1,53 @@
+@if (transitions$ | async; as transitions) {
+  <p-table
+    [value]="transitions"
+    selectionMode="single"
+    styleClass="p-datatable-striped">
+    <ng-template pTemplate="caption">
+      <div class="flex flex-row-reverse">
+        <p-button
+          label="New Transition"
+          icon="pi pi-plus"
+          severity="success"
+          [routerLink]="['new']" />
+      </div>
+    </ng-template>
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 47%">From</th>
+        <th style="width: 47%">To</th>
+        <th style="width: 6%"></th>
+      </tr>
+    </ng-template>
+    <ng-template
+      pTemplate="body"
+      let-transition>
+      <tr>
+        <td>
+          <p-tag
+            [value]="transition.from.name"
+            [rounded]="true"
+            [style]="{
+              background: transition.from.color | color,
+              color: transition.from.color | luminance,
+            }" />
+        </td>
+        <td>
+          <p-tag
+            [value]="transition.to.name"
+            [rounded]="true"
+            [style]="{
+              background: transition.to.color | color,
+              color: transition.to.color | luminance,
+            }" />
+        </td>
+        <td>
+          <p-button
+            icon="pi pi-trash"
+            [outlined]="true"
+            (onClick)="deleteTransition(transition)" />
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+}

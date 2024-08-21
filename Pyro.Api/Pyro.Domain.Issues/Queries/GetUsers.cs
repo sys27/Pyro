@@ -9,9 +9,9 @@ public record GetUsers : IRequest<IReadOnlyList<User>>;
 
 public class GetUsersHandler : IRequestHandler<GetUsers, IReadOnlyList<User>>
 {
-    private readonly IIssueRepository repository;
+    private readonly IGitRepositoryRepository repository;
 
-    public GetUsersHandler(IIssueRepository repository)
+    public GetUsersHandler(IGitRepositoryRepository repository)
         => this.repository = repository;
 
     public async Task<IReadOnlyList<User>> Handle(GetUsers request, CancellationToken cancellationToken)

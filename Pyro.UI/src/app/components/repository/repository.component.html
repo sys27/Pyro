@@ -1,2 +1,6 @@
-<p-tabMenu [model]="menu" />
-<router-outlet></router-outlet>
+<div class="flex flex-column h-full">
+  <p-tabMenu [model]="menu" />
+  <div class="flex-grow-1">
+    <router-outlet></router-outlet>
+  </div>
+</div>

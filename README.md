@@ -14,8 +14,8 @@ Pyro is a platform designed to manage and collaborate on code, repositories, iss
   - [ ] Clone/push over SSH
 - [ ] Issues Tracking and Management
   - [x] Manage issues (create/update/delete)
-  - [ ] Statuses, Transition rules
-  - [x] Tags
+  - [x] Statuses, Transition rules
+  - [x] Labels
   - [ ] Releases
   - [ ] Lock issues
   - [ ] Track change history

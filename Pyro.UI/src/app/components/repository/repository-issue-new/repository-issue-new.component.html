@@ -3,7 +3,7 @@
     class="w-6"
     [formGroup]="form"
     (ngSubmit)="onSubmit()">
-    <h1>{{ isEditMode() ? 'Edit Issue' : 'New Issue' }}</h1>
+    <h1>New Issue</h1>
 
     <div class="field">
       <with-validation>
@@ -36,10 +36,11 @@
 
     <div class="field">
       <with-validation>
-        <label>Labels:</label>
+        <label for="labels">Labels:</label>
 
         @if (labels$ | async; as labels) {
           <p-multiSelect
+            id="labels"
             formControlName="labelIds"
             [options]="labels"
             optionLabel="name"
@@ -52,8 +53,25 @@
     </div>
 
     <div class="field">
+      <with-validation>
+        <label for="status">Status:</label>
+
+        @if (statuses$ | async; as statuses) {
+          <p-dropdown
+            id="status"
+            formControlName="statusId"
+            [options]="statuses"
+            optionLabel="name"
+            optionValue="id"
+            styleClass="w-full"
+            placeholder="Select Status" />
+        }
+      </with-validation>
+    </div>
+
+    <div class="field">
       <p-button
-        [label]="isEditMode() ? 'Update' : 'Create'"
+        label="Save"
         type="submit"
         [disabled]="form.invalid"
         [loading]="isLoading()" />
