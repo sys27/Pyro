@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { WithValidationComponent } from '@controls/with-validation/with-validation.component';
 import { NotificationEvent, NotificationService } from '@services/notification.service';
 import { CreateRepository, RepositoryService } from '@services/repository.service';
 import { ButtonModule } from 'primeng/button';
@@ -10,7 +11,7 @@ import { filter, finalize, Observable, Subject, switchMap, takeUntil } from 'rxj
 @Component({
     selector: 'repository-new',
     standalone: true,
-    imports: [ReactiveFormsModule, ButtonModule, InputTextModule],
+    imports: [ButtonModule, InputTextModule, ReactiveFormsModule, WithValidationComponent],
     templateUrl: './repository-new.component.html',
     styleUrls: ['./repository-new.component.css'],
 })

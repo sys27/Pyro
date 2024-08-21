@@ -1,6 +1,7 @@
 import { Component, input, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { WithValidationComponent } from '@controls/with-validation/with-validation.component';
 import { Color } from '@models/color';
 import { LabelService } from '@services/label.service';
 import { mapErrorToNull } from '@services/operators';
@@ -11,7 +12,13 @@ import { InputTextModule } from 'primeng/inputtext';
 @Component({
     selector: 'label-new',
     standalone: true,
-    imports: [ButtonModule, ColorPickerModule, InputTextModule, ReactiveFormsModule],
+    imports: [
+        ButtonModule,
+        ColorPickerModule,
+        InputTextModule,
+        ReactiveFormsModule,
+        WithValidationComponent,
+    ],
     templateUrl: './label-new.component.html',
     styleUrl: './label-new.component.css',
 })

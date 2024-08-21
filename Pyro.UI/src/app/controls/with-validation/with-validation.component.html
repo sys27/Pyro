@@ -1,0 +1,5 @@
+<ng-content />
+
+@for (error of errors$ | async; track error.type) {
+  <div class="error">{{ error.message }}</div>
+}

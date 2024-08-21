@@ -4,14 +4,16 @@
     (ngSubmit)="onSubmit()">
     <p-tabView>
       <p-tabPanel header="Write">
-        <textarea
-          #commentText
-          pInputTextarea
-          rows="5"
-          autoResize="true"
-          formControlName="comment"
-          class="w-full"
-          placeholder="Write a comment"></textarea>
+        <with-validation>
+          <textarea
+            #commentText
+            pInputTextarea
+            rows="5"
+            autoResize="true"
+            formControlName="comment"
+            class="w-full"
+            placeholder="Write a comment"></textarea>
+        </with-validation>
       </p-tabPanel>
 
       <p-tabPanel header="Preview">
@@ -22,12 +24,13 @@
     </p-tabView>
 
     <div class="flex flex-row-reverse gap-2">
-      <p-button
-        *ngIf="isEditMode"
-        severity="secondary"
-        label="Cancel"
-        (onClick)="cancel()"
-        [loading]="isLoading()" />
+      @if (isEditMode) {
+        <p-button
+          severity="secondary"
+          label="Cancel"
+          (onClick)="cancel()"
+          [loading]="isLoading()" />
+      }
       <p-button
         severity="success"
         label="Comment"

@@ -10,6 +10,7 @@ import { DropdownModule } from 'primeng/dropdown';
 import { InputTextModule } from 'primeng/inputtext';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { finalize, Observable, shareReplay, take } from 'rxjs';
+import { WithValidationComponent } from '../../../controls/with-validation/with-validation.component';
 
 @Component({
     selector: 'repo-issue-new',
@@ -21,6 +22,7 @@ import { finalize, Observable, shareReplay, take } from 'rxjs';
         InputTextModule,
         MultiSelectModule,
         ReactiveFormsModule,
+        WithValidationComponent,
     ],
     templateUrl: './repository-issue-new.component.html',
     styleUrl: './repository-issue-new.component.css',

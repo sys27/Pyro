@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { WithValidationComponent } from '@controls/with-validation/with-validation.component';
 import { mapErrorToNull } from '@services/operators';
 import { ProfileService, UpdateProfile } from '@services/profile.service';
 import { ButtonModule } from 'primeng/button';
@@ -8,7 +9,7 @@ import { InputTextModule } from 'primeng/inputtext';
 @Component({
     selector: 'profile',
     standalone: true,
-    imports: [ReactiveFormsModule, ButtonModule, InputTextModule],
+    imports: [ButtonModule, InputTextModule, ReactiveFormsModule, WithValidationComponent],
     templateUrl: './profile.component.html',
     styleUrl: './profile.component.css',
 })
