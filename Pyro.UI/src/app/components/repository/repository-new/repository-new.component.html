@@ -6,33 +6,39 @@
     <h1>New User</h1>
 
     <div class="field">
-      <label for="name">Name:</label>
-      <input
-        id="name"
-        type="text"
-        class="w-full"
-        pInputText
-        formControlName="name" />
+      <with-validation>
+        <label for="name">Name:</label>
+        <input
+          id="name"
+          type="text"
+          class="w-full"
+          pInputText
+          formControlName="name" />
+      </with-validation>
     </div>
 
     <div class="field">
-      <label for="description">Description:</label>
-      <input
-        id="description"
-        type="text"
-        class="w-full"
-        pInputText
-        formControlName="description" />
+      <with-validation>
+        <label for="description">Description:</label>
+        <input
+          id="description"
+          type="text"
+          class="w-full"
+          pInputText
+          formControlName="description" />
+      </with-validation>
     </div>
 
     <div class="field">
-      <label for="defaultBranch">Default Branch:</label>
-      <input
-        id="defaultBranch"
-        type="text"
-        class="w-full"
-        pInputText
-        formControlName="defaultBranch" />
+      <with-validation>
+        <label for="defaultBranch">Default Branch:</label>
+        <input
+          id="defaultBranch"
+          type="text"
+          class="w-full"
+          pInputText
+          formControlName="defaultBranch" />
+      </with-validation>
     </div>
 
     <div class="field">

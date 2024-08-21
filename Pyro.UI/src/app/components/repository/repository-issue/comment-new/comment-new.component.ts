@@ -8,6 +8,7 @@ import { DividerModule } from 'primeng/divider';
 import { InputTextModule } from 'primeng/inputtext';
 import { PanelModule } from 'primeng/panel';
 import { TabViewModule } from 'primeng/tabview';
+import { WithValidationComponent } from '../../../../controls/with-validation/with-validation.component';
 import { MarkdownPipe } from '../../../../pipes/markdown.pipe';
 
 @Component({
@@ -22,6 +23,7 @@ import { MarkdownPipe } from '../../../../pipes/markdown.pipe';
         PanelModule,
         ReactiveFormsModule,
         TabViewModule,
+        WithValidationComponent,
     ],
     templateUrl: './comment-new.component.html',
     styleUrl: './comment-new.component.css',

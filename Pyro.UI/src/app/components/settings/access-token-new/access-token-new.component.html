@@ -4,37 +4,47 @@
     [formGroup]="form"
     (ngSubmit)="onSubmit()">
     <div class="field">
-      <label for="name">Name:</label>
-      <input
-        id="name"
-        type="text"
-        class="w-full"
-        pInputText
-        formControlName="name" />
+      <with-validation>
+        <label for="name">Name:</label>
+        <input
+          id="name"
+          type="text"
+          class="w-full"
+          pInputText
+          formControlName="name" />
+      </with-validation>
     </div>
 
     <div class="field">
-      <label for="expiresAt">Expires At:</label>
-      <p-calendar
-        [minDate]="minDate"
-        [showTime]="true"
-        hourFormat="24"
-        inputId="expiresAt"
-        [showIcon]="true"
-        [showOnFocus]="false"
-        formControlName="expiresAt"
-        styleClass="w-full" />
+      <with-validation>
+        <label for="expiresAt">Expires At:</label>
+        <p-calendar
+          [minDate]="minDate"
+          [showTime]="true"
+          hourFormat="24"
+          inputId="expiresAt"
+          [showIcon]="true"
+          [showOnFocus]="false"
+          formControlName="expiresAt"
+          styleClass="w-full" />
+      </with-validation>
     </div>
 
     @if (isViewMode()) {
       <div class="field">
         <label for="token">Token:</label>
-        <input
-          id="token"
-          type="text"
-          class="w-full"
-          pInputText
-          formControlName="token" />
+        <p-inputGroup class="w-full">
+          <input
+            id="token"
+            type="text"
+            pInputText
+            formControlName="token" />
+          <button
+            pButton
+            type="button"
+            icon="pi pi-copy"
+            (click)="copyToken()"></button>
+        </p-inputGroup>
       </div>
     } @else {
       <div class="field">

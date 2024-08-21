@@ -5,11 +5,18 @@ import { AuthService } from '@services/auth.service';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
+import { WithValidationComponent } from '../../controls/with-validation/with-validation.component';
 
 @Component({
     selector: 'login',
     standalone: true,
-    imports: [ButtonModule, InputTextModule, PasswordModule, ReactiveFormsModule],
+    imports: [
+        ButtonModule,
+        InputTextModule,
+        PasswordModule,
+        ReactiveFormsModule,
+        WithValidationComponent,
+    ],
     templateUrl: './login.component.html',
     styleUrl: './login.component.css',
 })

@@ -6,43 +6,49 @@
     <h1>{{ isEditMode() ? 'Edit Issue' : 'New Issue' }}</h1>
 
     <div class="field">
-      <label for="title">Title:</label>
-      <input
-        id="title"
-        type="text"
-        class="w-full"
-        pInputText
-        formControlName="title" />
+      <with-validation>
+        <label for="title">Title:</label>
+        <input
+          id="title"
+          type="text"
+          class="w-full"
+          pInputText
+          formControlName="title" />
+      </with-validation>
     </div>
 
     <div class="field">
-      <label for="assignee">Assignee:</label>
+      <with-validation>
+        <label for="assignee">Assignee:</label>
 
-      @if (users$ | async; as users) {
-        <p-dropdown
-          id="assignee"
-          formControlName="assigneeId"
-          [options]="users"
-          optionLabel="name"
-          optionValue="id"
-          styleClass="w-full"
-          placeholder="Select User" />
-      }
+        @if (users$ | async; as users) {
+          <p-dropdown
+            id="assignee"
+            formControlName="assigneeId"
+            [options]="users"
+            optionLabel="name"
+            optionValue="id"
+            styleClass="w-full"
+            placeholder="Select User" />
+        }
+      </with-validation>
     </div>
 
     <div class="field">
-      <label>Labels:</label>
+      <with-validation>
+        <label>Labels:</label>
 
-      @if (labels$ | async; as labels) {
-        <p-multiSelect
-          formControlName="labelIds"
-          [options]="labels"
-          optionLabel="name"
-          optionValue="id"
-          styleClass="w-full"
-          placeholder="Select Labels"
-          [filter]="false" />
-      }
+        @if (labels$ | async; as labels) {
+          <p-multiSelect
+            formControlName="labelIds"
+            [options]="labels"
+            optionLabel="name"
+            optionValue="id"
+            styleClass="w-full"
+            placeholder="Select Labels"
+            [filter]="false" />
+        }
+      </with-validation>
     </div>
 
     <div class="field">

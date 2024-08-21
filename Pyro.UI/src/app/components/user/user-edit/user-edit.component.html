@@ -6,33 +6,41 @@
     <h1>Edit User</h1>
 
     <div class="field">
-      <label for="login">Login:</label>
-      <input
-        id="login"
-        type="text"
-        class="w-full"
-        pInputText
-        formControlName="login" />
+      <with-validation>
+        <label for="login">Login:</label>
+        <input
+          id="login"
+          type="text"
+          class="w-full"
+          pInputText
+          formControlName="login" />
+      </with-validation>
     </div>
 
     <div class="field">
-      <label for="roles">Roles:</label>
-      <p-multiSelect
-        id="roles"
-        formControlName="roles"
-        styleClass="w-full"
-        [options]="roles"
-        optionLabel="name"
-        placeholder="Select Roles"
-        [filter]="false" />
+      <with-validation>
+        <label for="roles">Roles:</label>
+        @if (roles$ | async; as roles) {
+          <p-multiSelect
+            id="roles"
+            formControlName="roles"
+            styleClass="w-full"
+            [options]="roles"
+            optionLabel="name"
+            placeholder="Select Roles"
+            [filter]="false" />
+        }
+      </with-validation>
     </div>
 
     <div class="field">
-      <p-checkbox
-        inputId="isLocked"
-        formControlName="isLocked"
-        [binary]="true"
-        label="Is Locked" />
+      <with-validation>
+        <p-checkbox
+          inputId="isLocked"
+          formControlName="isLocked"
+          [binary]="true"
+          label="Is Locked" />
+      </with-validation>
     </div>
 
     <!-- TODO: permissions -->
