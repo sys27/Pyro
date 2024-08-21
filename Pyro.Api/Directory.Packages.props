@@ -28,7 +28,7 @@
     <PackageVersion Include="NSubstitute.Analyzers.CSharp" Version="1.0.17" />
     <PackageVersion Include="NUnit" Version="4.1.0" />
     <PackageVersion Include="NUnit.Analyzers" Version="4.3.0" />
-    <PackageVersion Include="NUnit3TestAdapter" Version="4.5.0" />
+    <PackageVersion Include="NUnit3TestAdapter" Version="4.6.0" />
     <PackageVersion Include="Riok.Mapperly" Version="3.6.0" />
     <PackageVersion Include="StyleCop.Analyzers" Version="1.2.0-beta.556" />
     <PackageVersion Include="Testcontainers" Version="3.9.0" />
