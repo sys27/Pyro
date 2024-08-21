@@ -7,11 +7,12 @@
 
   <ItemGroup>
     <PackageReference Include="LibGit2Sharp" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Pyro.Domain\Pyro.Domain.csproj"/>
+    <ProjectReference Include="..\Pyro.Domain\Pyro.Domain.csproj" />
     <ProjectReference Include="..\Pyro.Infrastructure.Shared\Pyro.Infrastructure.Shared.csproj" />
   </ItemGroup>
 
