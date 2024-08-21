@@ -9,14 +9,15 @@
   <ItemGroup>
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
     <PackageReference Include="Hellang.Middleware.ProblemDetails" />
+    <PackageReference Include="JWT" />
     <PackageReference Include="JWT.Extensions.AspNetCore" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" />
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi"/>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Riok.Mapperly" ExcludeAssets="runtime" PrivateAssets="all"/>
+    <PackageReference Include="Riok.Mapperly" ExcludeAssets="runtime" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,7 +25,7 @@
     <ProjectReference Include="..\Pyro.Infrastructure.Issues\Pyro.Infrastructure.Issues.csproj" />
     <ProjectReference Include="..\Pyro.Infrastructure.Shared\Pyro.Infrastructure.Shared.csproj" />
     <ProjectReference Include="..\Pyro.Infrastructure.Identity\Pyro.Infrastructure.Identity.csproj" />
-    <ProjectReference Include="..\Pyro.Infrastructure\Pyro.Infrastructure.csproj"/>
+    <ProjectReference Include="..\Pyro.Infrastructure\Pyro.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
