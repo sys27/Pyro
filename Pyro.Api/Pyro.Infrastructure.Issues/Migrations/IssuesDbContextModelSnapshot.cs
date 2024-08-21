@@ -15,7 +15,7 @@ namespace Pyro.Infrastructure.Issues.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "8.0.6");
+            modelBuilder.HasAnnotation("ProductVersion", "8.0.8");
 
             modelBuilder.Entity("Pyro.Domain.Issues.GitRepository", b =>
                 {
@@ -61,6 +61,9 @@ namespace Pyro.Infrastructure.Issues.Migrations
                     b.Property<Guid>("RepositoryId")
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid>("StatusId")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -72,6 +75,8 @@ namespace Pyro.Infrastructure.Issues.Migrations
                     b.HasIndex("AssigneeId");
 
                     b.HasIndex("AuthorId");
+
+                    b.HasIndex("StatusId");
 
                     b.HasIndex("RepositoryId", "IssueNumber")
                         .IsUnique()
@@ -107,6 +112,57 @@ namespace Pyro.Infrastructure.Issues.Migrations
                     b.HasIndex("IssueId");
 
                     b.ToTable("IssueComments", (string)null);
+                });
+
+            modelBuilder.Entity("Pyro.Domain.Issues.IssueStatus", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Color")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("RepositoryId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id")
+                        .HasName("PK_IssueStatuses");
+
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasDatabaseName("IX_IssueStatuses_Name");
+
+                    b.HasIndex("RepositoryId");
+
+                    b.ToTable("IssueStatuses", (string)null);
+                });
+
+            modelBuilder.Entity("Pyro.Domain.Issues.IssueStatusTransition", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("FromId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ToId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id")
+                        .HasName("PK_IssueStatusTranslations");
+
+                    b.HasIndex("ToId");
+
+                    b.HasIndex("FromId", "ToId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_IssueStatusTranslations_FromId_ToId");
+
+                    b.ToTable("IssueStatusTransitions", (string)null);
                 });
 
             modelBuilder.Entity("Pyro.Domain.Issues.Label", b =>
@@ -205,17 +261,24 @@ namespace Pyro.Infrastructure.Issues.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Pyro.Domain.Issues.GitRepository", "Repository")
+                    b.HasOne("Pyro.Domain.Issues.GitRepository", null)
                         .WithMany()
                         .HasForeignKey("RepositoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Pyro.Domain.Issues.IssueStatus", "Status")
+                        .WithMany()
+                        .HasForeignKey("StatusId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired()
+                        .HasConstraintName("FK_Issue_Status");
+
                     b.Navigation("Assignee");
 
                     b.Navigation("Author");
 
-                    b.Navigation("Repository");
+                    b.Navigation("Status");
                 });
 
             modelBuilder.Entity("Pyro.Domain.Issues.IssueComment", b =>
@@ -235,6 +298,36 @@ namespace Pyro.Infrastructure.Issues.Migrations
                     b.Navigation("Author");
 
                     b.Navigation("Issue");
+                });
+
+            modelBuilder.Entity("Pyro.Domain.Issues.IssueStatus", b =>
+                {
+                    b.HasOne("Pyro.Domain.Issues.GitRepository", "Repository")
+                        .WithMany("IssueStatuses")
+                        .HasForeignKey("RepositoryId")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
+
+                    b.Navigation("Repository");
+                });
+
+            modelBuilder.Entity("Pyro.Domain.Issues.IssueStatusTransition", b =>
+                {
+                    b.HasOne("Pyro.Domain.Issues.IssueStatus", "From")
+                        .WithMany("FromTransitions")
+                        .HasForeignKey("FromId")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
+
+                    b.HasOne("Pyro.Domain.Issues.IssueStatus", "To")
+                        .WithMany("ToTransitions")
+                        .HasForeignKey("ToId")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
+
+                    b.Navigation("From");
+
+                    b.Navigation("To");
                 });
 
             modelBuilder.Entity("Pyro.Domain.Issues.Label", b =>
@@ -277,12 +370,21 @@ namespace Pyro.Infrastructure.Issues.Migrations
 
             modelBuilder.Entity("Pyro.Domain.Issues.GitRepository", b =>
                 {
+                    b.Navigation("IssueStatuses");
+
                     b.Navigation("Labels");
                 });
 
             modelBuilder.Entity("Pyro.Domain.Issues.Issue", b =>
                 {
                     b.Navigation("Comments");
+                });
+
+            modelBuilder.Entity("Pyro.Domain.Issues.IssueStatus", b =>
+                {
+                    b.Navigation("FromTransitions");
+
+                    b.Navigation("ToTransitions");
                 });
 #pragma warning restore 612, 618
         }

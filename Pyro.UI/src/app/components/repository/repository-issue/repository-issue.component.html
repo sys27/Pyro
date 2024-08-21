@@ -39,6 +39,21 @@
       </div>
       <div class="col-2">
         <div>
+          <div>Status:</div>
+          <div>
+            <p-tag
+              [value]="issue.status.name"
+              [rounded]="true"
+              [style]="{
+                background: issue.status.color | color,
+                color: issue.status.color | luminance,
+              }" />
+          </div>
+        </div>
+
+        <p-divider />
+
+        <div>
           <div>Assignee:</div>
           <div class="flex flex-row gap-2">
             <span class="pi pi-user"></span>
@@ -72,7 +87,9 @@
               <p-tag
                 [value]="label.name"
                 [rounded]="true"
-                [style]="{ background: label.color | color }" />
+                [style]="{ background: label.color | color, color: label.color | luminance }" />
+            } @empty {
+              <span>No Labels</span>
             }
           </div>
         </div>

@@ -12,16 +12,24 @@ public class IssueCommentTests
         var createdAt = DateTimeOffset.Now;
         var user = new User(Guid.NewGuid(), "user");
 
+        var gitRepository = new GitRepository
+        {
+            Id = Guid.NewGuid(),
+            Name = "test",
+        };
         var issue = new Issue
         {
             Id = Guid.NewGuid(),
             IssueNumber = 1,
             Title = "title",
-            Repository = new GitRepository
+            Status = new IssueStatus
             {
                 Id = Guid.NewGuid(),
-                Name = "test",
+                Name = "status",
+                Color = 0,
+                Repository = gitRepository,
             },
+            RepositoryId = gitRepository.Id,
             Author = user,
             CreatedAt = DateTimeOffset.Now,
         };
@@ -43,16 +51,24 @@ public class IssueCommentTests
     {
         var user = new User(Guid.NewGuid(), "user");
 
+        var gitRepository = new GitRepository
+        {
+            Id = Guid.NewGuid(),
+            Name = "test",
+        };
         var issue = new Issue
         {
             Id = Guid.NewGuid(),
             IssueNumber = 1,
             Title = "title",
-            Repository = new GitRepository
+            Status = new IssueStatus
             {
                 Id = Guid.NewGuid(),
-                Name = "test",
+                Name = "status",
+                Color = 0,
+                Repository = gitRepository,
             },
+            RepositoryId = gitRepository.Id,
             Author = user,
             CreatedAt = DateTimeOffset.Now,
         };

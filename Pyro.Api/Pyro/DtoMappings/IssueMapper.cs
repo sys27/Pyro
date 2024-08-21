@@ -13,7 +13,7 @@ namespace Pyro.DtoMappings;
 [Mapper]
 public static partial class IssueMapper
 {
-    [MapperIgnoreSource(nameof(Issue.Repository))]
+    [MapperIgnoreSource(nameof(Issue.RepositoryId))]
     [MapperIgnoreSource(nameof(Issue.Comments))]
     public static partial IssueResponse ToResponse(this Issue gitRepository);
 
@@ -42,4 +42,16 @@ public static partial class IssueMapper
     }
 
     public static partial LabelResponse ToResponse(this Label request);
+
+    [MapperIgnoreSource(nameof(IssueStatus.Repository))]
+    [MapperIgnoreSource(nameof(IssueStatus.FromTransitions))]
+    [MapperIgnoreSource(nameof(IssueStatus.ToTransitions))]
+    public static partial IssueStatusResponse ToResponse(this IssueStatus request);
+
+    public static partial IReadOnlyList<IssueStatusResponse> ToResponse(this IReadOnlyList<IssueStatus> request);
+
+    public static partial IssueStatusTransitionResponse ToResponse(this IssueStatusTransition request);
+
+    public static partial IReadOnlyList<IssueStatusTransitionResponse> ToResponse(
+        this IReadOnlyList<IssueStatusTransition> request);
 }

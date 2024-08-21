@@ -3,4 +3,4 @@
 
 namespace Pyro.Contracts.Requests.Issues;
 
-public record UpdateIssueRequest(string Title, Guid? AssigneeId, IReadOnlyList<Guid> Labels);
+public record UpdateIssueRequest(string Title, Guid? AssigneeId, Guid StatusId, IReadOnlyList<Guid> Labels);

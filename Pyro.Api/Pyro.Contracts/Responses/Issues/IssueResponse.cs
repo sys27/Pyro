@@ -7,6 +7,7 @@ public record IssueResponse(
     Guid Id,
     int IssueNumber,
     string Title,
+    IssueStatusResponse Status,
     UserResponse Author,
     DateTimeOffset CreatedAt,
     UserResponse? Assignee,

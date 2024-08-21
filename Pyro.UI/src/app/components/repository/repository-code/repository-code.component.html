@@ -15,7 +15,26 @@
         <div class="p-toolbar-group-end">
           <p-button
             label="Clone"
-            severity="success" />
+            icon="pi pi-clone"
+            severity="success"
+            (onClick)="cloneDialog.toggle($event)" />
+          <p-overlayPanel #cloneDialog>
+            <div class="flex flex-column gap-2 w-25rem">
+              <span>Clone with HTTP/HTTPS</span>
+              <p-inputGroup>
+                <input
+                  pInputText
+                  [value]="cloneUrl()"
+                  readonly />
+                <button
+                  pButton
+                  type="button"
+                  (click)="copyCloneUrl()">
+                  <span class="pi pi-copy"></span>
+                </button>
+              </p-inputGroup>
+            </div>
+          </p-overlayPanel>
         </div>
       </p-toolbar>
 

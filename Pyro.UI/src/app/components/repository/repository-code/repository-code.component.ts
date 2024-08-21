@@ -1,5 +1,5 @@
 import { AsyncPipe, DatePipe, SlicePipe } from '@angular/common';
-import { Component, input, OnDestroy, OnInit } from '@angular/core';
+import { Component, computed, input, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MarkdownService } from '@services/markdown.service';
@@ -8,6 +8,9 @@ import { BranchItem, Repository, RepositoryService, TreeView } from '@services/r
 import { ButtonModule } from 'primeng/button';
 import { DeferModule } from 'primeng/defer';
 import { DropdownModule } from 'primeng/dropdown';
+import { InputGroupModule } from 'primeng/inputgroup';
+import { InputTextModule } from 'primeng/inputtext';
+import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { SkeletonModule } from 'primeng/skeleton';
 import { TableModule } from 'primeng/table';
 import { TabViewModule } from 'primeng/tabview';
@@ -38,6 +41,9 @@ import {
         DeferModule,
         DropdownModule,
         FormsModule,
+        InputGroupModule,
+        InputTextModule,
+        OverlayPanelModule,
         RouterModule,
         SkeletonModule,
         SlicePipe,
@@ -50,6 +56,11 @@ import {
 })
 export class RepositoryCodeComponent implements OnInit, OnDestroy {
     public readonly repositoryName = input.required<string>();
+    public readonly cloneUrl = computed(() => {
+        let localUrl = window.location.origin;
+
+        return `${localUrl}/${this.repositoryName()}.git`;
+    });
     public branchOrPath$: Observable<string[]> | undefined;
     public repository$: Observable<Repository | null> | undefined;
     public readonly selectedBranch$ = new BehaviorSubject<BranchItem | undefined>(undefined);
@@ -185,5 +196,9 @@ export class RepositoryCodeComponent implements OnInit, OnDestroy {
             switchMap(content => this.markdownService.parse(content ?? '')),
             shareReplay(1),
         );
+    }
+
+    public copyCloneUrl(): void {
+        navigator.clipboard.writeText(this.cloneUrl());
     }
 }

@@ -34,16 +34,24 @@ public class UpdateIssueCommentHandlerTests
         const int issueNumber = 1;
         var currentUser = new CurrentUser(Guid.NewGuid(), "User", [], []);
         var author = new User(currentUser.Id, currentUser.Login);
+        var gitRepository = new GitRepository
+        {
+            Id = Guid.NewGuid(),
+            Name = "test",
+        };
         var issue = new Issue
         {
             Id = Guid.NewGuid(),
             IssueNumber = issueNumber,
             Title = "title",
-            Repository = new GitRepository
+            Status = new IssueStatus
             {
                 Id = Guid.NewGuid(),
-                Name = "test",
+                Name = "Open",
+                Color = 0,
+                Repository = gitRepository,
             },
+            RepositoryId = gitRepository.Id,
             Author = author,
             CreatedAt = DateTimeOffset.Now,
         };
@@ -68,16 +76,24 @@ public class UpdateIssueCommentHandlerTests
         const int issueNumber = 1;
         var currentUser = new CurrentUser(Guid.NewGuid(), "User", [], []);
         var author = new User(currentUser.Id, currentUser.Login);
+        var gitRepository = new GitRepository
+        {
+            Id = Guid.NewGuid(),
+            Name = "test",
+        };
         var issue = new Issue
         {
             Id = Guid.NewGuid(),
             IssueNumber = issueNumber,
             Title = "title",
-            Repository = new GitRepository
+            Status = new IssueStatus
             {
                 Id = Guid.NewGuid(),
-                Name = "test",
+                Name = "Open",
+                Color = 0,
+                Repository = gitRepository,
             },
+            RepositoryId = gitRepository.Id,
             Author = author,
             CreatedAt = DateTimeOffset.Now,
         };
@@ -105,16 +121,24 @@ public class UpdateIssueCommentHandlerTests
         const int issueNumber = 1;
         var currentUser = new CurrentUser(Guid.NewGuid(), "User", [], []);
         var author = new User(currentUser.Id, currentUser.Login);
+        var gitRepository = new GitRepository
+        {
+            Id = Guid.NewGuid(),
+            Name = "test",
+        };
         var issue = new Issue
         {
             Id = Guid.NewGuid(),
             IssueNumber = issueNumber,
             Title = "title",
-            Repository = new GitRepository
+            Status = new IssueStatus
             {
                 Id = Guid.NewGuid(),
-                Name = "test",
+                Name = "Open",
+                Color = 0,
+                Repository = gitRepository,
             },
+            RepositoryId = gitRepository.Id,
             Author = author,
             CreatedAt = DateTimeOffset.Now,
         };

@@ -2,6 +2,7 @@ import { AsyncPipe, DatePipe } from '@angular/common';
 import { Component, input, OnDestroy, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { ColorPipe } from '@pipes/color.pipe';
+import { LuminanceColorPipe } from '@pipes/luminance-color.pipe';
 import { AuthService } from '@services/auth.service';
 import { Comment, Issue, IssueService } from '@services/issue.service';
 import { mapErrorToEmpty, mapErrorToNull } from '@services/operators';
@@ -32,6 +33,7 @@ import { CommentViewComponent } from './comment-view/comment-view.component';
         CommentViewComponent,
         DatePipe,
         DividerModule,
+        LuminanceColorPipe,
         MarkdownPipe,
         RouterModule,
         TagModule,

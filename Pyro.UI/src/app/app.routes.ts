@@ -10,12 +10,18 @@ import {
     RepositoryComponent,
     RepositoryFileComponent,
     RepositoryIssueComponent,
+    RepositoryIssueEditComponent,
     RepositoryIssueNewComponent,
     RepositoryIssuesComponent,
     RepositoryListComponent,
     RepositoryNewComponent,
     RepositoryPullRequqestsComponent,
     RepositorySettingsComponent,
+    StatusEditComponent,
+    StatusListComponent,
+    StatusNewComponent,
+    StatusTransitionNewComponent,
+    StatusTransitionViewComponent,
 } from './components/repository';
 import {
     AccessTokenListComponent,
@@ -61,7 +67,7 @@ export const routes: Routes = [
             },
             {
                 path: 'issues/:issueNumber/edit',
-                component: RepositoryIssueNewComponent,
+                component: RepositoryIssueEditComponent,
                 canActivate: [authGuard],
             },
             {
@@ -86,6 +92,34 @@ export const routes: Routes = [
                         canActivate: [authGuard],
                     },
                     { path: 'labels', component: LabelListComponent, canActivate: [authGuard] },
+
+                    {
+                        path: 'statuses/transitions/new',
+                        component: StatusTransitionNewComponent,
+                        canActivate: [authGuard],
+                    },
+                    {
+                        path: 'statuses/transitions',
+                        component: StatusTransitionViewComponent,
+                        canActivate: [authGuard],
+                    },
+
+                    {
+                        path: 'statuses/new',
+                        component: StatusNewComponent,
+                        canActivate: [authGuard],
+                    },
+                    {
+                        path: 'statuses/:statusId',
+                        component: StatusEditComponent,
+                        canActivate: [authGuard],
+                    },
+                    {
+                        path: 'statuses',
+                        component: StatusListComponent,
+                        canActivate: [authGuard],
+                    },
+
                     { path: '', redirectTo: 'labels', pathMatch: 'full' },
                 ],
             },

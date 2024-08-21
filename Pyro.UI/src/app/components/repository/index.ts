@@ -1,5 +1,6 @@
 export { RepositoryCodeComponent } from './repository-code/repository-code.component';
 export { RepositoryFileComponent } from './repository-file/repository-file.component';
+export { RepositoryIssueEditComponent } from './repository-issue-edit/repository-issue-edit.component';
 export { RepositoryIssueNewComponent } from './repository-issue-new/repository-issue-new.component';
 export { RepositoryIssueComponent } from './repository-issue/repository-issue.component';
 export { RepositoryIssuesComponent } from './repository-issues/repository-issues.component';
@@ -10,4 +11,9 @@ export { LabelEditComponent } from './repository-settings/label-edit/label-edit.
 export { LabelListComponent } from './repository-settings/label-list/label-list.component';
 export { LabelNewComponent } from './repository-settings/label-new/label-new.component';
 export { RepositorySettingsComponent } from './repository-settings/repository-settings.component';
+export { StatusEditComponent } from './repository-settings/status-edit/status-edit.component';
+export { StatusNewComponent } from './repository-settings/status-new/status-new.component';
+export { StatusTransitionNewComponent } from './repository-settings/status-transition-new/status-transition-new.component';
+export { StatusTransitionViewComponent } from './repository-settings/status-transition-view/status-transition-view.component';
+export { StatusListComponent } from './repository-settings/status-view/status-view.component';
 export { RepositoryComponent } from './repository.component';

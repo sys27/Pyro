@@ -1,9 +1,10 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Color } from '@models/color';
 import { catchError, Observable, of } from 'rxjs';
 import { Endpoints } from '../endpoints';
 import { PyroResponse, ResponseError } from '../models/response';
+import { IssueStatus } from './issue-status.service';
+import { Label } from './label.service';
 
 @Injectable({ providedIn: 'root' })
 export class IssueService {
@@ -49,6 +50,7 @@ export class IssueService {
             title: issue.title,
             assigneeId: issue.assigneeId,
             labels: issue.labels,
+            statusId: issue.statusId,
         };
 
         return this.httpClient.post<void>(Endpoints.Issues(repositoryName), request);
@@ -63,6 +65,7 @@ export class IssueService {
             title: issue.title,
             assigneeId: issue.assigneeId,
             labels: issue.labels,
+            statusId: issue.statusId,
         };
 
         return this.httpClient.put<void>(
@@ -116,12 +119,7 @@ export interface Issue {
     createdAt: Date;
     assignee: User | null;
     labels: Label[];
-}
-
-export interface Label {
-    id: string;
-    name: string;
-    color: Color;
+    status: IssueStatus;
 }
 
 export interface Comment {
@@ -139,14 +137,15 @@ export interface User {
 export interface CreateIssue {
     title: string;
     assigneeId: string | null;
-
     labels: string[];
+    statusId: string;
 }
 
 export interface UpdateIssue {
     title: string;
     assigneeId: string | null;
     labels: string[];
+    statusId: string;
 }
 
 export interface CreateIssueComment {

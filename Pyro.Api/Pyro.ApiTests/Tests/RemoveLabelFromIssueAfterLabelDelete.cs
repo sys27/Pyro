@@ -25,7 +25,7 @@ public class RemoveLabelFromIssueAfterLabelDelete
         await issueClient.Login();
 
         var createRequest = new CreateGitRepositoryRequest(
-            faker.Lorem.Word(),
+            faker.Random.Hash(),
             faker.Lorem.Sentence(),
             "master");
         var repository = await pyroClient.CreateGitRepository(createRequest) ??
@@ -34,16 +34,23 @@ public class RemoveLabelFromIssueAfterLabelDelete
         repositoryName = repository.Name;
 
         var createLabelRequest = new CreateLabelRequest(
-            faker.Lorem.Word(),
+            faker.Random.Hash(),
             ColorRequest.FromHex(faker.Internet.Color()));
         var label = await pyroClient.CreateLabel(repository.Name, createLabelRequest) ??
                     throw new Exception("Label not created");
 
         labelId = label.Id;
 
+        var createIssueStatusRequest = new CreateIssueStatusRequest(
+            faker.Random.Hash(),
+            ColorRequest.FromHex(faker.Internet.Color()));
+        var status = await issueClient.CreateIssueStatus(repository.Name, createIssueStatusRequest) ??
+                     throw new Exception("Status not created");
+
         var createIssueRequest = new CreateIssueRequest(
-            faker.Lorem.Word(),
+            faker.Random.Hash(),
             null,
+            status.Id,
             [labelId]);
         var issue = await issueClient.CreateIssue(repository.Name, createIssueRequest) ??
                     throw new Exception("Issue not created");

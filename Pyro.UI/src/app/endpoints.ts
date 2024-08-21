@@ -18,4 +18,12 @@ export class Endpoints {
     public static Labels(repositoryName: string): string {
         return `/api/repositories/${repositoryName}/labels`;
     }
+
+    public static Statuses(repositoryName: string): string {
+        return `/api/repositories/${repositoryName}/issues/statuses`;
+    }
+
+    public static StatusTransitions(repositoryName: string): string {
+        return `/api/repositories/${repositoryName}/issues/statuses/transitions`;
+    }
 }

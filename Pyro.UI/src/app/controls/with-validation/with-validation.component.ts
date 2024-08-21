@@ -23,6 +23,7 @@ export class WithValidationComponent implements AfterContentInit, OnDestroy {
         ['maxlength', (error: LengthError) => `Maximum length is ${error.requiredLength}`],
         ['pattern', _ => 'Invalid format'],
         ['email', _ => 'Invalid email'],
+        ['notUnique', _ => 'This value is not unique'],
     ]);
 
     public ngAfterContentInit(): void {

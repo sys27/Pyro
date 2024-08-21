@@ -1,61 +1,68 @@
 <p-toast />
-<p-toolbar styleClass="toolbar">
-  <div class="p-toolbar-group-start gap-2">
-    <p-button
-      styleClass="text-2xl"
-      label="Pyro"
-      icon="pi pi-server"
-      routerLink="/"
-      text="true"
-      severity="warning" />
-    <p-buttonGroup>
-      <p-button
-        label="Repositories"
-        routerLink="/repositories"
-        outlined="true" />
-      <p-button
-        icon="pi pi-plus"
-        routerLink="/repositories/new"
-        outlined="true" />
-    </p-buttonGroup>
-    <p-buttonGroup>
-      <p-button
-        label="Users"
-        routerLink="/users"
-        outlined="true" />
-      <p-button
-        icon="pi pi-plus"
-        routerLink="/users/new"
-        outlined="true" />
-    </p-buttonGroup>
+<div class="h-full flex flex-column">
+  <div class="flex-shrink-0">
+    <p-toolbar styleClass="toolbar">
+      <div class="p-toolbar-group-start gap-2">
+        <p-button
+          styleClass="text-2xl"
+          label="Pyro"
+          icon="pi pi-server"
+          routerLink="/"
+          text="true"
+          severity="warning" />
+        <p-buttonGroup>
+          <p-button
+            label="Repositories"
+            routerLink="/repositories"
+            outlined="true" />
+          <p-button
+            icon="pi pi-plus"
+            routerLink="/repositories/new"
+            outlined="true" />
+        </p-buttonGroup>
+        <p-buttonGroup>
+          <p-button
+            label="Users"
+            routerLink="/users"
+            outlined="true" />
+          <p-button
+            icon="pi pi-plus"
+            routerLink="/users/new"
+            outlined="true" />
+        </p-buttonGroup>
+      </div>
+
+      <div class="p-toolbar-group-end gap-2">
+        <p-iconField iconPosition="left">
+          <p-inputIcon styleClass="pi pi-search" />
+          <input
+            type="text"
+            pInputText
+            placeholder="Search" />
+        </p-iconField>
+
+        <p-button
+          [icon]="themeIcon()"
+          [outlined]="true"
+          (onClick)="toggleThemeClick()" />
+
+        @if (authService.currentUser | async) {
+          <p-splitButton
+            icon="pi pi-user"
+            [outlined]="true"
+            [model]="loginMenuItems"
+            (onClick)="profileOnClick()" />
+        } @else {
+          <p-button
+            icon="pi pi-sign-in"
+            routerLink="/login"
+            [outlined]="true" />
+        }
+      </div>
+    </p-toolbar>
   </div>
 
-  <div class="p-toolbar-group-end gap-2">
-    <p-iconField iconPosition="left">
-      <p-inputIcon styleClass="pi pi-search" />
-      <input
-        type="text"
-        pInputText
-        placeholder="Search" />
-    </p-iconField>
-
-    <p-button
-      [icon]="themeIcon()"
-      [outlined]="true"
-      (onClick)="toggleThemeClick()" />
-
-    @if (authService.currentUser | async) {
-      <p-splitButton
-        icon="pi pi-user"
-        [outlined]="true"
-        [model]="loginMenuItems"
-        (onClick)="profileOnClick()" />
-    } @else {
-      <p-button
-        icon="pi pi-sign-in"
-        routerLink="/login"
-        [outlined]="true" />
-    }
+  <div class="flex-grow-1">
+    <router-outlet></router-outlet>
   </div>
-</p-toolbar>
-<router-outlet></router-outlet>
+</div>

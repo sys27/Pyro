@@ -43,4 +43,35 @@ internal class IssueClient : BaseClient
 
     public async Task DeleteComment(string repositoryName, int number, Guid commentId)
         => await Delete($"/api/repositories/{repositoryName}/issues/{number}/comments/{commentId}");
+
+    public async Task<IReadOnlyList<IssueStatusResponse>?> GetIssueStatuses(string repositoryName)
+        => await Get<IReadOnlyList<IssueStatusResponse>>($"/api/repositories/{repositoryName}/issues/statuses");
+
+    public async Task<IssueStatusResponse?> GetIssueStatus(string repositoryName, Guid id)
+        => await Get<IssueStatusResponse>($"/api/repositories/{repositoryName}/issues/statuses/{id}");
+
+    public async Task<IssueStatusResponse?> CreateIssueStatus(
+        string repositoryName,
+        CreateIssueStatusRequest request)
+        => await Post<IssueStatusResponse>($"/api/repositories/{repositoryName}/issues/statuses", request);
+
+    public async Task<IssueStatusResponse?> UpdateIssueStatus(
+        string repositoryName,
+        Guid id,
+        UpdateIssueStatusRequest request)
+        => await Put<IssueStatusResponse>($"/api/repositories/{repositoryName}/issues/statuses/{id}", request);
+
+    public async Task DeleteIssueStatus(string repositoryName, Guid id)
+        => await Delete($"/api/repositories/{repositoryName}/issues/statuses/{id}");
+
+    public async Task<IReadOnlyList<IssueStatusTransitionResponse>?> GetIssueStatusTransitions(string repositoryName)
+        => await Get<IReadOnlyList<IssueStatusTransitionResponse>>($"/api/repositories/{repositoryName}/issues/statuses/transitions");
+
+    public async Task<IssueStatusTransitionResponse?> CreateIssueStatusTransition(
+        string repositoryName,
+        CreateIssueStatusTransitionRequest request)
+        => await Post<IssueStatusTransitionResponse>($"/api/repositories/{repositoryName}/issues/statuses/transitions", request);
+
+    public async Task DeleteIssueStatusTransition(string repositoryName, Guid id)
+        => await Delete($"/api/repositories/{repositoryName}/issues/statuses/transitions/{id}");
 }
