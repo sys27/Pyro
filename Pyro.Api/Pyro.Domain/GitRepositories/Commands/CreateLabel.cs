@@ -22,7 +22,6 @@ public class CreateLabelValidator : AbstractValidator<CreateLabel>
             .MaximumLength(50);
 
         RuleFor(x => x.Color)
-            .NotEmpty()
             .InclusiveBetween(0, 0xFFFFFF);
     }
 }
