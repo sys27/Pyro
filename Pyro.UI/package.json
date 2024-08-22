@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^18.2.1",
-    "@angular/cli": "^18.2.0",
+    "@angular/cli": "^18.2.1",
     "@angular/compiler-cli": "^18.2.0",
     "@types/dompurify": "^3.0.5",
     "autoprefixer": "^10.4.20",
