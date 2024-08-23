@@ -35,6 +35,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.Configure<JsonSerializerOptions>(options =>
     options.TypeInfoResolver = PyroJsonContext.Default);
 builder.Services.AddProblemDetails(builder.Environment);
+builder.Services.AddHealthChecks();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton(TimeProvider.System);
@@ -91,6 +92,8 @@ if (!app.Environment.IsDevelopment())
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapHealthChecks("/health");
 
 app.MapGroup("/api")
     .RequireAuthorization()
