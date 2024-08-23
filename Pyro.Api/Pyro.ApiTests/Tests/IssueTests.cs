@@ -60,7 +60,7 @@ public class IssueTests
         for (var i = 0; i < 3; i++)
         {
             var createLabelRequest = new CreateLabelRequest(
-                faker.Lorem.Word(),
+                faker.Random.Hash(),
                 ColorRequest.FromHex(faker.Internet.Color()));
             _ = await pyroClient.CreateLabel(repository.Name, createLabelRequest) ??
                 throw new Exception("Label not created");

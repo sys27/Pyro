@@ -24,7 +24,7 @@ public class Api
             .WithImage(imageId)
             .WithName("pyro")
             .WithPortBinding(hostPort, containerPort)
-            .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(containerPort))
+            .WithWaitStrategy(Wait.ForUnixContainer().UntilContainerIsHealthy())
             .Build();
 
         await container.StartAsync();

@@ -48,6 +48,7 @@ RUN npm run build
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0.8-alpine3.20 AS final
 EXPOSE 80
+HEALTHCHECK --interval=5s --timeout=5s CMD wget http://localhost/health -q -O - > /dev/null 2>&1
 
 ENV ASPNETCORE_ENVIRONMENT="Production"
 ENV ASPNETCORE_ConnectionStrings__DefaultConnection="Data Source=/data/pyro.db"
