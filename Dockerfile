@@ -39,7 +39,7 @@ RUN dotnet publish "Pyro/Pyro.csproj" \
     --nologo --no-restore --no-build -c $BUILD_CONFIGURATION \
     -o /app/publish /p:UseAppHost=false
 
-FROM --platform=$BUILDPLATFORM node:22.7.0-alpine AS node
+FROM --platform=$BUILDPLATFORM node:22.8.0-alpine AS node
 WORKDIR /src
 COPY ["Pyro.UI/package.json", "Pyro.UI/package-lock.json", "./"]
 RUN npm ci
