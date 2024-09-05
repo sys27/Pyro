@@ -39,7 +39,14 @@ export class AppComponent implements OnInit, OnDestroy {
     public themeIcon = signal('pi pi-sun');
     public loginMenuItems: MenuItem[] = [
         { label: 'Settings', icon: 'pi pi-cog' },
-        { label: 'Logout', icon: 'pi pi-sign-out' },
+        {
+            label: 'Logout',
+            icon: 'pi pi-sign-out',
+            command: () => {
+                this.authService.logout();
+                this.router.navigate(['login']);
+            },
+        },
     ];
 
     public constructor(

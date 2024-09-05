@@ -7,6 +7,7 @@ using Pyro.Contracts.Requests;
 using Pyro.Contracts.Requests.Identity;
 using Pyro.Contracts.Responses.Identity;
 using Pyro.Domain.Identity.Commands;
+using Pyro.Domain.Identity.Models;
 using Pyro.Domain.Identity.Queries;
 using Pyro.DtoMappings;
 using Pyro.Infrastructure.Shared.DataAccess;
@@ -38,6 +39,7 @@ internal static class IdentityEndpoints
 
                 return Results.Ok(result);
             })
+            .RequirePermission(Permission.UserView)
             .Produces<IReadOnlyList<UserResponse>>()
             .Produces(401)
             .Produces(403)
@@ -58,6 +60,7 @@ internal static class IdentityEndpoints
                     ? Results.Ok(result)
                     : Results.NotFound();
             })
+            .RequirePermission(Permission.UserView)
             .Produces<UserResponse>()
             .Produces(404)
             .ProducesProblem(500)
@@ -76,6 +79,7 @@ internal static class IdentityEndpoints
 
                 return Results.Created($"/api/users/{request.Login}", null);
             })
+            .RequirePermission(Permission.UserEdit)
             .Produces(201)
             .ProducesValidationProblem()
             .Produces(401)
@@ -101,6 +105,7 @@ internal static class IdentityEndpoints
 
                 return Results.Ok(user.ToResponse());
             })
+            .RequirePermission(Permission.UserEdit)
             .Produces<UserResponse>()
             .ProducesValidationProblem()
             .Produces(401)

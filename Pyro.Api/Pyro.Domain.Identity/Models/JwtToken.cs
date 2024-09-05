@@ -22,7 +22,9 @@ public class JwtToken
     [JsonPropertyName("login")]
     public required string Login { get; init; }
 
+    [JsonPropertyName("roles")]
     public IEnumerable<string>? Roles { get; init; }
 
+    [JsonPropertyName("permissions")]
     public IEnumerable<string>? Permissions { get; init; }
 }

@@ -8,6 +8,10 @@ export class CurrentUser {
         private readonly _permissions: string[],
     ) {}
 
+    public hasPermission(permission: string): boolean {
+        return this._permissions.includes(permission);
+    }
+
     public get accessToken(): string {
         return this._accessToken;
     }
@@ -22,5 +26,13 @@ export class CurrentUser {
 
     public get login(): string {
         return this._login;
+    }
+
+    public get roles(): string[] {
+        return this._roles;
+    }
+
+    public get permissions(): string[] {
+        return this._permissions;
     }
 }
