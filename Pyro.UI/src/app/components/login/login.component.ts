@@ -1,11 +1,11 @@
 import { Component, input } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { ValidationSummaryComponent, Validators } from '@controls/validation-summary';
 import { AuthService } from '@services/auth.service';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
-import { WithValidationComponent } from '../../controls/with-validation/with-validation.component';
 
 @Component({
     selector: 'login',
@@ -15,7 +15,7 @@ import { WithValidationComponent } from '../../controls/with-validation/with-val
         InputTextModule,
         PasswordModule,
         ReactiveFormsModule,
-        WithValidationComponent,
+        ValidationSummaryComponent,
     ],
     templateUrl: './login.component.html',
     styleUrl: './login.component.css',
@@ -23,8 +23,8 @@ import { WithValidationComponent } from '../../controls/with-validation/with-val
 export class LoginComponent {
     public readonly returnUrl = input<string>('/');
     public readonly formGroup = this.formBuilder.nonNullable.group({
-        login: ['', [Validators.required]],
-        password: ['', Validators.required],
+        login: ['', Validators.required('Login')],
+        password: ['', Validators.required('Password')],
     });
 
     public constructor(

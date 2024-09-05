@@ -1,6 +1,8 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, input, OnInit, output, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { ValidationSummaryComponent, Validators } from '@controls/validation-summary';
+import { MarkdownPipe } from '@pipes/markdown.pipe';
 import { Comment, IssueService } from '@services/issue.service';
 import { mapErrorToNull } from '@services/operators';
 import { ButtonModule } from 'primeng/button';
@@ -8,8 +10,6 @@ import { DividerModule } from 'primeng/divider';
 import { InputTextModule } from 'primeng/inputtext';
 import { PanelModule } from 'primeng/panel';
 import { TabViewModule } from 'primeng/tabview';
-import { WithValidationComponent } from '../../../../controls/with-validation/with-validation.component';
-import { MarkdownPipe } from '../../../../pipes/markdown.pipe';
 
 @Component({
     selector: 'comment-new',
@@ -23,7 +23,7 @@ import { MarkdownPipe } from '../../../../pipes/markdown.pipe';
         PanelModule,
         ReactiveFormsModule,
         TabViewModule,
-        WithValidationComponent,
+        ValidationSummaryComponent,
     ],
     templateUrl: './comment-new.component.html',
     styleUrl: './comment-new.component.css',
@@ -34,7 +34,7 @@ export class CommentNewComponent implements OnInit {
     public readonly comment = input<Comment>();
     public readonly isLoading = signal<boolean>(false);
     public readonly form = this.formBuilder.group({
-        comment: ['', [Validators.required, Validators.maxLength(2000)]],
+        comment: ['', [Validators.required('Comment'), Validators.maxLength('Comment', 2000)]],
     });
     public readonly commentAdded = output<Comment>();
     public readonly onCancel = output();

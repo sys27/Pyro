@@ -1,7 +1,7 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, OnInit, input } from '@angular/core';
-import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { WithValidationComponent } from '@controls/with-validation/with-validation.component';
+import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
+import { ValidationSummaryComponent, Validators } from '@controls/validation-summary';
 import { mapErrorToEmpty, mapErrorToNull } from '@services/operators';
 import { Role, UpdateUser, UserService } from '@services/user.service';
 import { ButtonModule } from 'primeng/button';
@@ -22,7 +22,7 @@ import { Observable, shareReplay } from 'rxjs';
         MultiSelectModule,
         ListboxModule,
         ReactiveFormsModule,
-        WithValidationComponent,
+        ValidationSummaryComponent,
     ],
     templateUrl: './user-edit.component.html',
     styleUrl: './user-edit.component.css',
@@ -31,9 +31,9 @@ export class UserEditComponent implements OnInit {
     public readonly login = input.required<string>();
     public roles$: Observable<Role[]> | undefined;
     public readonly form = this.formBuilder.nonNullable.group({
-        login: ['', [Validators.required]],
-        isLocked: [false, Validators.required],
-        roles: new FormControl<Role[]>([], Validators.required),
+        login: ['', [Validators.required('Login')]],
+        isLocked: [false, Validators.required('Is Locked')],
+        roles: new FormControl<Role[]>([], Validators.required('Roles')),
     });
 
     public constructor(

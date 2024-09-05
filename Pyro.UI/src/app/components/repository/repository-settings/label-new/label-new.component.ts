@@ -1,7 +1,7 @@
 import { Component, input, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { WithValidationComponent } from '@controls/with-validation/with-validation.component';
+import { ValidationSummaryComponent, Validators } from '@controls/validation-summary';
 import { Color } from '@models/color';
 import { LabelService } from '@services/label.service';
 import { mapErrorToNull } from '@services/operators';
@@ -17,7 +17,7 @@ import { InputTextModule } from 'primeng/inputtext';
         ColorPickerModule,
         InputTextModule,
         ReactiveFormsModule,
-        WithValidationComponent,
+        ValidationSummaryComponent,
     ],
     templateUrl: './label-new.component.html',
     styleUrl: './label-new.component.css',
@@ -25,8 +25,8 @@ import { InputTextModule } from 'primeng/inputtext';
 export class LabelNewComponent {
     public readonly repositoryName = input.required<string>();
     public readonly form = this.formBuilder.nonNullable.group({
-        name: ['', [Validators.required, Validators.maxLength(50)]],
-        color: [{} as Color, [Validators.required]],
+        name: ['', [Validators.required('Name'), Validators.maxLength('Name', 50)]],
+        color: [{} as Color, [Validators.required('Name')]],
     });
     public readonly isLoading = signal<boolean>(false);
 

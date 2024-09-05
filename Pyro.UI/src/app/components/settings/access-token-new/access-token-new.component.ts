@@ -1,6 +1,6 @@
 import { Component, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { WithValidationComponent } from '@controls/with-validation/with-validation.component';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { ValidationSummaryComponent, Validators } from '@controls/validation-summary';
 import { AccessTokenService, CreateAccessToken } from '@services/access-token.service';
 import { mapErrorToNull } from '@services/operators';
 import { ButtonModule } from 'primeng/button';
@@ -17,15 +17,15 @@ import { InputTextModule } from 'primeng/inputtext';
         InputGroupModule,
         InputTextModule,
         ReactiveFormsModule,
-        WithValidationComponent,
+        ValidationSummaryComponent,
     ],
     templateUrl: './access-token-new.component.html',
     styleUrls: ['./access-token-new.component.css'],
 })
 export class AccessTokenNewComponent {
     public readonly form = this.formBuilder.nonNullable.group({
-        name: ['', Validators.compose([Validators.required, Validators.maxLength(50)])],
-        expiresAt: [new Date(), Validators.required],
+        name: ['', [Validators.required('Name'), Validators.maxLength('Name', 50)]],
+        expiresAt: [new Date(), Validators.required('Expires At')],
         token: [''],
     });
     public readonly minDate: Date = new Date();

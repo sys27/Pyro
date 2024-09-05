@@ -4,39 +4,36 @@
     [formGroup]="form"
     (ngSubmit)="onSubmit()">
     <h1>New Status Transition</h1>
+    <validation-summary />
 
     <div class="field">
-      <with-validation>
+      @if (statuses$ | async; as statuses) {
         <label for="from">From:</label>
-
-        @if (statuses$ | async; as statuses) {
-          <p-dropdown
-            id="from"
-            formControlName="fromId"
-            [options]="statuses"
-            optionLabel="name"
-            optionValue="id"
-            styleClass="w-full"
-            placeholder="Select Status" />
-        }
-      </with-validation>
+        <p-dropdown
+          id="from"
+          formControlName="fromId"
+          [options]="statuses"
+          optionLabel="name"
+          optionValue="id"
+          styleClass="w-full"
+          placeholder="Select Status" />
+        <validation-summary controlName="fromId" />
+      }
     </div>
 
     <div class="field">
-      <with-validation>
+      @if (statuses$ | async; as statuses) {
         <label for="to">To:</label>
-
-        @if (statuses$ | async; as statuses) {
-          <p-dropdown
-            id="to"
-            formControlName="toId"
-            [options]="statuses"
-            optionLabel="name"
-            optionValue="id"
-            styleClass="w-full"
-            placeholder="Select Status" />
-        }
-      </with-validation>
+        <p-dropdown
+          id="to"
+          formControlName="toId"
+          [options]="statuses"
+          optionLabel="name"
+          optionValue="id"
+          styleClass="w-full"
+          placeholder="Select Status" />
+        <validation-summary controlName="toId" />
+      }
     </div>
 
     <div class="field">

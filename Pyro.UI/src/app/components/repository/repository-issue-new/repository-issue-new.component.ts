@@ -1,7 +1,8 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, input, OnInit, signal } from '@angular/core';
-import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ValidationSummaryComponent, Validators } from '@controls/validation-summary';
 import { IssueStatus, IssueStatusService } from '@services/issue-status.service';
 import { IssueService, User } from '@services/issue.service';
 import { Label, LabelService } from '@services/label.service';
@@ -11,7 +12,6 @@ import { DropdownModule } from 'primeng/dropdown';
 import { InputTextModule } from 'primeng/inputtext';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { finalize, Observable, shareReplay } from 'rxjs';
-import { WithValidationComponent } from '../../../controls/with-validation/with-validation.component';
 
 @Component({
     selector: 'repo-issue-new',
@@ -23,7 +23,7 @@ import { WithValidationComponent } from '../../../controls/with-validation/with-
         InputTextModule,
         MultiSelectModule,
         ReactiveFormsModule,
-        WithValidationComponent,
+        ValidationSummaryComponent,
     ],
     templateUrl: './repository-issue-new.component.html',
     styleUrl: './repository-issue-new.component.css',
@@ -34,10 +34,10 @@ export class RepositoryIssueNewComponent implements OnInit {
     public labels$: Observable<Label[]> | undefined;
     public statuses$: Observable<IssueStatus[]> | undefined;
     public readonly form = this.formBuilder.group({
-        title: ['', [Validators.required, Validators.maxLength(200)]],
+        title: ['', [Validators.required('Title'), Validators.maxLength('Title', 200)]],
         assigneeId: new FormControl<string | null>(null),
         labelIds: new FormControl<string[]>([]),
-        statusId: ['', Validators.required],
+        statusId: ['', Validators.required('Status')],
     });
     public readonly isLoading = signal<boolean>(false);
 
