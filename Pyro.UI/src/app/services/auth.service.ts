@@ -57,9 +57,7 @@ export class AuthService {
             )
             .pipe(
                 catchError((error: ResponseError) => {
-                    localStorage.removeItem(AuthService.accessTokenKey);
-                    localStorage.removeItem(AuthService.refreshTokenKey);
-                    this.updateCurrentUser();
+                    this.logout();
 
                     return of(error);
                 }),
@@ -74,6 +72,12 @@ export class AuthService {
                     return this.currentUser;
                 }),
             );
+    }
+
+    public logout(): void {
+        localStorage.removeItem(AuthService.accessTokenKey);
+        localStorage.removeItem(AuthService.refreshTokenKey);
+        this.updateCurrentUser();
     }
 
     private getUserFromJwt(jwt: string): CurrentUser {

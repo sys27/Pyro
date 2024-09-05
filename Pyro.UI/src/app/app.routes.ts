@@ -1,5 +1,7 @@
 import { ResolveFn, Routes, UrlMatcher } from '@angular/router';
+import { PyroPermissions } from '@models/pyro-permissions';
 import { authGuard } from './auth.guard';
+import { ForbiddenComponent } from './components/forbidden/forbidden.component';
 import { LoginComponent } from './components/login/login.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import {
@@ -32,12 +34,20 @@ import {
 import { UserEditComponent, UserListComponent, UserNewComponent } from './components/user';
 
 export const routes: Routes = [
-    { path: 'repositories', component: RepositoryListComponent, canActivate: [authGuard] },
-    { path: 'repositories/new', component: RepositoryNewComponent, canActivate: [authGuard] },
+    {
+        path: 'repositories',
+        component: RepositoryListComponent,
+        canActivate: [authGuard(PyroPermissions.RepositoryView)],
+    },
+    {
+        path: 'repositories/new',
+        component: RepositoryNewComponent,
+        canActivate: [authGuard(PyroPermissions.RepositoryEdit)],
+    },
     {
         path: 'repositories/:repositoryName',
         component: RepositoryComponent,
-        canActivate: [authGuard],
+        canActivate: [authGuard(PyroPermissions.RepositoryView)],
         children: [
             {
                 matcher: prefixMatcher('code'),
@@ -45,7 +55,7 @@ export const routes: Routes = [
                     branchOrPath: branchOrPathResolver('code'),
                 },
                 component: RepositoryCodeComponent,
-                canActivate: [authGuard],
+                canActivate: [authGuard(PyroPermissions.RepositoryView)],
             },
             {
                 matcher: prefixMatcher('file'),
@@ -53,71 +63,79 @@ export const routes: Routes = [
                     branchOrPath: branchOrPathResolver('file'),
                 },
                 component: RepositoryFileComponent,
-                canActivate: [authGuard],
+                canActivate: [authGuard(PyroPermissions.RepositoryView)],
             },
             {
                 path: 'issues/new',
                 component: RepositoryIssueNewComponent,
-                canActivate: [authGuard],
+                canActivate: [authGuard(PyroPermissions.IssueEdit)],
             },
             {
                 path: 'issues/:issueNumber',
                 component: RepositoryIssueComponent,
-                canActivate: [authGuard],
+                canActivate: [authGuard(PyroPermissions.IssueView)],
             },
             {
                 path: 'issues/:issueNumber/edit',
                 component: RepositoryIssueEditComponent,
-                canActivate: [authGuard],
+                canActivate: [authGuard(PyroPermissions.IssueEdit)],
             },
             {
                 path: 'issues',
                 component: RepositoryIssuesComponent,
-                canActivate: [authGuard],
+                canActivate: [authGuard(PyroPermissions.IssueView)],
             },
             {
                 path: 'pull-requests',
                 component: RepositoryPullRequqestsComponent,
-                canActivate: [authGuard],
+                canActivate: [authGuard()],
             },
             {
                 path: 'settings',
                 component: RepositorySettingsComponent,
-                canActivate: [authGuard],
+                canActivate: [authGuard(PyroPermissions.RepositoryView)],
                 children: [
-                    { path: 'labels/new', component: LabelNewComponent, canActivate: [authGuard] },
+                    {
+                        path: 'labels/new',
+                        component: LabelNewComponent,
+                        canActivate: [authGuard(PyroPermissions.RepositoryManage)],
+                    },
                     {
                         path: 'labels/:labelId',
                         component: LabelEditComponent,
-                        canActivate: [authGuard],
+                        canActivate: [authGuard(PyroPermissions.RepositoryManage)],
                     },
-                    { path: 'labels', component: LabelListComponent, canActivate: [authGuard] },
+                    {
+                        path: 'labels',
+                        component: LabelListComponent,
+                        canActivate: [authGuard(PyroPermissions.RepositoryView)],
+                    },
 
                     {
                         path: 'statuses/transitions/new',
                         component: StatusTransitionNewComponent,
-                        canActivate: [authGuard],
+                        canActivate: [authGuard(PyroPermissions.RepositoryManage)],
                     },
                     {
                         path: 'statuses/transitions',
                         component: StatusTransitionViewComponent,
-                        canActivate: [authGuard],
+                        canActivate: [authGuard(PyroPermissions.RepositoryView)],
                     },
 
                     {
                         path: 'statuses/new',
                         component: StatusNewComponent,
-                        canActivate: [authGuard],
+                        canActivate: [authGuard(PyroPermissions.RepositoryManage)],
                     },
                     {
                         path: 'statuses/:statusId',
                         component: StatusEditComponent,
-                        canActivate: [authGuard],
+                        canActivate: [authGuard(PyroPermissions.RepositoryManage)],
                     },
                     {
                         path: 'statuses',
                         component: StatusListComponent,
-                        canActivate: [authGuard],
+                        canActivate: [authGuard(PyroPermissions.RepositoryView)],
                     },
 
                     { path: '', redirectTo: 'labels', pathMatch: 'full' },
@@ -130,30 +148,43 @@ export const routes: Routes = [
     {
         path: 'settings',
         component: SettingsComponent,
-        canActivate: [authGuard],
+        canActivate: [authGuard()],
         children: [
-            { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },
+            { path: 'profile', component: ProfileComponent, canActivate: [authGuard()] },
             {
                 path: 'access-tokens/new',
                 component: AccessTokenNewComponent,
-                canActivate: [authGuard],
+                canActivate: [authGuard()],
             },
             {
                 path: 'access-tokens',
                 component: AccessTokenListComponent,
-                canActivate: [authGuard],
+                canActivate: [authGuard()],
                 children: [],
             },
             { path: '', redirectTo: 'profile', pathMatch: 'full' },
         ],
     },
 
-    { path: 'users', component: UserListComponent, canActivate: [authGuard] },
-    { path: 'users/new', component: UserNewComponent, canActivate: [authGuard] },
-    { path: 'users/:login', component: UserEditComponent, canActivate: [authGuard] },
+    {
+        path: 'users',
+        component: UserListComponent,
+        canActivate: [authGuard(PyroPermissions.UserView)],
+    },
+    {
+        path: 'users/new',
+        component: UserNewComponent,
+        canActivate: [authGuard(PyroPermissions.UserEdit)],
+    },
+    {
+        path: 'users/:login',
+        component: UserEditComponent,
+        canActivate: [authGuard(PyroPermissions.UserEdit)],
+    },
 
     { path: 'login', component: LoginComponent },
     { path: '', redirectTo: 'repositories', pathMatch: 'full' },
+    { path: 'forbidden', component: ForbiddenComponent },
     { path: '**', component: NotFoundComponent },
 ];
 
