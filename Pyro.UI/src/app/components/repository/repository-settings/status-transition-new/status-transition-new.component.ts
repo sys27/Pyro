@@ -2,7 +2,7 @@ import { AsyncPipe } from '@angular/common';
 import { Component, input, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { WithValidationComponent } from '@controls/with-validation/with-validation.component';
+import { ValidationSummaryComponent } from '@controls/validation-summary';
 import { IssueStatus, IssueStatusService } from '@services/issue-status.service';
 import { mapErrorToEmpty, mapErrorToNull } from '@services/operators';
 import { ButtonModule } from 'primeng/button';
@@ -17,18 +17,31 @@ import { Observable, shareReplay } from 'rxjs';
         ButtonModule,
         DropdownModule,
         ReactiveFormsModule,
-        WithValidationComponent,
+        ValidationSummaryComponent,
     ],
     templateUrl: './status-transition-new.component.html',
     styleUrl: './status-transition-new.component.css',
 })
 export class StatusTransitionNewComponent implements OnInit {
     public readonly repositoryName = input.required<string>();
-    // TODO: add validator
-    public readonly form = this.formBuilder.group({
-        fromId: ['', Validators.required],
-        toId: ['', Validators.required],
-    });
+    public readonly form = this.formBuilder.group(
+        {
+            fromId: ['', Validators.required],
+            toId: ['', Validators.required],
+        },
+        {
+            validators: form => {
+                let fromId = form.get('fromId')?.value;
+                let toId = form.get('toId')?.value;
+
+                if (fromId === toId) {
+                    return { sameAsFrom: 'The from status and the to status cannot be the same' };
+                }
+
+                return null;
+            },
+        },
+    );
     public readonly isLoading = signal<boolean>(false);
 
     public statuses$: Observable<IssueStatus[]> | undefined;

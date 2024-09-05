@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { WithValidationComponent } from '@controls/with-validation/with-validation.component';
+import { ValidationSummaryComponent, Validators } from '@controls/validation-summary';
 import { NotificationEvent, NotificationService } from '@services/notification.service';
 import { CreateRepository, RepositoryService } from '@services/repository.service';
 import { ButtonModule } from 'primeng/button';
@@ -11,7 +11,7 @@ import { filter, finalize, Observable, Subject, switchMap, takeUntil } from 'rxj
 @Component({
     selector: 'repository-new',
     standalone: true,
-    imports: [ButtonModule, InputTextModule, ReactiveFormsModule, WithValidationComponent],
+    imports: [ButtonModule, InputTextModule, ReactiveFormsModule, ValidationSummaryComponent],
     templateUrl: './repository-new.component.html',
     styleUrls: ['./repository-new.component.css'],
 })
@@ -19,10 +19,17 @@ export class RepositoryNewComponent implements OnInit, OnDestroy {
     public readonly form = this.formBuilder.nonNullable.group({
         name: [
             '',
-            [Validators.required, Validators.maxLength(20), Validators.pattern(/^[a-zA-Z0-9-_]+$/)],
+            [
+                Validators.required('Name'),
+                Validators.maxLength('Name', 20),
+                Validators.pattern('Name', /^[a-zA-Z0-9-_]+$/),
+            ],
         ],
-        description: ['', [Validators.maxLength(250)]],
-        defaultBranch: ['', [Validators.required, Validators.maxLength(50)]],
+        description: ['', [Validators.maxLength('Description', 250)]],
+        defaultBranch: [
+            '',
+            [Validators.required('Default Branch'), Validators.maxLength('Default Branch', 50)],
+        ],
     });
     public readonly isLoading = signal<boolean>(false);
     private readonly destroy$: Subject<void> = new Subject<void>();

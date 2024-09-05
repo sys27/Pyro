@@ -6,66 +6,59 @@
     <h1>Edit Issue</h1>
 
     <div class="field">
-      <with-validation>
-        <label for="title">Title:</label>
-        <input
-          id="title"
-          type="text"
-          class="w-full"
-          pInputText
-          formControlName="title" />
-      </with-validation>
+      <label for="title">Title:</label>
+      <input
+        id="title"
+        type="text"
+        class="w-full"
+        pInputText
+        formControlName="title" />
+      <validation-summary controlName="title" />
     </div>
 
     <div class="field">
-      <with-validation>
+      @if (users$ | async; as users) {
         <label for="assignee">Assignee:</label>
-
-        @if (users$ | async; as users) {
-          <p-dropdown
-            id="assignee"
-            formControlName="assigneeId"
-            [options]="users"
-            optionLabel="name"
-            optionValue="id"
-            styleClass="w-full"
-            placeholder="Select User" />
-        }
-      </with-validation>
+        <p-dropdown
+          id="assignee"
+          formControlName="assigneeId"
+          [options]="users"
+          optionLabel="name"
+          optionValue="id"
+          styleClass="w-full"
+          placeholder="Select User" />
+        <validation-summary controlName="assigneeId" />
+      }
     </div>
 
     <div class="field">
-      <with-validation>
-        <label>Labels:</label>
-
-        @if (labels$ | async; as labels) {
-          <p-multiSelect
-            formControlName="labelIds"
-            [options]="labels"
-            optionLabel="name"
-            optionValue="id"
-            styleClass="w-full"
-            placeholder="Select Labels"
-            [filter]="false" />
-        }
-      </with-validation>
+      @if (labels$ | async; as labels) {
+        <label for="labelIds">Labels:</label>
+        <p-multiSelect
+          formControlName="labelIds"
+          [options]="labels"
+          optionLabel="name"
+          optionValue="id"
+          styleClass="w-full"
+          placeholder="Select Labels"
+          [filter]="false" />
+        <validation-summary controlName="labelIds" />
+      }
     </div>
 
     <div class="field">
-      <with-validation>
+      @if (statuses$ | async; as statuses) {
         <label for="status">Status:</label>
-
-        @if (statuses$ | async; as statuses) {
-          <p-dropdown
-            id="status"
-            formControlName="statusId"
-            [options]="statuses"
-            optionLabel="name"
-            optionValue="id"
-            styleClass="w-full"
-            placeholder="Select Status" />
-        }
-      </with-validation>
+        <p-dropdown
+          id="status"
+          formControlName="statusId"
+          [options]="statuses"
+          optionLabel="name"
+          optionValue="id"
+          styleClass="w-full"
+          placeholder="Select Status" />
+        <validation-summary controlName="statusId" />
+      }
     </div>
 
     <div class="field">

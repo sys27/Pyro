@@ -1,17 +1,27 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, input, signal } from '@angular/core';
-import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+    AbstractControl,
+    FormBuilder,
+    FormControl,
+    ReactiveFormsModule,
+    ValidationErrors,
+} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { WithValidationComponent } from '@controls/with-validation/with-validation.component';
-import { IssueStatus, IssueStatusService } from '@services/issue-status.service';
-import { IssueService, User } from '@services/issue.service';
+import { ValidationSummaryComponent, Validators } from '@controls/validation-summary';
+import {
+    IssueStatus,
+    IssueStatusService,
+    IssueStatusTransition,
+} from '@services/issue-status.service';
+import { Issue, IssueService, User } from '@services/issue.service';
 import { Label, LabelService } from '@services/label.service';
 import { mapErrorToEmpty, mapErrorToNull } from '@services/operators';
 import { ButtonModule } from 'primeng/button';
 import { DropdownModule } from 'primeng/dropdown';
 import { InputTextModule } from 'primeng/inputtext';
 import { MultiSelectModule } from 'primeng/multiselect';
-import { finalize, Observable, shareReplay, take } from 'rxjs';
+import { finalize, map, Observable, of, shareReplay, take } from 'rxjs';
 
 @Component({
     selector: 'repository-issue-edit',
@@ -23,7 +33,7 @@ import { finalize, Observable, shareReplay, take } from 'rxjs';
         InputTextModule,
         MultiSelectModule,
         ReactiveFormsModule,
-        WithValidationComponent,
+        ValidationSummaryComponent,
     ],
     templateUrl: './repository-issue-edit.component.html',
     styleUrl: './repository-issue-edit.component.css',
@@ -34,11 +44,37 @@ export class RepositoryIssueEditComponent {
     public users$: Observable<User[]> | undefined;
     public labels$: Observable<Label[]> | undefined;
     public statuses$: Observable<IssueStatus[]> | undefined;
+    private issue: Issue | undefined;
+    private statusTranstions$: Observable<IssueStatusTransition[]> | undefined;
     public readonly form = this.formBuilder.group({
-        title: ['', [Validators.required, Validators.maxLength(200)]],
+        title: ['', [Validators.required('Title'), Validators.maxLength('Title', 200)]],
         assigneeId: new FormControl<string | null>(null),
         labelIds: new FormControl<string[]>([]),
-        statusId: ['', Validators.required], // TODO: validator
+        statusId: [
+            '',
+            Validators.required('Status'),
+            (control: AbstractControl): Observable<ValidationErrors | null> => {
+                if (!this.statusTranstions$ || !this.issue) {
+                    return of(null);
+                }
+
+                return this.statusTranstions$.pipe(
+                    map(transitions => {
+                        let initialValue = this.issue?.status.id;
+                        let currentValue = control.value;
+                        if (!initialValue || initialValue == currentValue) {
+                            return null;
+                        }
+
+                        let transition = transitions.find(
+                            t => t.from.id === initialValue && t.to.id === currentValue,
+                        );
+
+                        return transition ? null : { invalidStatus: `Invalid status` };
+                    }),
+                );
+            },
+        ],
     });
     public readonly isLoading = signal<boolean>(false);
 
@@ -59,11 +95,15 @@ export class RepositoryIssueEditComponent {
         this.statuses$ = this.statusService
             .getStatuses(this.repositoryName())
             .pipe(mapErrorToEmpty, shareReplay(1));
+        this.statusTranstions$ = this.statusService
+            .getStatusTransitions(this.repositoryName())
+            .pipe(mapErrorToEmpty, shareReplay(1));
         this.issueService
             .getIssue(this.repositoryName(), this.issueNumber()!)
             .pipe(mapErrorToNull, take(1))
             .subscribe(issue => {
                 if (issue) {
+                    this.issue = issue;
                     this.form.setValue({
                         title: issue.title,
                         assigneeId: issue.assignee?.id || null,

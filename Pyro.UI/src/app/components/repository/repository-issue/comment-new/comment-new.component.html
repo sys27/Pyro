@@ -4,16 +4,15 @@
     (ngSubmit)="onSubmit()">
     <p-tabView>
       <p-tabPanel header="Write">
-        <with-validation>
-          <textarea
-            #commentText
-            pInputTextarea
-            rows="5"
-            autoResize="true"
-            formControlName="comment"
-            class="w-full"
-            placeholder="Write a comment"></textarea>
-        </with-validation>
+        <textarea
+          #commentText
+          pInputTextarea
+          rows="5"
+          autoResize="true"
+          formControlName="comment"
+          class="w-full"
+          placeholder="Write a comment"></textarea>
+        <validation-summary controlName="comment" />
       </p-tabPanel>
 
       <p-tabPanel header="Preview">

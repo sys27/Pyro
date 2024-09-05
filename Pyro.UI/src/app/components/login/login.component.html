@@ -4,27 +4,25 @@
     [formGroup]="formGroup"
     (ngSubmit)="onSubmit()">
     <div class="field">
-      <with-validation>
-        <label for="login">Login:</label>
-        <input
-          id="login"
-          type="text"
-          class="w-full"
-          pInputText
-          formControlName="login" />
-      </with-validation>
+      <label for="login">Login:</label>
+      <input
+        id="login"
+        type="text"
+        class="w-full"
+        pInputText
+        formControlName="login" />
+      <validation-summary controlName="login" />
     </div>
 
     <div class="field">
-      <with-validation>
-        <label for="password">Password:</label>
-        <input
-          id="password"
-          type="password"
-          class="w-full"
-          pInputText
-          formControlName="password" />
-      </with-validation>
+      <label for="password">Password:</label>
+      <input
+        id="password"
+        type="password"
+        class="w-full"
+        pInputText
+        formControlName="password" />
+      <validation-summary controlName="password" />
     </div>
 
     <div class="field">

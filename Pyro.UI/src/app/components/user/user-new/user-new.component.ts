@@ -1,8 +1,8 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { WithValidationComponent } from '@controls/with-validation/with-validation.component';
+import { ValidationSummaryComponent, Validators } from '@controls/validation-summary';
 import { mapErrorToEmpty } from '@services/operators';
 import { CreateUser, Role, User, UserService } from '@services/user.service';
 import { ButtonModule } from 'primeng/button';
@@ -23,7 +23,7 @@ import { Observable } from 'rxjs';
         MultiSelectModule,
         ListboxModule,
         ReactiveFormsModule,
-        WithValidationComponent,
+        ValidationSummaryComponent,
     ],
     templateUrl: './user-new.component.html',
     styleUrl: './user-new.component.css',
@@ -33,9 +33,9 @@ export class UserNewComponent implements OnInit {
     public roles$: Observable<Role[]> | undefined;
 
     public readonly form = this.formBuilder.nonNullable.group({
-        login: ['', [Validators.required, Validators.maxLength(32)]],
-        password: ['', [Validators.required, Validators.minLength(8)]],
-        roles: new FormControl<Role[]>([], Validators.required),
+        login: ['', [Validators.required('Login'), Validators.maxLength('Login', 32)]],
+        password: ['', [Validators.required('Password'), Validators.minLength('Password', 8)]],
+        roles: new FormControl<Role[]>([], Validators.required('Roles')),
     });
 
     public constructor(
