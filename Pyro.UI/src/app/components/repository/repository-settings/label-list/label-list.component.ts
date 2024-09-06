@@ -1,14 +1,17 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, input, OnDestroy, OnInit } from '@angular/core';
+import { Component, DestroyRef, input, OnDestroy, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
+import { PyroPermissions } from '@models/pyro-permissions';
 import { ResponseError } from '@models/response';
 import { ColorPipe } from '@pipes/color.pipe';
+import { AuthService } from '@services/auth.service';
 import { Label, LabelService } from '@services/label.service';
 import { mapErrorToEmpty } from '@services/operators';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
-import { BehaviorSubject, Observable, shareReplay, switchMap } from 'rxjs';
+import { BehaviorSubject, map, Observable, shareReplay, switchMap } from 'rxjs';
 
 @Component({
     selector: 'label-list',
@@ -21,10 +24,13 @@ export class LabelListComponent implements OnInit, OnDestroy {
     public readonly repositoryName = input.required<string>();
     private readonly refreshLabels$ = new BehaviorSubject<void>(undefined);
     public labels$: Observable<Label[]> | undefined;
+    public hasManagePermission$: Observable<boolean> | undefined;
 
     public constructor(
+        private readonly destroyRef: DestroyRef,
         private readonly messageService: MessageService,
         private readonly labelService: LabelService,
+        private readonly authService: AuthService,
     ) {}
 
     public ngOnInit(): void {
@@ -33,6 +39,10 @@ export class LabelListComponent implements OnInit, OnDestroy {
                 this.labelService.getLabels(this.repositoryName()).pipe(mapErrorToEmpty),
             ),
             shareReplay(1),
+        );
+        this.hasManagePermission$ = this.authService.currentUser.pipe(
+            takeUntilDestroyed(this.destroyRef),
+            map(user => user?.hasPermission(PyroPermissions.RepositoryManage) ?? false),
         );
     }
 

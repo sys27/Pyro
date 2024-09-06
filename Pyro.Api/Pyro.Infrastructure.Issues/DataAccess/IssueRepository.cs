@@ -76,6 +76,7 @@ internal class IssueRepository : IIssueRepository
             .Include(x => x.Assignee)
             .Include(x => x.Author)
             .Include(x => x.Comments.OrderBy(c => c.CreatedAt))
+            .ThenInclude(x => x.Author)
             .Include(x => x.Labels)
             .Include(x => x.Status)
             .FirstOrDefaultAsync(

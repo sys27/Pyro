@@ -1,6 +1,8 @@
 import { AsyncPipe, DatePipe } from '@angular/common';
-import { Component, input, OnDestroy, OnInit } from '@angular/core';
+import { Component, DestroyRef, input, OnDestroy, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterModule } from '@angular/router';
+import { PyroPermissions } from '@models/pyro-permissions';
 import { ColorPipe } from '@pipes/color.pipe';
 import { LuminanceColorPipe } from '@pipes/luminance-color.pipe';
 import { AuthService } from '@services/auth.service';
@@ -9,15 +11,7 @@ import { mapErrorToEmpty, mapErrorToNull } from '@services/operators';
 import { ButtonModule } from 'primeng/button';
 import { DividerModule } from 'primeng/divider';
 import { TagModule } from 'primeng/tag';
-import {
-    BehaviorSubject,
-    combineLatest,
-    map,
-    Observable,
-    shareReplay,
-    switchMap,
-    withLatestFrom,
-} from 'rxjs';
+import { BehaviorSubject, combineLatest, map, Observable, shareReplay, switchMap } from 'rxjs';
 import { MarkdownPipe } from '../../../pipes/markdown.pipe';
 import { CommentNewComponent } from './comment-new/comment-new.component';
 import { CommentViewComponent } from './comment-view/comment-view.component';
@@ -46,10 +40,11 @@ export class RepositoryIssueComponent implements OnInit, OnDestroy {
     public readonly issueNumber = input.required<number>();
     public issue$: Observable<Issue | null> | undefined;
     public comments$: Observable<Comment[]> | undefined;
-    public canEditIssue$: Observable<boolean> | undefined;
+    public hasEditPermission$: Observable<boolean> | undefined;
     private readonly commentAddedTrigger$ = new BehaviorSubject<void>(undefined);
 
     public constructor(
+        private readonly destroyRef: DestroyRef,
         private readonly issueService: IssueService,
         private readonly authService: AuthService,
     ) {}
@@ -59,7 +54,7 @@ export class RepositoryIssueComponent implements OnInit, OnDestroy {
             .getIssue(this.repositoryName(), this.issueNumber())
             .pipe(mapErrorToNull, shareReplay(1));
         this.comments$ = combineLatest([this.issue$!, this.commentAddedTrigger$]).pipe(
-            switchMap(([issue, name]) => {
+            switchMap(([issue, _]) => {
                 if (!issue) {
                     return [];
                 }
@@ -69,15 +64,9 @@ export class RepositoryIssueComponent implements OnInit, OnDestroy {
             mapErrorToEmpty,
             shareReplay(1),
         );
-        this.canEditIssue$ = this.issue$?.pipe(
-            withLatestFrom(this.authService.currentUser),
-            map(([issue, user]) => {
-                if (!issue || !user) {
-                    return false;
-                }
-
-                return issue.author.id === user.id;
-            }),
+        this.hasEditPermission$ = this.authService.currentUser.pipe(
+            takeUntilDestroyed(this.destroyRef),
+            map(user => user?.hasPermission(PyroPermissions.IssueEdit) ?? false),
         );
     }
 

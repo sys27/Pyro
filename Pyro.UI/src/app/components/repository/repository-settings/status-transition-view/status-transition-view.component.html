@@ -9,7 +9,8 @@
           label="New Transition"
           icon="pi pi-plus"
           severity="success"
-          [routerLink]="['new']" />
+          [routerLink]="['new']"
+          [disabled]="!(hasManagePermission$ | async)" />
       </div>
     </ng-template>
     <ng-template pTemplate="header">
@@ -45,7 +46,8 @@
           <p-button
             icon="pi pi-trash"
             [outlined]="true"
-            (onClick)="deleteTransition(transition)" />
+            (onClick)="deleteTransition(transition)"
+            [disabled]="!(hasManagePermission$ | async)" />
         </td>
       </tr>
     </ng-template>
