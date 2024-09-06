@@ -1,7 +1,7 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, input, OnInit } from '@angular/core';
+import { Component, Injector, input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { mapErrorToNull } from '@services/operators';
+import { createErrorHandler } from '@services/operators';
 import { Repository, RepositoryService } from '@services/repository.service';
 import { combineLatest, filter, from, map, Observable, of, shareReplay, switchMap } from 'rxjs';
 
@@ -19,6 +19,7 @@ export class RepositoryFileComponent implements OnInit {
     public fileContent$: Observable<string | null> | undefined;
 
     public constructor(
+        private readonly injector: Injector,
         private readonly route: ActivatedRoute,
         private readonly repositoryService: RepositoryService,
     ) {}
@@ -27,14 +28,14 @@ export class RepositoryFileComponent implements OnInit {
         this.branchOrPath$ = this.route.data.pipe(map(data => data['branchOrPath']));
         this.repository$ = this.repositoryService
             .getRepository(this.repositoryName())
-            .pipe(mapErrorToNull, shareReplay(1));
+            .pipe(createErrorHandler(this.injector), shareReplay(1));
 
         this.fileContent$ = combineLatest([this.repository$!, this.branchOrPath$!]).pipe(
             filter(([repository, branchOrPath]) => repository != null && branchOrPath.length > 0),
             switchMap(([repository, branchOrPath]) =>
                 this.repositoryService.getFile(repository!.name, branchOrPath.join('/')),
             ),
-            mapErrorToNull,
+            createErrorHandler(this.injector),
             switchMap(blob => (blob != null ? from(blob.text()) : of(null))),
             shareReplay(1),
         );

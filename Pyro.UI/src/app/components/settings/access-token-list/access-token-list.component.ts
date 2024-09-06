@@ -1,8 +1,9 @@
 import { AsyncPipe, DatePipe } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, Injector, OnDestroy, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { AccessToken, AccessTokenService } from '@services/access-token.service';
-import { mapErrorToEmpty } from '@services/operators';
+import { createErrorHandler } from '@services/operators';
+
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
@@ -20,13 +21,14 @@ export class AccessTokenListComponent implements OnInit, OnDestroy {
     private readonly refresh$ = new BehaviorSubject<void>(undefined);
 
     public constructor(
+        private readonly injector: Injector,
         private readonly service: AccessTokenService,
         private readonly messageService: MessageService,
     ) {}
 
     public ngOnInit(): void {
         this.accessTokens$ = this.refresh$.pipe(
-            switchMap(() => this.service.getAccessTokens().pipe(mapErrorToEmpty, shareReplay(1))),
+            switchMap(() => this.service.getAccessTokens().pipe(shareReplay(1))),
         );
     }
 
@@ -35,14 +37,17 @@ export class AccessTokenListComponent implements OnInit, OnDestroy {
     }
 
     public deleteAccessToken(tokenName: string): void {
-        this.service.deleteAccessToken(tokenName).subscribe(() => {
-            this.messageService.add({
-                severity: 'success',
-                summary: 'Success',
-                detail: `Access token ${tokenName} deleted`,
-            });
+        this.service
+            .deleteAccessToken(tokenName)
+            .pipe(createErrorHandler(this.injector))
+            .subscribe(() => {
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Success',
+                    detail: `Access token ${tokenName} deleted`,
+                });
 
-            this.refresh$.next();
-        });
+                this.refresh$.next();
+            });
     }
 }

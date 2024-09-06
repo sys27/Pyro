@@ -1,5 +1,6 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, input, OnDestroy, OnInit, output } from '@angular/core';
+import { Component, Injector, input, OnDestroy, OnInit, output } from '@angular/core';
+import { createErrorHandler } from '@services/operators';
 import { ButtonModule } from 'primeng/button';
 import {
     BehaviorSubject,
@@ -31,9 +32,11 @@ export class PaginatorComponent implements OnInit, OnDestroy {
     private next$: Observable<any[]> = of([]);
     private readonly destroy$ = new Subject<void>();
 
+    public constructor(private readonly injector: Injector) {}
+
     public ngOnInit(): void {
         this.loadAfter()
-            .pipe(take(1))
+            .pipe(take(1), createErrorHandler(this.injector))
             .subscribe(x => this.current$.next(x));
         this.previous$ = this.current$.pipe(
             filter(items => items.length > 0),
@@ -46,6 +49,7 @@ export class PaginatorComponent implements OnInit, OnDestroy {
 
                 return this.loadBefore(before);
             }),
+            createErrorHandler(this.injector),
             shareReplay(1),
         );
         this.next$ = this.current$.pipe(
@@ -59,6 +63,7 @@ export class PaginatorComponent implements OnInit, OnDestroy {
 
                 return this.loadAfter(after);
             }),
+            createErrorHandler(this.injector),
             shareReplay(1),
         );
 

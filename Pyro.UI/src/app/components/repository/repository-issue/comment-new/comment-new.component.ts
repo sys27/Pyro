@@ -1,10 +1,10 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, input, OnInit, output, signal } from '@angular/core';
+import { Component, Injector, input, OnInit, output, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { ValidationSummaryComponent, Validators } from '@controls/validation-summary';
 import { MarkdownPipe } from '@pipes/markdown.pipe';
 import { Comment, IssueService } from '@services/issue.service';
-import { mapErrorToNull } from '@services/operators';
+import { createErrorHandler } from '@services/operators';
 import { ButtonModule } from 'primeng/button';
 import { DividerModule } from 'primeng/divider';
 import { InputTextModule } from 'primeng/inputtext';
@@ -40,6 +40,7 @@ export class CommentNewComponent implements OnInit {
     public readonly onCancel = output();
 
     public constructor(
+        private readonly injector: Injector,
         private readonly formBuilder: FormBuilder,
         private readonly issueService: IssueService,
     ) {}
@@ -83,7 +84,7 @@ export class CommentNewComponent implements OnInit {
                   comment,
               );
 
-        httpCall.pipe(mapErrorToNull).subscribe(comment => {
+        httpCall.pipe(createErrorHandler(this.injector)).subscribe(comment => {
             this.isLoading.set(false);
             this.form.enable();
 

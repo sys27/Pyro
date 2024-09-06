@@ -7,7 +7,6 @@ import { ColorPipe } from '@pipes/color.pipe';
 import { LuminanceColorPipe } from '@pipes/luminance-color.pipe';
 import { AuthService } from '@services/auth.service';
 import { Issue, IssueService } from '@services/issue.service';
-import { mapErrorToEmpty } from '@services/operators';
 import { ButtonModule } from 'primeng/button';
 import { DataViewModule } from 'primeng/dataview';
 import { DividerModule } from 'primeng/divider';
@@ -54,9 +53,7 @@ export class RepositoryIssuesComponent implements OnInit {
             return of([]);
         }
 
-        return this.issueService
-            .getIssues(this.repositoryName(), state.before, state.after)
-            .pipe(mapErrorToEmpty);
+        return this.issueService.getIssues(this.repositoryName(), state.before, state.after);
     };
 
     public paginatorOffsetSelector(item: Issue): string {

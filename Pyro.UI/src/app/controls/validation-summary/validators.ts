@@ -1,4 +1,16 @@
-import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
+import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
+import { AbstractControl, AsyncValidatorFn, ValidationErrors, ValidatorFn } from '@angular/forms';
+import {
+    catchError,
+    defaultIfEmpty,
+    delay,
+    distinctUntilChanged,
+    first,
+    map,
+    Observable,
+    of,
+    switchMap,
+} from 'rxjs';
 
 export class Validators {
     public static required(name: string): ValidatorFn {
@@ -70,6 +82,33 @@ export class Validators {
             }
 
             return regex.test(control.value) ? null : { pattern: `The '${name}' field is invalid` };
+        };
+    }
+
+    public static exists<T>(
+        message: (value: any) => string,
+        fn: (value: any) => Observable<T>,
+    ): AsyncValidatorFn {
+        return control => {
+            if (this.isEmptyInputValue(control.value)) {
+                return of(null);
+            }
+
+            return of(control.value).pipe(
+                delay(200),
+                distinctUntilChanged(),
+                switchMap(value => fn(value)),
+                defaultIfEmpty(null),
+                first(),
+                map(result => (result ? { exists: message(control.value) } : null)),
+                catchError((error: HttpErrorResponse) => {
+                    if (error.status === HttpStatusCode.NotFound) {
+                        return of(null);
+                    }
+
+                    return of({ failed: 'An error occurred while checking the existence' });
+                }),
+            );
         };
     }
 

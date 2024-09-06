@@ -3,5 +3,5 @@
 
 namespace Pyro.Contracts.Requests.Issues;
 
-public record GetUsersRequest(string Name, int Size, Guid? Before, Guid? After)
+public record GetUsersRequest(string RepositoryName, int Size, Guid? Before, Guid? After)
     : PageRequest<Guid?>(Size, Before, After);

@@ -28,7 +28,6 @@ public static partial class IssueMapper
 
     public static partial IReadOnlyList<UserResponse> ToResponse(this IReadOnlyList<User> gitRepository);
 
-    [MapProperty(nameof(GetUsersRequest.Name), nameof(GetIssues.RepositoryName))]
     public static partial GetIssues ToGetIssues(this GetUsersRequest request);
 
     [UserMapping(Default = true)]

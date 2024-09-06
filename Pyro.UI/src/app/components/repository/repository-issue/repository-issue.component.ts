@@ -1,5 +1,5 @@
 import { AsyncPipe, DatePipe } from '@angular/common';
-import { Component, DestroyRef, input, OnDestroy, OnInit } from '@angular/core';
+import { Component, DestroyRef, Injector, input, OnDestroy, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterModule } from '@angular/router';
 import { PyroPermissions } from '@models/pyro-permissions';
@@ -7,7 +7,7 @@ import { ColorPipe } from '@pipes/color.pipe';
 import { LuminanceColorPipe } from '@pipes/luminance-color.pipe';
 import { AuthService } from '@services/auth.service';
 import { Comment, Issue, IssueService } from '@services/issue.service';
-import { mapErrorToEmpty, mapErrorToNull } from '@services/operators';
+import { createErrorHandler } from '@services/operators';
 import { ButtonModule } from 'primeng/button';
 import { DividerModule } from 'primeng/divider';
 import { TagModule } from 'primeng/tag';
@@ -44,6 +44,7 @@ export class RepositoryIssueComponent implements OnInit, OnDestroy {
     private readonly commentAddedTrigger$ = new BehaviorSubject<void>(undefined);
 
     public constructor(
+        private readonly injector: Injector,
         private readonly destroyRef: DestroyRef,
         private readonly issueService: IssueService,
         private readonly authService: AuthService,
@@ -52,7 +53,7 @@ export class RepositoryIssueComponent implements OnInit, OnDestroy {
     public ngOnInit(): void {
         this.issue$ = this.issueService
             .getIssue(this.repositoryName(), this.issueNumber())
-            .pipe(mapErrorToNull, shareReplay(1));
+            .pipe(createErrorHandler(this.injector), shareReplay(1));
         this.comments$ = combineLatest([this.issue$!, this.commentAddedTrigger$]).pipe(
             switchMap(([issue, _]) => {
                 if (!issue) {
@@ -61,7 +62,7 @@ export class RepositoryIssueComponent implements OnInit, OnDestroy {
 
                 return this.issueService.getIssueComments(this.repositoryName(), issue.issueNumber);
             }),
-            mapErrorToEmpty,
+            createErrorHandler(this.injector),
             shareReplay(1),
         );
         this.hasEditPermission$ = this.authService.currentUser.pipe(

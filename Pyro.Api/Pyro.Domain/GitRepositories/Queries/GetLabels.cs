@@ -3,10 +3,11 @@
 
 using FluentValidation;
 using MediatR;
+using Pyro.Domain.Shared.Exceptions;
 
 namespace Pyro.Domain.GitRepositories.Queries;
 
-public record GetLabels(string RepositoryName) : IRequest<IReadOnlyList<Label>>;
+public record GetLabels(string RepositoryName, string? LabelName) : IRequest<IReadOnlyList<Label>>;
 
 public class GetLabelsValidator : AbstractValidator<GetLabels>
 {
@@ -27,8 +28,11 @@ public class GetLabelsHandler : IRequestHandler<GetLabels, IReadOnlyList<Label>>
 
     public async Task<IReadOnlyList<Label>> Handle(GetLabels request, CancellationToken cancellationToken = default)
     {
-        var gitRepository = await repository.GetGitRepository(request.RepositoryName, cancellationToken);
+        var gitRepository = await repository.GetGitRepository(request.RepositoryName, cancellationToken) ??
+                            throw new NotFoundException($"The repository (Name: {request.RepositoryName}) not found");
 
-        return gitRepository?.Labels ?? [];
+        return gitRepository.Labels
+            .Where(x => request.LabelName == null || x.Name.Contains(request.LabelName))
+            .ToList();
     }
 }

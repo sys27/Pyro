@@ -1,8 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, catchError, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { Endpoints } from '../endpoints';
-import { PyroResponse, ResponseError } from '../models/response';
 
 @Injectable({
     providedIn: 'root',
@@ -10,10 +9,8 @@ import { PyroResponse, ResponseError } from '../models/response';
 export class ProfileService {
     public constructor(private readonly http: HttpClient) {}
 
-    public getProfile(): Observable<PyroResponse<Profile>> {
-        return this.http
-            .get<Profile>(Endpoints.Profile)
-            .pipe(catchError((error: ResponseError) => of(error)));
+    public getProfile(): Observable<Profile> {
+        return this.http.get<Profile>(Endpoints.Profile);
     }
 
     public updateProfile(profile: UpdateProfile): Observable<void> {

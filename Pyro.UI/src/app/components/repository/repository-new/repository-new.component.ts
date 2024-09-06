@@ -1,8 +1,9 @@
-import { Component, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, Injector, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ValidationSummaryComponent, Validators } from '@controls/validation-summary';
 import { NotificationEvent, NotificationService } from '@services/notification.service';
+import { createErrorHandler } from '@services/operators';
 import { CreateRepository, RepositoryService } from '@services/repository.service';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
@@ -24,6 +25,12 @@ export class RepositoryNewComponent implements OnInit, OnDestroy {
                 Validators.maxLength('Name', 20),
                 Validators.pattern('Name', /^[a-zA-Z0-9-_]+$/),
             ],
+            [
+                Validators.exists(
+                    value => `The '${value}' repository already exists`,
+                    value => this.repositoryService.getRepository(value),
+                ),
+            ],
         ],
         description: ['', [Validators.maxLength('Description', 250)]],
         defaultBranch: [
@@ -36,6 +43,7 @@ export class RepositoryNewComponent implements OnInit, OnDestroy {
     private repositoryInitialized$: Observable<string> | undefined;
 
     public constructor(
+        private readonly injector: Injector,
         private readonly formBuilder: FormBuilder,
         private readonly router: Router,
         private readonly repositoryService: RepositoryService,
@@ -63,6 +71,7 @@ export class RepositoryNewComponent implements OnInit, OnDestroy {
         this.repositoryService
             .createRepository(this.form.value as CreateRepository)
             .pipe(
+                createErrorHandler(this.injector),
                 switchMap(() => this.repositoryInitialized$!),
                 filter(name => name === this.form.value.name),
                 finalize(() => this.isLoading.set(false)),

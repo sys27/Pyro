@@ -120,9 +120,10 @@ internal static class IdentityEndpoints
 
         accessTokenBuilder.MapGet("/", async (
                 IMediator mediator,
+                string? accessTokenName,
                 CancellationToken cancellationToken) =>
             {
-                var request = new GetAccessTokens();
+                var request = new GetAccessTokens(accessTokenName);
                 var accessTokens = await mediator.Send(request, cancellationToken);
                 var result = accessTokens.ToResponse();
 

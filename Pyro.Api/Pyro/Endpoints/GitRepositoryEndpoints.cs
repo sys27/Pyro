@@ -34,12 +34,12 @@ internal static class GitRepositoryEndpoints
 
     private static IEndpointRouteBuilder MapRepositories(this IEndpointRouteBuilder repositoryBuilder)
     {
-        repositoryBuilder.MapGet("/{name}", async (
+        repositoryBuilder.MapGet("/{repositoryName}", async (
                 IMediator mediator,
-                string name,
+                string repositoryName,
                 CancellationToken cancellationToken) =>
             {
-                var request = new GetGitRepository(name);
+                var request = new GetGitRepository(repositoryName);
                 var gitRepository = await mediator.Send(request, cancellationToken);
                 var result = gitRepository?.ToResponse();
 
@@ -99,12 +99,12 @@ internal static class GitRepositoryEndpoints
             .WithName("Create Repository")
             .WithOpenApi();
 
-        repositoryBuilder.MapGet("/{name}/branches", async (
+        repositoryBuilder.MapGet("/{repositoryName}/branches", async (
                 IMediator mediator,
-                string name,
+                string repositoryName,
                 CancellationToken cancellationToken) =>
             {
-                var request = new GetBranches(name);
+                var request = new GetBranches(repositoryName);
                 var branches = await mediator.Send(request, cancellationToken);
 
                 return Results.Ok(branches.ToResponse());
@@ -118,13 +118,13 @@ internal static class GitRepositoryEndpoints
             .WithName("Get Branches")
             .WithOpenApi();
 
-        repositoryBuilder.MapGet("/{name}/tree/{**branchOrPath}", async (
+        repositoryBuilder.MapGet("/{repositoryName}/tree/{**branchOrPath}", async (
                 IMediator mediator,
-                string name,
+                string repositoryName,
                 string? branchOrPath,
                 CancellationToken cancellationToken) =>
             {
-                var request = new GetTreeView(name, branchOrPath);
+                var request = new GetTreeView(repositoryName, branchOrPath);
                 var treeView = await mediator.Send(request, cancellationToken);
 
                 return treeView is not null
@@ -141,14 +141,14 @@ internal static class GitRepositoryEndpoints
             .WithName("Get Tree")
             .WithOpenApi();
 
-        repositoryBuilder.MapGet("/{name}/file/{**branchAndPath}", async (
+        repositoryBuilder.MapGet("/{repositoryName}/file/{**branchAndPath}", async (
                 IMediator mediator,
                 [FromServices] IContentTypeProvider contentTypeProvider,
-                string name,
+                string repositoryName,
                 string branchAndPath,
                 CancellationToken cancellationToken) =>
             {
-                var request = new GetFile(name, branchAndPath);
+                var request = new GetFile(repositoryName, branchAndPath);
                 var gitFile = await mediator.Send(request, cancellationToken);
                 if (gitFile is null)
                     return Results.NotFound();
@@ -173,15 +173,16 @@ internal static class GitRepositoryEndpoints
 
     private static IEndpointRouteBuilder MapLabels(this IEndpointRouteBuilder app)
     {
-        var labelsBuilder = app.MapGroup("/{name}/labels")
+        var labelsBuilder = app.MapGroup("/{repositoryName}/labels")
             .WithTags("Repository Labels");
 
         labelsBuilder.MapGet("/", async (
                 IMediator mediator,
-                string name,
+                string repositoryName,
+                string? labelName,
                 CancellationToken cancellationToken) =>
             {
-                var query = new GetLabels(name);
+                var query = new GetLabels(repositoryName, labelName);
                 var labels = await mediator.Send(query, cancellationToken);
                 var result = labels.ToResponse();
 
@@ -199,11 +200,11 @@ internal static class GitRepositoryEndpoints
 
         labelsBuilder.MapGet("/{id:guid}", async (
                 IMediator mediator,
-                [FromRoute] string name,
+                [FromRoute] string repositoryName,
                 [FromRoute] Guid id,
                 CancellationToken cancellationToken) =>
             {
-                var query = new GetLabel(name, id);
+                var query = new GetLabel(repositoryName, id);
                 var label = await mediator.Send(query, cancellationToken);
                 var result = label.ToResponse();
 
@@ -222,17 +223,17 @@ internal static class GitRepositoryEndpoints
         labelsBuilder.MapPost("/", async (
                 IMediator mediator,
                 UnitOfWork unitOfWork,
-                [FromRoute] string name,
+                [FromRoute] string repositoryName,
                 [FromBody] CreateLabelRequest request,
                 CancellationToken cancellationToken) =>
             {
-                var command = new CreateLabel(name, request.Name, request.Color.ToInt());
+                var command = new CreateLabel(repositoryName, request.Name, request.Color.ToInt());
                 var label = await mediator.Send(command, cancellationToken);
                 await unitOfWork.SaveChangesAsync(cancellationToken);
 
                 var result = label.ToResponse();
 
-                return Results.Created($"/repositories/{name}/labels/{label.Name}", result);
+                return Results.Created($"/repositories/{repositoryName}/labels/{label.Name}", result);
             })
             .RequirePermission(IssueEdit)
             .Produces<LabelResponse>(201)
@@ -246,12 +247,12 @@ internal static class GitRepositoryEndpoints
         labelsBuilder.MapPut("/{id:guid}", async (
                 IMediator mediator,
                 UnitOfWork unitOfWork,
-                [FromRoute] string name,
+                [FromRoute] string repositoryName,
                 [FromRoute] Guid id,
                 [FromBody] UpdateLabelRequest request,
                 CancellationToken cancellationToken) =>
             {
-                var command = new UpdateLabel(name, id, request.Name, request.Color.ToInt());
+                var command = new UpdateLabel(repositoryName, id, request.Name, request.Color.ToInt());
                 var label = await mediator.Send(command, cancellationToken);
                 await unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -271,11 +272,11 @@ internal static class GitRepositoryEndpoints
         labelsBuilder.MapDelete("/{id:guid}", async (
                 IMediator mediator,
                 UnitOfWork unitOfWork,
-                string name,
+                string repositoryName,
                 Guid id,
                 CancellationToken cancellationToken) =>
             {
-                var command = new DeleteLabel(name, id);
+                var command = new DeleteLabel(repositoryName, id);
                 await mediator.Send(command, cancellationToken);
                 await unitOfWork.SaveChangesAsync(cancellationToken);
 

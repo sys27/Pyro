@@ -3,7 +3,6 @@ import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideRouter, withComponentInputBinding, withRouterConfig } from '@angular/router';
 import { authInterceptor } from '@services/auth.interceptor';
-import { errorHandlingInterceptor } from '@services/error-handling.interceptor';
 import { MessageService } from 'primeng/api';
 import { routes } from './app.routes';
 
@@ -16,7 +15,7 @@ export const appConfig: ApplicationConfig = {
             withComponentInputBinding(),
             withRouterConfig({ paramsInheritanceStrategy: 'always' }),
         ),
-        provideHttpClient(withInterceptors([authInterceptor, errorHandlingInterceptor])),
+        provideHttpClient(withInterceptors([authInterceptor])),
         provideAnimationsAsync(),
     ],
 };

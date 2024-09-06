@@ -11,5 +11,5 @@ internal static class EndpointExtensions
         this TBuilder builder,
         string permission)
         where TBuilder : IEndpointConventionBuilder
-        => builder.RequireAuthorization([$"{PermissionPolicyProvider.PolicyPrefix}{permission}"]);
+        => builder.RequireAuthorization($"{PermissionPolicyProvider.PolicyPrefix}{permission}");
 }

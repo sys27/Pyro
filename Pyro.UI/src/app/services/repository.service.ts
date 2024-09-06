@@ -1,8 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, catchError, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { Endpoints } from '../endpoints';
-import { PyroResponse, ResponseError } from '../models/response';
 
 @Injectable({
     providedIn: 'root',
@@ -10,10 +9,7 @@ import { PyroResponse, ResponseError } from '../models/response';
 export class RepositoryService {
     public constructor(private readonly httpClient: HttpClient) {}
 
-    public getRepositories(
-        before?: string,
-        after?: string,
-    ): Observable<PyroResponse<RepositoryItem[]>> {
+    public getRepositories(before?: string, after?: string): Observable<RepositoryItem[]> {
         let params = new HttpParams().set('size', 20);
 
         if (before) {
@@ -24,15 +20,11 @@ export class RepositoryService {
             params = params.set('after', after);
         }
 
-        return this.httpClient
-            .get<RepositoryItem[]>(Endpoints.Repositories, { params: params })
-            .pipe(catchError((error: ResponseError) => of(error)));
+        return this.httpClient.get<RepositoryItem[]>(Endpoints.Repositories, { params: params });
     }
 
-    public getRepository(name: string): Observable<PyroResponse<Repository>> {
-        return this.httpClient
-            .get<Repository>(`${Endpoints.Repositories}/${name}`)
-            .pipe(catchError((error: ResponseError) => of(error)));
+    public getRepository(name: string): Observable<Repository> {
+        return this.httpClient.get<Repository>(`${Endpoints.Repositories}/${name}`);
     }
 
     public createRepository(repository: CreateRepository): Observable<void> {
@@ -45,32 +37,24 @@ export class RepositoryService {
         return this.httpClient.post<void>(Endpoints.Repositories, request);
     }
 
-    public getBranches(name: string): Observable<PyroResponse<BranchItem[]>> {
-        return this.httpClient
-            .get<BranchItem[]>(`${Endpoints.Repositories}/${name}/branches`)
-            .pipe(catchError((error: ResponseError) => of(error)));
+    public getBranches(name: string): Observable<BranchItem[]> {
+        return this.httpClient.get<BranchItem[]>(`${Endpoints.Repositories}/${name}/branches`);
     }
 
-    public getTreeView(name: string, branchOrPath?: string): Observable<PyroResponse<TreeView>> {
-        let observable$: Observable<TreeView>;
-
+    public getTreeView(name: string, branchOrPath?: string): Observable<TreeView> {
         if (branchOrPath) {
-            observable$ = this.httpClient.get<TreeView>(
+            return this.httpClient.get<TreeView>(
                 `${Endpoints.Repositories}/${name}/tree/${branchOrPath}`,
             );
-        } else {
-            observable$ = this.httpClient.get<TreeView>(`${Endpoints.Repositories}/${name}/tree`);
         }
 
-        return observable$.pipe(catchError((error: ResponseError) => of(error)));
+        return this.httpClient.get<TreeView>(`${Endpoints.Repositories}/${name}/tree`);
     }
 
-    public getFile(name: string, branchAndPath: string): Observable<PyroResponse<Blob>> {
-        return this.httpClient
-            .get(`${Endpoints.Repositories}/${name}/file/${branchAndPath}`, {
-                responseType: 'blob',
-            })
-            .pipe(catchError((error: ResponseError) => of(error)));
+    public getFile(name: string, branchAndPath: string): Observable<Blob> {
+        return this.httpClient.get(`${Endpoints.Repositories}/${name}/file/${branchAndPath}`, {
+            responseType: 'blob',
+        });
     }
 }
 

@@ -1,14 +1,13 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, DestroyRef, input, OnInit } from '@angular/core';
+import { Component, DestroyRef, Injector, input, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { PyroPermissions } from '@models/pyro-permissions';
-import { ResponseError } from '@models/response';
 import { ColorPipe } from '@pipes/color.pipe';
 import { LuminanceColorPipe } from '@pipes/luminance-color.pipe';
 import { AuthService } from '@services/auth.service';
 import { IssueStatus, IssueStatusService } from '@services/issue-status.service';
-import { mapErrorToEmpty } from '@services/operators';
+import { createErrorHandler } from '@services/operators';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
@@ -37,6 +36,7 @@ export class StatusListComponent implements OnInit {
     private readonly refreshStatuses$ = new BehaviorSubject<void>(undefined);
 
     public constructor(
+        private readonly injector: Injector,
         private readonly destroyRef: DestroyRef,
         private readonly messageService: MessageService,
         private readonly statusService: IssueStatusService,
@@ -46,7 +46,7 @@ export class StatusListComponent implements OnInit {
     public ngOnInit(): void {
         this.statuses$ = this.refreshStatuses$.pipe(
             switchMap(() => this.statusService.getStatuses(this.repositoryName())),
-            mapErrorToEmpty,
+            createErrorHandler(this.injector),
         );
         this.hasManagePermission$ = this.authService.currentUser.pipe(
             takeUntilDestroyed(this.destroyRef),
@@ -55,18 +55,17 @@ export class StatusListComponent implements OnInit {
     }
 
     public deleteStatus(status: IssueStatus): void {
-        this.statusService.deleteStatus(this.repositoryName(), status.id).subscribe(response => {
-            if (response instanceof ResponseError) {
-                return;
-            }
+        this.statusService
+            .deleteStatus(this.repositoryName(), status.id)
+            .pipe(createErrorHandler(this.injector))
+            .subscribe(() => {
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Success',
+                    detail: `Status '${status.name}' deleted`,
+                });
 
-            this.messageService.add({
-                severity: 'success',
-                summary: 'Success',
-                detail: `Status '${status.name}' deleted`,
+                this.refreshStatuses$.next();
             });
-
-            this.refreshStatuses$.next();
-        });
     }
 }

@@ -7,7 +7,7 @@ using Pyro.Domain.Shared.Exceptions;
 
 namespace Pyro.Domain.Issues.Queries;
 
-public record GetIssueStatuses(string RepositoryName) : IRequest<IReadOnlyList<IssueStatus>>;
+public record GetIssueStatuses(string RepositoryName, string? StatusName) : IRequest<IReadOnlyList<IssueStatus>>;
 
 public class GetIssueStatusesValidator : AbstractValidator<GetIssueStatuses>
 {
@@ -15,6 +15,9 @@ public class GetIssueStatusesValidator : AbstractValidator<GetIssueStatuses>
     {
         RuleFor(x => x.RepositoryName)
             .NotEmpty()
+            .MaximumLength(50);
+
+        RuleFor(x => x.StatusName)
             .MaximumLength(50);
     }
 }
@@ -33,6 +36,8 @@ public class GetIssueStatusesHandler : IRequestHandler<GetIssueStatuses, IReadOn
         var repository = await gitRepositoryRepository.GetRepository(request.RepositoryName, cancellationToken) ??
                          throw new NotFoundException($"The repository (Name: {request.RepositoryName}) not found");
 
-        return repository.IssueStatuses;
+        return repository.IssueStatuses
+            .Where(x => request.StatusName == null || x.Name.Contains(request.StatusName))
+            .ToList();
     }
 }

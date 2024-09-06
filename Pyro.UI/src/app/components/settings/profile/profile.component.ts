@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Injector, OnInit } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { ValidationSummaryComponent, Validators } from '@controls/validation-summary';
-import { mapErrorToNull } from '@services/operators';
+import { createErrorHandler } from '@services/operators';
 import { ProfileService, UpdateProfile } from '@services/profile.service';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
@@ -28,8 +28,9 @@ export class ProfileComponent implements OnInit {
     });
 
     public constructor(
-        private formBuilder: FormBuilder,
-        private profileService: ProfileService,
+        private readonly injector: Injector,
+        private readonly formBuilder: FormBuilder,
+        private readonly profileService: ProfileService,
     ) {}
 
     public ngOnInit(): void {
@@ -37,7 +38,7 @@ export class ProfileComponent implements OnInit {
 
         this.profileService
             .getProfile()
-            .pipe(mapErrorToNull)
+            .pipe(createErrorHandler(this.injector))
             .subscribe(profile => {
                 this.form.patchValue({
                     email: profile?.email,
@@ -52,6 +53,9 @@ export class ProfileComponent implements OnInit {
             return;
         }
 
-        this.profileService.updateProfile(this.form.value as UpdateProfile).subscribe(() => {});
+        this.profileService
+            .updateProfile(this.form.value as UpdateProfile)
+            .pipe(createErrorHandler(this.injector))
+            .subscribe(() => {});
     }
 }

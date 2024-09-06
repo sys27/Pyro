@@ -1,13 +1,14 @@
-import { Component, input, OnInit, signal } from '@angular/core';
+import { Component, Injector, input, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ValidationSummaryComponent, Validators } from '@controls/validation-summary';
 import { Color } from '@models/color';
 import { IssueStatusService } from '@services/issue-status.service';
-import { mapErrorToNull } from '@services/operators';
+import { createErrorHandler } from '@services/operators';
 import { ButtonModule } from 'primeng/button';
 import { ColorPickerModule } from 'primeng/colorpicker';
 import { InputTextModule } from 'primeng/inputtext';
+import { finalize } from 'rxjs';
 
 @Component({
     selector: 'status-edit',
@@ -32,6 +33,7 @@ export class StatusEditComponent implements OnInit {
     public readonly isLoading = signal<boolean>(false);
 
     public constructor(
+        private readonly injector: Injector,
         private readonly formBuilder: FormBuilder,
         private readonly router: Router,
         private readonly route: ActivatedRoute,
@@ -41,12 +43,8 @@ export class StatusEditComponent implements OnInit {
     public ngOnInit(): void {
         this.statusService
             .getStatus(this.repositoryName(), this.statusId())
-            .pipe(mapErrorToNull)
+            .pipe(createErrorHandler(this.injector))
             .subscribe(status => {
-                if (status === null) {
-                    return;
-                }
-
                 this.form.setValue({
                     name: status.name,
                     color: status.color,
@@ -68,13 +66,11 @@ export class StatusEditComponent implements OnInit {
 
         this.statusService
             .updateStatus(this.repositoryName(), this.statusId(), status)
-            .pipe(mapErrorToNull)
-            .subscribe(response => {
-                if (response === null) {
-                    this.isLoading.set(false);
-                    return;
-                }
-
+            .pipe(
+                createErrorHandler(this.injector),
+                finalize(() => this.isLoading.set(false)),
+            )
+            .subscribe(() => {
                 this.router.navigate(['../'], { relativeTo: this.route });
             });
     }

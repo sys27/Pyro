@@ -1,7 +1,6 @@
 import { Component, signal } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { PaginatorComponent, PaginatorState } from '@controls/paginator/paginator.component';
-import { mapErrorToEmpty } from '@services/operators';
 import { RepositoryItem, RepositoryService } from '@services/repository.service';
 import { TableModule } from 'primeng/table';
 import { Observable } from 'rxjs';
@@ -19,7 +18,7 @@ export class RepositoryListComponent {
     public constructor(private readonly repoService: RepositoryService) {}
 
     public paginatorLoader = (state: PaginatorState): Observable<RepositoryItem[]> => {
-        return this.repoService.getRepositories(state.before, state.after).pipe(mapErrorToEmpty);
+        return this.repoService.getRepositories(state.before, state.after);
     };
 
     public paginatorOffsetSelector(item: RepositoryItem): string {
