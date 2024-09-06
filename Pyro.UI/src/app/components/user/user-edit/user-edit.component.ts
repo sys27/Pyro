@@ -32,7 +32,6 @@ export class UserEditComponent implements OnInit {
     public roles$: Observable<Role[]> | undefined;
     public readonly form = this.formBuilder.nonNullable.group({
         login: ['', [Validators.required('Login')]],
-        isLocked: [false, Validators.required('Is Locked')],
         roles: new FormControl<Role[]>([], Validators.required('Roles')),
     });
 
@@ -52,7 +51,6 @@ export class UserEditComponent implements OnInit {
             .subscribe(user => {
                 this.form.patchValue({
                     login: user?.login,
-                    isLocked: user?.isLocked,
                     roles: user?.roles,
                 });
             });

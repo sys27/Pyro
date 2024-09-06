@@ -3,9 +3,7 @@
 
 using NSubstitute;
 using Pyro.Domain.Issues.Commands;
-using Pyro.Domain.Shared;
 using Pyro.Domain.Shared.Exceptions;
-using Pyro.Domain.Shared.Models;
 
 namespace Pyro.Domain.Issues.UnitTests.Commands;
 
@@ -16,14 +14,13 @@ public class UpdateIssueHandlerTests
     {
         var command = new UpdateIssue("repo", 1, "title", null, Guid.NewGuid(), []);
 
-        var currentUserProvider = Substitute.For<ICurrentUserProvider>();
         var issueRepository = Substitute.For<IIssueRepository>();
         issueRepository
             .GetIssue(command.RepositoryName, command.IssueNumber, Arg.Any<CancellationToken>())
             .Returns((Issue?)null);
         var gitRepositoryRepository = Substitute.For<IGitRepositoryRepository>();
 
-        var handler = new UpdateIssueHandler(currentUserProvider, issueRepository, gitRepositoryRepository);
+        var handler = new UpdateIssueHandler(issueRepository, gitRepositoryRepository);
 
         Assert.ThrowsAsync<NotFoundException>(() => handler.Handle(command));
     }
@@ -31,7 +28,6 @@ public class UpdateIssueHandlerTests
     [Test]
     public void MissingRepository()
     {
-        var currentUser = new CurrentUser(Guid.NewGuid(), "User", [], []);
         var gitRepository = new GitRepository
         {
             Id = Guid.NewGuid(),
@@ -52,14 +48,10 @@ public class UpdateIssueHandlerTests
                 Repository = gitRepository,
             },
             RepositoryId = gitRepository.Id,
-            Author = new User(currentUser.Id, currentUser.Login),
+            Author = new User(Guid.NewGuid(), "User"),
             CreatedAt = DateTimeOffset.Now,
         };
 
-        var currentUserProvider = Substitute.For<ICurrentUserProvider>();
-        currentUserProvider
-            .GetCurrentUser()
-            .Returns(currentUser);
         var repository = Substitute.For<IIssueRepository>();
         repository
             .GetIssue(command.RepositoryName, command.IssueNumber, Arg.Any<CancellationToken>())
@@ -69,61 +61,15 @@ public class UpdateIssueHandlerTests
             .GetRepository(command.RepositoryName, Arg.Any<CancellationToken>())
             .Returns((GitRepository?)null);
 
-        var handler = new UpdateIssueHandler(currentUserProvider, repository, gitRepositoryRepository);
+        var handler = new UpdateIssueHandler(repository, gitRepositoryRepository);
 
         Assert.ThrowsAsync<NotFoundException>(() => handler.Handle(command));
     }
 
     [Test]
-    public void CurrentUserCantUpdateIssue()
-    {
-        var currentUser = new CurrentUser(Guid.NewGuid(), "User", [], []);
-        var command = new UpdateIssue("repo", 1, "title", null, Guid.NewGuid(), []);
-        var gitRepository = new GitRepository
-        {
-            Id = Guid.NewGuid(),
-            Name = "test",
-        };
-        var issue = new Issue
-        {
-            Id = Guid.NewGuid(),
-            IssueNumber = command.IssueNumber,
-            Title = "title",
-            Status = new IssueStatus
-            {
-                Id = Guid.NewGuid(),
-                Name = "Open",
-                Color = 0,
-                Repository = gitRepository,
-            },
-            RepositoryId = gitRepository.Id,
-            Author = new User(Guid.NewGuid(), "test"),
-            CreatedAt = DateTimeOffset.Now,
-        };
-
-        var currentUserProvider = Substitute.For<ICurrentUserProvider>();
-        currentUserProvider
-            .GetCurrentUser()
-            .Returns(currentUser);
-        var repository = Substitute.For<IIssueRepository>();
-        repository
-            .GetIssue(command.RepositoryName, command.IssueNumber, Arg.Any<CancellationToken>())
-            .Returns(issue);
-        var gitRepositoryRepository = Substitute.For<IGitRepositoryRepository>();
-        gitRepositoryRepository
-            .GetRepository(command.RepositoryName, Arg.Any<CancellationToken>())
-            .Returns(gitRepository);
-
-        var handler = new UpdateIssueHandler(currentUserProvider, repository, gitRepositoryRepository);
-
-        Assert.ThrowsAsync<DomainException>(() => handler.Handle(command));
-    }
-
-    [Test]
     public async Task UpdateIssue()
     {
-        var currentUser = new CurrentUser(Guid.NewGuid(), "User", [], []);
-        var author = new User(currentUser.Id, currentUser.Login);
+        var author = new User(Guid.NewGuid(), "User");
         var gitRepository = new GitRepository
         {
             Id = Guid.NewGuid(),
@@ -172,10 +118,6 @@ public class UpdateIssueHandlerTests
             done.Id,
             [gitRepository.Labels[1].Id]);
 
-        var currentUserProvider = Substitute.For<ICurrentUserProvider>();
-        currentUserProvider
-            .GetCurrentUser()
-            .Returns(currentUser);
         var repository = Substitute.For<IIssueRepository>();
         repository
             .GetIssue(command.RepositoryName, command.IssueNumber, Arg.Any<CancellationToken>())
@@ -185,7 +127,7 @@ public class UpdateIssueHandlerTests
             .GetRepository(command.RepositoryName, Arg.Any<CancellationToken>())
             .Returns(gitRepository);
 
-        var handler = new UpdateIssueHandler(currentUserProvider, repository, gitRepositoryRepository);
+        var handler = new UpdateIssueHandler(repository, gitRepositoryRepository);
 
         var updatedIssue = await handler.Handle(command);
 

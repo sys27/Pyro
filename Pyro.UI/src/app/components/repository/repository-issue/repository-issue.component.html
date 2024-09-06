@@ -10,7 +10,7 @@
             routerLink="edit"
             label="Edit"
             icon="pi pi-pencil"
-            [disabled]="!(canEditIssue$ | async)"
+            [disabled]="!(hasEditPermission$ | async)"
             [outlined]="true" />
         </div>
       </div>
@@ -30,12 +30,14 @@
           </div>
         }
 
-        <div class="mt-2">
-          <comment-new
-            [repositoryName]="repositoryName()"
-            [issueNumber]="issueNumber()"
-            (commentAdded)="commentAdded()" />
-        </div>
+        @if (hasEditPermission$ | async) {
+          <div class="mt-2">
+            <comment-new
+              [repositoryName]="repositoryName()"
+              [issueNumber]="issueNumber()"
+              (commentAdded)="commentAdded()" />
+          </div>
+        }
       </div>
       <div class="col-2">
         <div>
