@@ -1,13 +1,14 @@
-import { Component, input, signal } from '@angular/core';
+import { Component, Injector, input, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ValidationSummaryComponent, Validators } from '@controls/validation-summary';
 import { Color } from '@models/color';
 import { LabelService } from '@services/label.service';
-import { mapErrorToNull } from '@services/operators';
+import { createErrorHandler } from '@services/operators';
 import { ButtonModule } from 'primeng/button';
 import { ColorPickerModule } from 'primeng/colorpicker';
 import { InputTextModule } from 'primeng/inputtext';
+import { filter, finalize } from 'rxjs';
 
 @Component({
     selector: 'label-new',
@@ -25,12 +26,25 @@ import { InputTextModule } from 'primeng/inputtext';
 export class LabelNewComponent {
     public readonly repositoryName = input.required<string>();
     public readonly form = this.formBuilder.nonNullable.group({
-        name: ['', [Validators.required('Name'), Validators.maxLength('Name', 50)]],
+        name: [
+            '',
+            [Validators.required('Name'), Validators.maxLength('Name', 50)],
+            [
+                Validators.exists(
+                    value => `The '${value}' status already exists`,
+                    value =>
+                        this.labelService
+                            .getLabels(this.repositoryName(), value)
+                            .pipe(filter(label => label.some(x => x.name == value))),
+                ),
+            ],
+        ],
         color: [{} as Color, [Validators.required('Name')]],
     });
     public readonly isLoading = signal<boolean>(false);
 
     public constructor(
+        private readonly injector: Injector,
         private readonly formBuilder: FormBuilder,
         private readonly router: Router,
         private readonly route: ActivatedRoute,
@@ -51,13 +65,11 @@ export class LabelNewComponent {
 
         this.labelService
             .createLabel(this.repositoryName(), label)
-            .pipe(mapErrorToNull)
-            .subscribe(response => {
-                if (response === null) {
-                    this.isLoading.set(false);
-                    return;
-                }
-
+            .pipe(
+                createErrorHandler(this.injector),
+                finalize(() => this.isLoading.set(false)),
+            )
+            .subscribe(() => {
                 this.router.navigate(['../'], { relativeTo: this.route });
             });
     }

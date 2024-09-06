@@ -1,8 +1,8 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, OnInit, input } from '@angular/core';
+import { Component, Injector, OnInit, input } from '@angular/core';
 import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ValidationSummaryComponent, Validators } from '@controls/validation-summary';
-import { mapErrorToEmpty, mapErrorToNull } from '@services/operators';
+import { createErrorHandler } from '@services/operators';
 import { Role, UpdateUser, UserService } from '@services/user.service';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
@@ -36,6 +36,7 @@ export class UserEditComponent implements OnInit {
     });
 
     public constructor(
+        private readonly injector: Injector,
         private readonly formBuilder: FormBuilder,
         private readonly userService: UserService,
     ) {}
@@ -43,11 +44,13 @@ export class UserEditComponent implements OnInit {
     public ngOnInit(): void {
         this.form.get('login')?.disable();
 
-        this.roles$ = this.userService.getRoles().pipe(mapErrorToEmpty, shareReplay(1));
+        this.roles$ = this.userService
+            .getRoles()
+            .pipe(createErrorHandler(this.injector), shareReplay(1));
 
         this.userService
             .getUser(this.login())
-            .pipe(mapErrorToNull)
+            .pipe(createErrorHandler(this.injector))
             .subscribe(user => {
                 this.form.patchValue({
                     login: user?.login,
@@ -63,6 +66,7 @@ export class UserEditComponent implements OnInit {
 
         this.userService
             .updateUser(this.login(), this.form.value as UpdateUser)
+            .pipe(createErrorHandler(this.injector))
             .subscribe(() => {});
     }
 }

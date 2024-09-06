@@ -4,7 +4,6 @@ import { RouterModule } from '@angular/router';
 import { PaginatorComponent, PaginatorState } from '@controls/paginator/paginator.component';
 import { PyroPermissions } from '@models/pyro-permissions';
 import { AuthService } from '@services/auth.service';
-import { mapErrorToEmpty } from '@services/operators';
 import { UserItem, UserService } from '@services/user.service';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
@@ -35,7 +34,7 @@ export class UserListComponent implements OnInit {
     }
 
     public paginatorLoader = (state: PaginatorState): Observable<UserItem[]> => {
-        return this.userService.getUsers(state.before, state.after).pipe(mapErrorToEmpty);
+        return this.userService.getUsers(state.before, state.after);
     };
 
     public paginatorOffsetSelector(item: UserItem): string {

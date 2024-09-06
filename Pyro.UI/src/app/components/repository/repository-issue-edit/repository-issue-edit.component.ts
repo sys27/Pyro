@@ -1,5 +1,5 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, input, signal } from '@angular/core';
+import { Component, Injector, input, signal } from '@angular/core';
 import {
     AbstractControl,
     FormBuilder,
@@ -16,7 +16,7 @@ import {
 } from '@services/issue-status.service';
 import { Issue, IssueService, User } from '@services/issue.service';
 import { Label, LabelService } from '@services/label.service';
-import { mapErrorToEmpty, mapErrorToNull } from '@services/operators';
+import { createErrorHandler } from '@services/operators';
 import { ButtonModule } from 'primeng/button';
 import { DropdownModule } from 'primeng/dropdown';
 import { InputTextModule } from 'primeng/inputtext';
@@ -79,6 +79,7 @@ export class RepositoryIssueEditComponent {
     public readonly isLoading = signal<boolean>(false);
 
     public constructor(
+        private readonly injector: Injector,
         private readonly formBuilder: FormBuilder,
         private readonly router: Router,
         private readonly route: ActivatedRoute,
@@ -88,19 +89,21 @@ export class RepositoryIssueEditComponent {
     ) {}
 
     public ngOnInit(): void {
-        this.users$ = this.issueService.getUsers().pipe(mapErrorToEmpty, shareReplay(1));
+        this.users$ = this.issueService
+            .getUsers()
+            .pipe(createErrorHandler(this.injector), shareReplay(1));
         this.labels$ = this.labelService
             .getLabels(this.repositoryName())
-            .pipe(mapErrorToEmpty, shareReplay(1));
+            .pipe(createErrorHandler(this.injector), shareReplay(1));
         this.statuses$ = this.statusService
             .getStatuses(this.repositoryName())
-            .pipe(mapErrorToEmpty, shareReplay(1));
+            .pipe(createErrorHandler(this.injector), shareReplay(1));
         this.statusTranstions$ = this.statusService
             .getStatusTransitions(this.repositoryName())
-            .pipe(mapErrorToEmpty, shareReplay(1));
+            .pipe(createErrorHandler(this.injector), shareReplay(1));
         this.issueService
             .getIssue(this.repositoryName(), this.issueNumber()!)
-            .pipe(mapErrorToNull, take(1))
+            .pipe(take(1), createErrorHandler(this.injector))
             .subscribe(issue => {
                 if (issue) {
                     this.issue = issue;
@@ -131,14 +134,10 @@ export class RepositoryIssueEditComponent {
         this.issueService
             .updateIssue(this.repositoryName(), this.issueNumber()!, issue)
             .pipe(
-                mapErrorToNull,
+                createErrorHandler(this.injector),
                 finalize(() => this.isLoading.set(false)),
             )
-            .subscribe(response => {
-                if (response === null) {
-                    return;
-                }
-
+            .subscribe(() => {
                 this.router.navigate(['../'], { relativeTo: this.route });
             });
     }

@@ -1,12 +1,12 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, input, OnInit, signal } from '@angular/core';
+import { Component, Injector, input, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ValidationSummaryComponent, Validators } from '@controls/validation-summary';
 import { IssueStatus, IssueStatusService } from '@services/issue-status.service';
 import { IssueService, User } from '@services/issue.service';
 import { Label, LabelService } from '@services/label.service';
-import { mapErrorToEmpty, mapErrorToNull } from '@services/operators';
+import { createErrorHandler } from '@services/operators';
 import { ButtonModule } from 'primeng/button';
 import { DropdownModule } from 'primeng/dropdown';
 import { InputTextModule } from 'primeng/inputtext';
@@ -42,6 +42,7 @@ export class RepositoryIssueNewComponent implements OnInit {
     public readonly isLoading = signal<boolean>(false);
 
     public constructor(
+        private readonly injector: Injector,
         private readonly formBuilder: FormBuilder,
         private readonly router: Router,
         private readonly route: ActivatedRoute,
@@ -51,13 +52,15 @@ export class RepositoryIssueNewComponent implements OnInit {
     ) {}
 
     public ngOnInit(): void {
-        this.users$ = this.issueService.getUsers().pipe(mapErrorToEmpty, shareReplay(1));
+        this.users$ = this.issueService
+            .getUsers()
+            .pipe(createErrorHandler(this.injector), shareReplay(1));
         this.labels$ = this.labelService
             .getLabels(this.repositoryName())
-            .pipe(mapErrorToEmpty, shareReplay(1));
+            .pipe(createErrorHandler(this.injector), shareReplay(1));
         this.statuses$ = this.statusService
             .getStatuses(this.repositoryName())
-            .pipe(mapErrorToEmpty, shareReplay(1));
+            .pipe(createErrorHandler(this.injector), shareReplay(1));
     }
 
     public onSubmit(): void {
@@ -77,14 +80,10 @@ export class RepositoryIssueNewComponent implements OnInit {
         this.issueService
             .createIssue(this.repositoryName(), issue)
             .pipe(
-                mapErrorToNull,
+                createErrorHandler(this.injector),
                 finalize(() => this.isLoading.set(false)),
             )
-            .subscribe(response => {
-                if (response === null) {
-                    return;
-                }
-
+            .subscribe(() => {
                 this.router.navigate(['../'], { relativeTo: this.route });
             });
     }

@@ -8,7 +8,7 @@ using Pyro.Domain.Shared.Exceptions;
 
 namespace Pyro.Domain.Identity.Queries;
 
-public record GetAccessTokens : IRequest<IReadOnlyList<AccessToken>>;
+public record GetAccessTokens(string? AccessTokenName) : IRequest<IReadOnlyList<AccessToken>>;
 
 public class GetAccessTokenHandler : IRequestHandler<GetAccessTokens, IReadOnlyList<AccessToken>>
 {
@@ -24,11 +24,11 @@ public class GetAccessTokenHandler : IRequestHandler<GetAccessTokens, IReadOnlyL
     public async Task<IReadOnlyList<AccessToken>> Handle(GetAccessTokens request, CancellationToken cancellationToken)
     {
         var currentUser = currentUserProvider.GetCurrentUser();
-        var user = await repository.GetUserById(currentUser.Id, cancellationToken);
-        if (user is null)
-            throw new DomainException("User not found");
+        var user = await repository.GetUserById(currentUser.Id, cancellationToken) ??
+                   throw new DomainException("User not found");
 
         return user.AccessTokens
+            .Where(x => request.AccessTokenName is null || x.Name.Contains(request.AccessTokenName))
             .OrderBy(x => x.Name)
             .ToList();
     }

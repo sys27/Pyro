@@ -1,12 +1,13 @@
-import { Component, signal } from '@angular/core';
+import { Component, Injector, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { ValidationSummaryComponent, Validators } from '@controls/validation-summary';
 import { AccessTokenService, CreateAccessToken } from '@services/access-token.service';
-import { mapErrorToNull } from '@services/operators';
+import { createErrorHandler } from '@services/operators';
 import { ButtonModule } from 'primeng/button';
 import { CalendarModule } from 'primeng/calendar';
 import { InputGroupModule } from 'primeng/inputgroup';
 import { InputTextModule } from 'primeng/inputtext';
+import { filter } from 'rxjs';
 
 @Component({
     selector: 'access-token-new',
@@ -24,7 +25,19 @@ import { InputTextModule } from 'primeng/inputtext';
 })
 export class AccessTokenNewComponent {
     public readonly form = this.formBuilder.nonNullable.group({
-        name: ['', [Validators.required('Name'), Validators.maxLength('Name', 50)]],
+        name: [
+            '',
+            [Validators.required('Name'), Validators.maxLength('Name', 50)],
+            [
+                Validators.exists(
+                    value => `The access token with name '${value}' already exists`,
+                    value =>
+                        this.service
+                            .getAccessTokens(value)
+                            .pipe(filter(token => token.some(x => x.name == value))),
+                ),
+            ],
+        ],
         expiresAt: [new Date(), Validators.required('Expires At')],
         token: [''],
     });
@@ -32,6 +45,7 @@ export class AccessTokenNewComponent {
     public readonly isViewMode = signal<boolean>(false);
 
     public constructor(
+        private readonly injector: Injector,
         private readonly formBuilder: FormBuilder,
         private readonly service: AccessTokenService,
     ) {}
@@ -43,12 +57,8 @@ export class AccessTokenNewComponent {
 
         this.service
             .createAccessToken(this.form.value as CreateAccessToken)
-            .pipe(mapErrorToNull)
+            .pipe(createErrorHandler(this.injector))
             .subscribe(response => {
-                if (response === null) {
-                    return;
-                }
-
                 this.form.disable();
                 this.isViewMode.set(true);
                 this.form.controls.token.setValue(response.token);

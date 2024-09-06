@@ -1,13 +1,14 @@
-import { Component, input, signal } from '@angular/core';
+import { Component, Injector, input, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ValidationSummaryComponent, Validators } from '@controls/validation-summary';
 import { Color } from '@models/color';
 import { LabelService } from '@services/label.service';
-import { mapErrorToNull } from '@services/operators';
+import { createErrorHandler } from '@services/operators';
 import { ButtonModule } from 'primeng/button';
 import { ColorPickerModule } from 'primeng/colorpicker';
 import { InputTextModule } from 'primeng/inputtext';
+import { finalize } from 'rxjs';
 
 @Component({
     selector: 'label-edit',
@@ -33,6 +34,7 @@ export class LabelEditComponent {
     public readonly isLoading = signal<boolean>(false);
 
     public constructor(
+        private readonly injector: Injector,
         private readonly formBuilder: FormBuilder,
         private readonly router: Router,
         private readonly route: ActivatedRoute,
@@ -42,12 +44,8 @@ export class LabelEditComponent {
     public ngOnInit(): void {
         this.labelService
             .getLabel(this.repositoryName(), this.labelId())
-            .pipe(mapErrorToNull)
+            .pipe(createErrorHandler(this.injector))
             .subscribe(label => {
-                if (label === null) {
-                    return;
-                }
-
                 this.form.setValue({
                     name: label.name,
                     color: label.color,
@@ -69,13 +67,11 @@ export class LabelEditComponent {
 
         this.labelService
             .updateLabel(this.repositoryName(), this.labelId(), label)
-            .pipe(mapErrorToNull)
-            .subscribe(response => {
-                if (response === null) {
-                    this.isLoading.set(false);
-                    return;
-                }
-
+            .pipe(
+                createErrorHandler(this.injector),
+                finalize(() => this.isLoading.set(false)),
+            )
+            .subscribe(() => {
                 this.router.navigate(['../'], { relativeTo: this.route });
             });
     }

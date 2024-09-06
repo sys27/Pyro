@@ -18,7 +18,7 @@ internal static class IssueEndpoints
     {
         app.MapIssueUsers();
 
-        var issuesBuilder = app.MapGroup("/repositories/{name}/issues")
+        var issuesBuilder = app.MapGroup("/repositories/{repositoryName}/issues")
             .WithTags("Issues");
 
         issuesBuilder
@@ -55,11 +55,11 @@ internal static class IssueEndpoints
 
         issuesBuilder.MapGet("/{number:int}", async (
                 IMediator mediator,
-                string name,
+                string repositoryName,
                 int number,
                 CancellationToken cancellationToken) =>
             {
-                var query = new GetIssue(name, number);
+                var query = new GetIssue(repositoryName, number);
                 var issue = await mediator.Send(query, cancellationToken);
                 var result = issue?.ToResponse();
 
@@ -80,12 +80,12 @@ internal static class IssueEndpoints
         issuesBuilder.MapPost("/", async (
                 IMediator mediator,
                 UnitOfWork unitOfWork,
-                string name,
+                string repositoryName,
                 CreateIssueRequest request,
                 CancellationToken cancellationToken) =>
             {
                 var command = new CreateIssue(
-                    name,
+                    repositoryName,
                     request.Title,
                     request.AssigneeId,
                     request.StatusId,
@@ -95,7 +95,7 @@ internal static class IssueEndpoints
 
                 var result = issue.ToResponse();
 
-                return Results.Created($"/repositories/{name}/issues/{issue.IssueNumber}", result);
+                return Results.Created($"/repositories/{repositoryName}/issues/{issue.IssueNumber}", result);
             })
             .RequirePermission(IssueEdit)
             .Produces<IssueResponse>(201)
@@ -109,13 +109,13 @@ internal static class IssueEndpoints
         issuesBuilder.MapPut("/{number:int}", async (
                 IMediator mediator,
                 UnitOfWork unitOfWork,
-                string name,
+                string repositoryName,
                 int number,
                 UpdateIssueRequest request,
                 CancellationToken cancellationToken) =>
             {
                 var command = new UpdateIssue(
-                    name,
+                    repositoryName,
                     number,
                     request.Title,
                     request.AssigneeId,
@@ -140,11 +140,11 @@ internal static class IssueEndpoints
         issuesBuilder.MapDelete("/{number:int}", async (
                 IMediator mediator,
                 UnitOfWork unitOfWork,
-                string name,
+                string repositoryName,
                 int number,
                 CancellationToken cancellationToken) =>
             {
-                var command = new DeleteIssue(name, number);
+                var command = new DeleteIssue(repositoryName, number);
                 await mediator.Send(command, cancellationToken);
                 await unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -170,11 +170,11 @@ internal static class IssueEndpoints
 
         commentsBuilder.MapGet("/", async (
                 IMediator mediator,
-                string name,
+                string repositoryName,
                 int number,
                 CancellationToken cancellationToken) =>
             {
-                var query = new GetIssueComments(name, number);
+                var query = new GetIssueComments(repositoryName, number);
                 var comments = await mediator.Send(query, cancellationToken);
 
                 var result = comments.ToResponse();
@@ -193,18 +193,18 @@ internal static class IssueEndpoints
         commentsBuilder.MapPost("/", async (
                 IMediator mediator,
                 UnitOfWork unitOfWork,
-                string name,
+                string repositoryName,
                 int number,
                 CreateIssueCommentRequest request,
                 CancellationToken cancellationToken) =>
             {
-                var command = new CreateIssueComment(name, number, request.Content);
+                var command = new CreateIssueComment(repositoryName, number, request.Content);
                 var comment = await mediator.Send(command, cancellationToken);
                 await unitOfWork.SaveChangesAsync(cancellationToken);
 
                 var result = comment.ToResponse();
 
-                return Results.Created($"/repositories/{name}/issues/{number}/comments/{comment.Id}", result);
+                return Results.Created($"/repositories/{repositoryName}/issues/{number}/comments/{comment.Id}", result);
             })
             .RequirePermission(IssueEdit)
             .Produces<IssueCommentResponse>(201)
@@ -218,13 +218,13 @@ internal static class IssueEndpoints
         commentsBuilder.MapPut("/{commentId:guid}", async (
                 IMediator mediator,
                 UnitOfWork unitOfWork,
-                string name,
+                string repositoryName,
                 int number,
                 Guid commentId,
                 UpdateIssueCommentRequest request,
                 CancellationToken cancellationToken) =>
             {
-                var command = new UpdateIssueComment(name, number, commentId, request.Content);
+                var command = new UpdateIssueComment(repositoryName, number, commentId, request.Content);
                 var comment = await mediator.Send(command, cancellationToken);
                 await unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -244,12 +244,12 @@ internal static class IssueEndpoints
         commentsBuilder.MapDelete("/{id:guid}", async (
                 IMediator mediator,
                 UnitOfWork unitOfWork,
-                string name,
+                string repositoryName,
                 int number,
                 Guid id,
                 CancellationToken cancellationToken) =>
             {
-                var command = new DeleteIssueComment(name, number, id);
+                var command = new DeleteIssueComment(repositoryName, number, id);
                 await mediator.Send(command, cancellationToken);
                 await unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -301,10 +301,11 @@ internal static class IssueEndpoints
 
         statusBuilder.MapGet("/", async (
                 IMediator mediator,
-                string name,
+                string repositoryName,
+                string? statusName,
                 CancellationToken cancellationToken) =>
             {
-                var query = new GetIssueStatuses(name);
+                var query = new GetIssueStatuses(repositoryName, statusName);
                 var statuses = await mediator.Send(query, cancellationToken);
                 var result = statuses.ToResponse();
 
@@ -322,11 +323,11 @@ internal static class IssueEndpoints
 
         statusBuilder.MapGet("/{id:guid}", async (
                 IMediator mediator,
-                string name,
+                string repositoryName,
                 Guid id,
                 CancellationToken cancellationToken) =>
             {
-                var query = new GetIssueStatus(name, id);
+                var query = new GetIssueStatus(repositoryName, id);
                 var statuses = await mediator.Send(query, cancellationToken);
                 var result = statuses?.ToResponse();
 
@@ -347,17 +348,17 @@ internal static class IssueEndpoints
         statusBuilder.MapPost("/", async (
                 IMediator mediator,
                 UnitOfWork unitOfWork,
-                string name,
+                string repositoryName,
                 CreateIssueStatusRequest request,
                 CancellationToken cancellationToken) =>
             {
-                var command = new CreateIssueStatus(name, request.Name, request.Color.ToInt());
+                var command = new CreateIssueStatus(repositoryName, request.Name, request.Color.ToInt());
                 var status = await mediator.Send(command, cancellationToken);
                 await unitOfWork.SaveChangesAsync(cancellationToken);
 
                 var result = status.ToResponse();
 
-                return Results.Created($"/repositories/{name}/issues/statuses/{status.Id}", result);
+                return Results.Created($"/repositories/{repositoryName}/issues/statuses/{status.Id}", result);
             })
             .RequirePermission(IssueManage)
             .Produces<IssueResponse>(201)
@@ -371,12 +372,12 @@ internal static class IssueEndpoints
         statusBuilder.MapPut("/{id:guid}", async (
                 IMediator mediator,
                 UnitOfWork unitOfWork,
-                string name,
+                string repositoryName,
                 Guid id,
                 UpdateIssueStatusRequest request,
                 CancellationToken cancellationToken) =>
             {
-                var command = new UpdateIssueStatus(name, id, request.Name, request.Color.ToInt());
+                var command = new UpdateIssueStatus(repositoryName, id, request.Name, request.Color.ToInt());
                 var status = await mediator.Send(command, cancellationToken);
                 await unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -396,11 +397,11 @@ internal static class IssueEndpoints
         statusBuilder.MapDelete("/{id:guid}", async (
                 IMediator mediator,
                 UnitOfWork unitOfWork,
-                string name,
+                string repositoryName,
                 Guid id,
                 CancellationToken cancellationToken) =>
             {
-                var command = new DeleteIssueStatus(name, id);
+                var command = new DeleteIssueStatus(repositoryName, id);
                 await mediator.Send(command, cancellationToken);
                 await unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -426,10 +427,10 @@ internal static class IssueEndpoints
 
         transitionsBuilder.MapGet("/", async (
                 IMediator mediator,
-                string name,
+                string repositoryName,
                 CancellationToken cancellationToken) =>
             {
-                var query = new GetAllIssueStatusTransitions(name);
+                var query = new GetAllIssueStatusTransitions(repositoryName);
                 var transitions = await mediator.Send(query, cancellationToken);
                 var result = transitions.ToResponse();
 
@@ -449,17 +450,17 @@ internal static class IssueEndpoints
         transitionsBuilder.MapPost("/", async (
                 IMediator mediator,
                 UnitOfWork unitOfWork,
-                string name,
+                string repositoryName,
                 CreateIssueStatusTransitionRequest request,
                 CancellationToken cancellationToken) =>
             {
-                var command = new CreateIssueStatusTransition(name, request.FromId, request.ToId);
+                var command = new CreateIssueStatusTransition(repositoryName, request.FromId, request.ToId);
                 var transition = await mediator.Send(command, cancellationToken);
                 await unitOfWork.SaveChangesAsync(cancellationToken);
 
                 var result = transition.ToResponse();
 
-                return Results.Created($"/repositories/{name}/issues/statuses/transitions/{transition.Id}", result);
+                return Results.Created($"/repositories/{repositoryName}/issues/statuses/transitions/{transition.Id}", result);
             })
             .RequirePermission(IssueManage)
             .Produces<IssueStatusTransitionResponse>(201)
@@ -473,11 +474,11 @@ internal static class IssueEndpoints
         transitionsBuilder.MapDelete("/{id:guid}", async (
                 IMediator mediator,
                 UnitOfWork unitOfWork,
-                string name,
+                string repositoryName,
                 Guid id,
                 CancellationToken cancellationToken) =>
             {
-                var command = new DeleteIssueStatusTransition(name, id);
+                var command = new DeleteIssueStatusTransition(repositoryName, id);
                 await mediator.Send(command, cancellationToken);
                 await unitOfWork.SaveChangesAsync(cancellationToken);
 

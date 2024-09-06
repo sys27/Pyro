@@ -1,13 +1,12 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, DestroyRef, input, OnDestroy, OnInit } from '@angular/core';
+import { Component, DestroyRef, Injector, input, OnDestroy, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { PyroPermissions } from '@models/pyro-permissions';
-import { ResponseError } from '@models/response';
 import { ColorPipe } from '@pipes/color.pipe';
 import { AuthService } from '@services/auth.service';
 import { Label, LabelService } from '@services/label.service';
-import { mapErrorToEmpty } from '@services/operators';
+import { createErrorHandler } from '@services/operators';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
@@ -27,6 +26,7 @@ export class LabelListComponent implements OnInit, OnDestroy {
     public hasManagePermission$: Observable<boolean> | undefined;
 
     public constructor(
+        private readonly injector: Injector,
         private readonly destroyRef: DestroyRef,
         private readonly messageService: MessageService,
         private readonly labelService: LabelService,
@@ -35,9 +35,8 @@ export class LabelListComponent implements OnInit, OnDestroy {
 
     public ngOnInit(): void {
         this.labels$ = this.refreshLabels$.pipe(
-            switchMap(() =>
-                this.labelService.getLabels(this.repositoryName()).pipe(mapErrorToEmpty),
-            ),
+            switchMap(() => this.labelService.getLabels(this.repositoryName())),
+            createErrorHandler(this.injector),
             shareReplay(1),
         );
         this.hasManagePermission$ = this.authService.currentUser.pipe(
@@ -51,18 +50,17 @@ export class LabelListComponent implements OnInit, OnDestroy {
     }
 
     public deleteLabel(label: Label): void {
-        this.labelService.deleteLabel(this.repositoryName(), label.id).subscribe(response => {
-            if (response instanceof ResponseError) {
-                return;
-            }
+        this.labelService
+            .deleteLabel(this.repositoryName(), label.id)
+            .pipe(createErrorHandler(this.injector))
+            .subscribe(() => {
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Success',
+                    detail: `Label ${label.name} deleted`,
+                });
 
-            this.messageService.add({
-                severity: 'success',
-                summary: 'Success',
-                detail: `Label ${label.name} deleted`,
+                this.refreshLabels$.next();
             });
-
-            this.refreshLabels$.next();
-        });
     }
 }

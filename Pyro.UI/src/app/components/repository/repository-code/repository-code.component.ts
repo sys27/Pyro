@@ -1,9 +1,9 @@
 import { AsyncPipe, DatePipe, SlicePipe } from '@angular/common';
-import { Component, computed, input, OnDestroy, OnInit } from '@angular/core';
+import { Component, computed, Injector, input, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MarkdownService } from '@services/markdown.service';
-import { mapErrorToEmpty, mapErrorToNull } from '@services/operators';
+import { createErrorHandler } from '@services/operators';
 import { BranchItem, Repository, RepositoryService, TreeView } from '@services/repository.service';
 import { ButtonModule } from 'primeng/button';
 import { DeferModule } from 'primeng/defer';
@@ -77,6 +77,7 @@ export class RepositoryCodeComponent implements OnInit, OnDestroy {
     private readonly destroy$ = new Subject<void>();
 
     public constructor(
+        private readonly injector: Injector,
         private readonly router: Router,
         private readonly route: ActivatedRoute,
         private readonly repositoryService: RepositoryService,
@@ -87,11 +88,11 @@ export class RepositoryCodeComponent implements OnInit, OnDestroy {
         this.branchOrPath$ = this.route.data.pipe(map(data => data['branchOrPath']));
         this.repository$ = this.repositoryService
             .getRepository(this.repositoryName())
-            .pipe(mapErrorToNull, shareReplay(1));
+            .pipe(createErrorHandler(this.injector), shareReplay(1));
         this.branches$ = this.repository$?.pipe(
             filter(repository => repository != null),
             switchMap(repository => this.repositoryService.getBranches(repository!.name)),
-            mapErrorToEmpty,
+            createErrorHandler(this.injector),
             shareReplay(1),
         );
 
@@ -111,7 +112,7 @@ export class RepositoryCodeComponent implements OnInit, OnDestroy {
             switchMap(([repository, branchOrPath]) =>
                 this.repositoryService.getTreeView(repository!.name, branchOrPath.join('/')),
             ),
-            mapErrorToNull,
+            createErrorHandler(this.injector),
             shareReplay(1),
         );
 
@@ -191,7 +192,7 @@ export class RepositoryCodeComponent implements OnInit, OnDestroy {
                     branchOrPath.concat(fileName).join('/'),
                 );
             }),
-            mapErrorToNull,
+            createErrorHandler(this.injector),
             switchMap(blob => (blob != null ? from(blob.text()) : of(null))),
             switchMap(content => this.markdownService.parse(content ?? '')),
             shareReplay(1),

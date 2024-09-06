@@ -22,11 +22,11 @@ internal static class GitBackendEndpoints
     private static IEndpointRouteBuilder MapNativeGitBackendEndpoints(this IEndpointRouteBuilder app)
     {
         app
-            .Map("/{name}.git/{**path}", async (
+            .Map("/{repositoryName}.git/{**path}", async (
                     GitBackend backend,
-                    string name,
+                    string repositoryName,
                     CancellationToken cancellationToken) =>
-                await backend.Handle(name, cancellationToken))
+                await backend.Handle(repositoryName, cancellationToken))
             .RequireAuthorization(pb => pb
                 .AddAuthenticationSchemes(AuthExtensions.BasicAuthenticationScheme)
                 .RequireAuthenticatedUser());
@@ -36,7 +36,7 @@ internal static class GitBackendEndpoints
 
     private static IEndpointRouteBuilder MapCsharpBackendEndpoint(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/{name}.git");
+        var group = app.MapGroup("/{repositoryName}.git");
 
         group.MapGet("/HEAD", () => { throw new NotImplementedException(); });
         group.MapGet("/info/refs", () => { throw new NotImplementedException(); });

@@ -1,8 +1,7 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Color } from '@models/color';
-import { PyroResponse, ResponseError } from '@models/response';
-import { catchError, Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { Endpoints } from '../endpoints';
 
 @Injectable({
@@ -11,82 +10,76 @@ import { Endpoints } from '../endpoints';
 export class IssueStatusService {
     public constructor(private readonly httpClient: HttpClient) {}
 
-    public getStatuses(repositoryName: string): Observable<PyroResponse<IssueStatus[]>> {
-        return this.httpClient
-            .get<IssueStatus[]>(Endpoints.Statuses(repositoryName))
-            .pipe(catchError((error: ResponseError) => of(error)));
+    public getStatuses(repositoryName: string, statusName?: string): Observable<IssueStatus[]> {
+        let httpParams = new HttpParams();
+        if (statusName) {
+            httpParams = httpParams.set('statusName', statusName);
+        }
+
+        return this.httpClient.get<IssueStatus[]>(Endpoints.Statuses(repositoryName), {
+            params: httpParams,
+        });
     }
 
-    public getStatus(repositoryName: string, id: string): Observable<PyroResponse<IssueStatus>> {
-        return this.httpClient
-            .get<IssueStatus>(`${Endpoints.Statuses(repositoryName)}/${id}`)
-            .pipe(catchError((error: ResponseError) => of(error)));
+    public getStatus(repositoryName: string, id: string): Observable<IssueStatus> {
+        return this.httpClient.get<IssueStatus>(`${Endpoints.Statuses(repositoryName)}/${id}`);
     }
 
     public createStatus(
         repositoryName: string,
         status: CreateIssueStatus,
-    ): Observable<PyroResponse<IssueStatus>> {
+    ): Observable<IssueStatus> {
         let request = {
             name: status.name,
             color: status.color,
         };
 
-        return this.httpClient
-            .post<IssueStatus>(Endpoints.Statuses(repositoryName), request)
-            .pipe(catchError((error: ResponseError) => of(error)));
+        return this.httpClient.post<IssueStatus>(Endpoints.Statuses(repositoryName), request);
     }
 
     public updateStatus(
         repositoryName: string,
         id: string,
         status: UpdateIssueStatus,
-    ): Observable<PyroResponse<IssueStatus>> {
+    ): Observable<IssueStatus> {
         let request = {
             name: status.name,
             color: status.color,
         };
 
-        return this.httpClient
-            .put<IssueStatus>(`${Endpoints.Statuses(repositoryName)}/${id}`, request)
-            .pipe(catchError((error: ResponseError) => of(error)));
+        return this.httpClient.put<IssueStatus>(
+            `${Endpoints.Statuses(repositoryName)}/${id}`,
+            request,
+        );
     }
 
-    public deleteStatus(repositoryName: string, id: string): Observable<PyroResponse<void>> {
-        return this.httpClient
-            .delete<void>(`${Endpoints.Statuses(repositoryName)}/${id}`)
-            .pipe(catchError((error: ResponseError) => of(error)));
+    public deleteStatus(repositoryName: string, id: string): Observable<void> {
+        return this.httpClient.delete<void>(`${Endpoints.Statuses(repositoryName)}/${id}`);
     }
 
-    public getStatusTransitions(
-        repositoryName: string,
-    ): Observable<PyroResponse<IssueStatusTransition[]>> {
-        return this.httpClient
-            .get<IssueStatusTransition[]>(Endpoints.StatusTransitions(repositoryName))
-            .pipe(catchError((error: ResponseError) => of(error)));
+    public getStatusTransitions(repositoryName: string): Observable<IssueStatusTransition[]> {
+        return this.httpClient.get<IssueStatusTransition[]>(
+            Endpoints.StatusTransitions(repositoryName),
+        );
     }
 
     public createStatusTransition(
         repositoryName: string,
         transition: CreateIssueStatusTransition,
-    ): Observable<PyroResponse<IssueStatusTransition>> {
+    ): Observable<IssueStatusTransition> {
         let request = {
             fromId: transition.fromId,
             toId: transition.toId,
         };
 
-        return this.httpClient
-            .post<IssueStatusTransition>(Endpoints.StatusTransitions(repositoryName), request)
-            .pipe(catchError((error: ResponseError) => of(error)));
+        return this.httpClient.post<IssueStatusTransition>(
+            Endpoints.StatusTransitions(repositoryName),
+            request,
+        );
     }
 
-    public deleteStatusTransition(
-        repositoryName: string,
-        id: string,
-    ): Observable<PyroResponse<void>> {
-        return this.httpClient
-            .delete<void>(`${Endpoints.StatusTransitions(repositoryName)}/${id}`)
-            .pipe(catchError((error: ResponseError) => of(error)));
+    public deleteStatusTransition(repositoryName: string, id: string): Observable<void> {
+        return this.httpClient.delete<void>(`${Endpoints.StatusTransitions(repositoryName)}/${id}`);
     }
 }
 

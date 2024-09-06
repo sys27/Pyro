@@ -1,8 +1,7 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { Endpoints } from '../endpoints';
-import { PyroResponse, ResponseError } from '../models/response';
 
 @Injectable({
     providedIn: 'root',
@@ -10,21 +9,22 @@ import { PyroResponse, ResponseError } from '../models/response';
 export class AccessTokenService {
     public constructor(private readonly httpClient: HttpClient) {}
 
-    public getAccessTokens(): Observable<PyroResponse<AccessToken[]>> {
-        return this.httpClient
-            .get<AccessToken[]>(Endpoints.AccessTokens)
-            .pipe(catchError((error: ResponseError) => of(error)));
+    public getAccessTokens(accessTokenName?: string): Observable<AccessToken[]> {
+        let httpParams = new HttpParams();
+        if (accessTokenName) {
+            httpParams = httpParams.set('accessTokenName', accessTokenName);
+        }
+
+        return this.httpClient.get<AccessToken[]>(Endpoints.AccessTokens, { params: httpParams });
     }
 
-    public createAccessToken(token: CreateAccessToken): Observable<PyroResponse<AccessToken>> {
+    public createAccessToken(token: CreateAccessToken): Observable<AccessToken> {
         let request = {
             name: token.name,
             expiresAt: token.expiresAt,
         };
 
-        return this.httpClient
-            .post<AccessToken>(Endpoints.AccessTokens, request)
-            .pipe(catchError((error: ResponseError) => of(error)));
+        return this.httpClient.post<AccessToken>(Endpoints.AccessTokens, request);
     }
 
     public deleteAccessToken(tokenName: string): Observable<void> {

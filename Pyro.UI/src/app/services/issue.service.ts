@@ -1,8 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { Endpoints } from '../endpoints';
-import { PyroResponse, ResponseError } from '../models/response';
 import { IssueStatus } from './issue-status.service';
 import { Label } from './label.service';
 
@@ -10,11 +9,7 @@ import { Label } from './label.service';
 export class IssueService {
     public constructor(private readonly httpClient: HttpClient) {}
 
-    public getIssues(
-        repositoryName: string,
-        before?: string,
-        after?: string,
-    ): Observable<PyroResponse<Issue[]>> {
+    public getIssues(repositoryName: string, before?: string, after?: string): Observable<Issue[]> {
         let params = new HttpParams().set('size', 20);
 
         if (before) {
@@ -25,24 +20,17 @@ export class IssueService {
             params = params.set('after', after);
         }
 
-        return this.httpClient
-            .get<Issue[]>(Endpoints.Issues(repositoryName), { params: params })
-            .pipe(catchError((error: ResponseError) => of(error)));
+        return this.httpClient.get<Issue[]>(Endpoints.Issues(repositoryName), { params: params });
     }
 
-    public getIssue(repositoryName: string, issueNumber: number): Observable<PyroResponse<Issue>> {
-        return this.httpClient
-            .get<Issue>(`${Endpoints.Issues(repositoryName)}/${issueNumber}`)
-            .pipe(catchError((error: ResponseError) => of(error)));
+    public getIssue(repositoryName: string, issueNumber: number): Observable<Issue> {
+        return this.httpClient.get<Issue>(`${Endpoints.Issues(repositoryName)}/${issueNumber}`);
     }
 
-    public getIssueComments(
-        repositoryName: string,
-        issueNumber: number,
-    ): Observable<PyroResponse<Comment[]>> {
-        return this.httpClient
-            .get<Comment[]>(`${Endpoints.Issues(repositoryName)}/${issueNumber}/comments`)
-            .pipe(catchError((error: ResponseError) => of(error)));
+    public getIssueComments(repositoryName: string, issueNumber: number): Observable<Comment[]> {
+        return this.httpClient.get<Comment[]>(
+            `${Endpoints.Issues(repositoryName)}/${issueNumber}/comments`,
+        );
     }
 
     public createIssue(repositoryName: string, issue: CreateIssue): Observable<void> {
@@ -78,14 +66,15 @@ export class IssueService {
         repositoryName: string,
         issueNumber: number,
         comment: CreateIssueComment,
-    ): Observable<PyroResponse<Comment>> {
+    ): Observable<Comment> {
         let request = {
             content: comment.content,
         };
 
-        return this.httpClient
-            .post<Comment>(`${Endpoints.Issues(repositoryName)}/${issueNumber}/comments`, request)
-            .pipe(catchError((error: ResponseError) => of(error)));
+        return this.httpClient.post<Comment>(
+            `${Endpoints.Issues(repositoryName)}/${issueNumber}/comments`,
+            request,
+        );
     }
 
     public updateIssueComment(
@@ -93,7 +82,7 @@ export class IssueService {
         issueNumber: number,
         commentId: string,
         comment: UpdateIssueComment,
-    ): Observable<PyroResponse<Comment>> {
+    ): Observable<Comment> {
         let request = {
             content: comment.content,
         };
@@ -104,10 +93,8 @@ export class IssueService {
         );
     }
 
-    public getUsers(): Observable<PyroResponse<User[]>> {
-        return this.httpClient
-            .get<User[]>(Endpoints.IssueUsers)
-            .pipe(catchError((error: ResponseError) => of(error)));
+    public getUsers(): Observable<User[]> {
+        return this.httpClient.get<User[]>(Endpoints.IssueUsers);
     }
 }
 

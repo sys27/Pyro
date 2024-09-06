@@ -1,8 +1,7 @@
 import { HttpClient, HttpContext } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { CurrentUser } from '@models/current-user';
-import { ResponseError } from '@models/response';
-import { BehaviorSubject, Observable, catchError, of, switchMap } from 'rxjs';
+import { BehaviorSubject, Observable, catchError, switchMap, throwError } from 'rxjs';
 import { Endpoints } from '../endpoints';
 import { ALLOW_ANONYMOUS } from './auth.interceptor';
 
@@ -22,18 +21,12 @@ export class AuthService {
 
     public login(login: string, password: string): Observable<CurrentUser | null> {
         return this.httpClient.post<LoginResponse>(Endpoints.Login, { login, password }).pipe(
-            catchError((error: ResponseError) => {
-                localStorage.removeItem(AuthService.accessTokenKey);
-                localStorage.removeItem(AuthService.refreshTokenKey);
-                this.updateCurrentUser();
+            catchError(error => {
+                this.logout();
 
-                return of(error);
+                return throwError(() => error);
             }),
             switchMap(response => {
-                if (response instanceof ResponseError) {
-                    return this.currentUser;
-                }
-
                 localStorage.setItem(AuthService.accessTokenKey, response.accessToken);
                 localStorage.setItem(AuthService.refreshTokenKey, response.refreshToken);
                 this.updateCurrentUser();
@@ -56,16 +49,12 @@ export class AuthService {
                 { context: new HttpContext().set(ALLOW_ANONYMOUS, true) },
             )
             .pipe(
-                catchError((error: ResponseError) => {
+                catchError(error => {
                     this.logout();
 
-                    return of(error);
+                    return throwError(() => error);
                 }),
                 switchMap(response => {
-                    if (response instanceof ResponseError) {
-                        return this.currentUser;
-                    }
-
                     localStorage.setItem(AuthService.accessTokenKey, response.accessToken);
                     this.updateCurrentUser();
 

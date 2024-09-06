@@ -1,26 +1,33 @@
-import { Observable, map } from 'rxjs';
-import { PyroResponse, ResponseError } from '../models/response';
+import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
+import { Injector } from '@angular/core';
+import { Router } from '@angular/router';
+import { MessageService } from 'primeng/api';
+import { catchError, Observable, OperatorFunction, throwError } from 'rxjs';
 
-export function mapErrorToNull<T>(source: Observable<PyroResponse<T>>): Observable<T | null> {
-    return source.pipe(
-        map(response => {
-            if (response instanceof ResponseError) {
-                return null;
-            }
+export function createErrorHandler<T>(injector: Injector): OperatorFunction<T, T> {
+    let router = injector.get(Router);
+    let messageService = injector.get(MessageService);
 
-            return response;
-        }),
-    );
-}
+    return (source: Observable<T>): Observable<T> => {
+        return source.pipe(
+            catchError((error: HttpErrorResponse) => {
+                if (error.status === HttpStatusCode.Unauthorized) {
+                    router.navigate(['/login']);
+                }
 
-export function mapErrorToEmpty<T>(source: Observable<PyroResponse<T[]>>): Observable<T[]> {
-    return source.pipe(
-        map(response => {
-            if (response instanceof ResponseError) {
-                return [];
-            }
+                if (
+                    error.status >= HttpStatusCode.BadRequest &&
+                    error.status <= HttpStatusCode.NetworkAuthenticationRequired
+                ) {
+                    messageService.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: error.statusText,
+                    });
+                }
 
-            return response;
-        }),
-    );
+                return throwError(() => error);
+            }),
+        );
+    };
 }

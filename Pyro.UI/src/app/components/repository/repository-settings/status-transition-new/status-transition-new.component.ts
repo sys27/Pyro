@@ -1,13 +1,13 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, input, OnInit, signal } from '@angular/core';
+import { Component, Injector, input, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ValidationSummaryComponent } from '@controls/validation-summary';
 import { IssueStatus, IssueStatusService } from '@services/issue-status.service';
-import { mapErrorToEmpty, mapErrorToNull } from '@services/operators';
+import { createErrorHandler } from '@services/operators';
 import { ButtonModule } from 'primeng/button';
 import { DropdownModule } from 'primeng/dropdown';
-import { Observable, shareReplay } from 'rxjs';
+import { finalize, Observable, shareReplay } from 'rxjs';
 
 @Component({
     selector: 'status-transition-new',
@@ -47,6 +47,7 @@ export class StatusTransitionNewComponent implements OnInit {
     public statuses$: Observable<IssueStatus[]> | undefined;
 
     public constructor(
+        private readonly injector: Injector,
         private readonly formBuilder: FormBuilder,
         private readonly router: Router,
         private readonly route: ActivatedRoute,
@@ -56,7 +57,7 @@ export class StatusTransitionNewComponent implements OnInit {
     public ngOnInit(): void {
         this.statuses$ = this.statusService
             .getStatuses(this.repositoryName())
-            .pipe(mapErrorToEmpty, shareReplay(1));
+            .pipe(createErrorHandler(this.injector), shareReplay(1));
     }
 
     public onSubmit(): void {
@@ -73,13 +74,11 @@ export class StatusTransitionNewComponent implements OnInit {
 
         this.statusService
             .createStatusTransition(this.repositoryName(), transition)
-            .pipe(mapErrorToNull)
-            .subscribe(response => {
-                if (response === null) {
-                    this.isLoading.set(false);
-                    return;
-                }
-
+            .pipe(
+                createErrorHandler(this.injector),
+                finalize(() => this.isLoading.set(false)),
+            )
+            .subscribe(() => {
                 this.router.navigate(['../'], { relativeTo: this.route });
             });
     }
