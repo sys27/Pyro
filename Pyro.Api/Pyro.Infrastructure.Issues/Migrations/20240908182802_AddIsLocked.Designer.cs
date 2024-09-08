@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Pyro.Infrastructure.Issues.DataAccess;
 
@@ -10,9 +11,11 @@ using Pyro.Infrastructure.Issues.DataAccess;
 namespace Pyro.Infrastructure.Issues.Migrations
 {
     [DbContext(typeof(IssuesDbContext))]
-    partial class IssuesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240908182802_AddIsLocked")]
+    partial class AddIsLocked
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.8");
@@ -349,13 +352,13 @@ namespace Pyro.Infrastructure.Issues.Migrations
                     b.HasOne("Pyro.Domain.Issues.Issue", "Issue")
                         .WithMany()
                         .HasForeignKey("IssueId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Pyro.Domain.Issues.Label", "Label")
                         .WithMany()
                         .HasForeignKey("LabelId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Issue");

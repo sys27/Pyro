@@ -1,9 +1,10 @@
 import { AsyncPipe, DatePipe } from '@angular/common';
 import { Component, input, OnInit, output } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
 import { AuthService } from '@services/auth.service';
-import { Comment } from '@services/issue.service';
+import { Comment, Issue } from '@services/issue.service';
 import { PanelModule } from 'primeng/panel';
-import { map, Observable } from 'rxjs';
+import { combineLatest, map, Observable } from 'rxjs';
 import { MarkdownPipe } from '../../../../pipes/markdown.pipe';
 import { CommentNewComponent } from '../comment-new/comment-new.component';
 
@@ -17,7 +18,8 @@ import { CommentNewComponent } from '../comment-new/comment-new.component';
 export class CommentViewComponent implements OnInit {
     public readonly comment = input.required<Comment>();
     public readonly repositoryName = input.required<string>();
-    public readonly issueNumber = input.required<number>();
+    public readonly issue = input.required<Issue>();
+    private readonly issue$ = toObservable(this.issue);
     public isEditMode: boolean = false;
     public canEditIssue$: Observable<boolean> | undefined;
     public readonly commentAdded = output<Comment>();
@@ -25,13 +27,13 @@ export class CommentViewComponent implements OnInit {
     public constructor(private readonly authService: AuthService) {}
 
     public ngOnInit(): void {
-        this.canEditIssue$ = this.authService.currentUser.pipe(
-            map(user => {
-                if (!user) {
+        this.canEditIssue$ = combineLatest([this.authService.currentUser, this.issue$]).pipe(
+            map(([user, issue]) => {
+                if (!user || !issue) {
                     return false;
                 }
 
-                return this.comment().author.id === user.id;
+                return this.comment().author.id === user.id && !issue.isLocked;
             }),
         );
     }

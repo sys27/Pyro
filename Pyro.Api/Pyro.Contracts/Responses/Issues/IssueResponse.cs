@@ -11,4 +11,5 @@ public record IssueResponse(
     UserResponse Author,
     DateTimeOffset CreatedAt,
     UserResponse? Assignee,
+    bool IsLocked,
     IReadOnlyList<LabelResponse> Labels);

@@ -62,6 +62,20 @@ export class IssueService {
         );
     }
 
+    public lockIssue(repositoryName: string, issueNumber: number): Observable<void> {
+        return this.httpClient.post<void>(
+            `${Endpoints.Issues(repositoryName)}/${issueNumber}/lock`,
+            null,
+        );
+    }
+
+    public unlockIssue(repositoryName: string, issueNumber: number): Observable<void> {
+        return this.httpClient.post<void>(
+            `${Endpoints.Issues(repositoryName)}/${issueNumber}/unlock`,
+            null,
+        );
+    }
+
     public createIssueComment(
         repositoryName: string,
         issueNumber: number,
@@ -107,6 +121,7 @@ export interface Issue {
     assignee: User | null;
     labels: Label[];
     status: IssueStatus;
+    isLocked: boolean;
 }
 
 export interface Comment {

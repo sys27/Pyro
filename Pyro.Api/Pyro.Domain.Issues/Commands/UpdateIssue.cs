@@ -58,15 +58,11 @@ public class UpdateIssueHandler : IRequestHandler<UpdateIssue, Issue>
         issue.AssignTo(assignee);
         issue.TransitionTo(request.StatusId, repository);
 
-        issue.ClearLabels();
-        foreach (var labelId in request.Labels)
-        {
-            var label = repository.GetLabel(labelId);
-            if (label is null)
-                continue;
-
-            issue.AddLabel(label);
-        }
+        var labels = request.Labels
+            .Select(x => repository.GetLabel(x))
+            .Where(x => x is not null)
+            .ToList();
+        issue.UpdateLabels(labels!);
 
         return issue;
     }
