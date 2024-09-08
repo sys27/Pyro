@@ -3,7 +3,7 @@ import { Component, Injector, input, OnInit, output, signal } from '@angular/cor
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { ValidationSummaryComponent, Validators } from '@controls/validation-summary';
 import { MarkdownPipe } from '@pipes/markdown.pipe';
-import { Comment, IssueService } from '@services/issue.service';
+import { Comment, Issue, IssueService } from '@services/issue.service';
 import { createErrorHandler } from '@services/operators';
 import { ButtonModule } from 'primeng/button';
 import { DividerModule } from 'primeng/divider';
@@ -30,7 +30,7 @@ import { TabViewModule } from 'primeng/tabview';
 })
 export class CommentNewComponent implements OnInit {
     public readonly repositoryName = input.required<string>();
-    public readonly issueNumber = input.required<number>();
+    public readonly issue = input.required<Issue>();
     public readonly comment = input<Comment>();
     public readonly isLoading = signal<boolean>(false);
     public readonly form = this.formBuilder.group({
@@ -74,15 +74,11 @@ export class CommentNewComponent implements OnInit {
         let httpCall = this.isEditMode
             ? this.issueService.updateIssueComment(
                   this.repositoryName(),
-                  this.issueNumber(),
+                  this.issue().issueNumber,
                   this.comment()!.id,
                   comment,
               )
-            : this.issueService.createIssueComment(
-                  this.repositoryName(),
-                  this.issueNumber(),
-                  comment,
-              );
+            : this.issueService.createIssueComment(this.repositoryName(), this.issue().issueNumber, comment);
 
         httpCall.pipe(createErrorHandler(this.injector)).subscribe(comment => {
             this.isLoading.set(false);

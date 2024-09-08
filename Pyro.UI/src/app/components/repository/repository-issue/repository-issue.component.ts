@@ -40,8 +40,10 @@ export class RepositoryIssueComponent implements OnInit, OnDestroy {
     public readonly issueNumber = input.required<number>();
     public issue$: Observable<Issue | null> | undefined;
     public comments$: Observable<Comment[]> | undefined;
-    public hasEditPermission$: Observable<boolean> | undefined;
+    public canEdit$: Observable<boolean> | undefined;
+    public canManage$: Observable<boolean> | undefined;
     private readonly commentAddedTrigger$ = new BehaviorSubject<void>(undefined);
+    private readonly refreshIssue$ = new BehaviorSubject<void>(undefined);
 
     public constructor(
         private readonly injector: Injector,
@@ -51,9 +53,11 @@ export class RepositoryIssueComponent implements OnInit, OnDestroy {
     ) {}
 
     public ngOnInit(): void {
-        this.issue$ = this.issueService
-            .getIssue(this.repositoryName(), this.issueNumber())
-            .pipe(createErrorHandler(this.injector), shareReplay(1));
+        this.issue$ = this.refreshIssue$.pipe(
+            switchMap(() => this.issueService.getIssue(this.repositoryName(), this.issueNumber())),
+            createErrorHandler(this.injector),
+            shareReplay(1),
+        );
         this.comments$ = combineLatest([this.issue$!, this.commentAddedTrigger$]).pipe(
             switchMap(([issue, _]) => {
                 if (!issue) {
@@ -65,18 +69,47 @@ export class RepositoryIssueComponent implements OnInit, OnDestroy {
             createErrorHandler(this.injector),
             shareReplay(1),
         );
-        this.hasEditPermission$ = this.authService.currentUser.pipe(
+        this.canEdit$ = combineLatest([this.authService.currentUser, this.issue$]).pipe(
             takeUntilDestroyed(this.destroyRef),
-            map(user => user?.hasPermission(PyroPermissions.IssueEdit) ?? false),
+            map(([user, issue]) => {
+                if (!user || !issue) {
+                    return false;
+                }
+
+                return user.hasPermission(PyroPermissions.IssueEdit) && !issue.isLocked;
+            }),
+        );
+        this.canManage$ = this.authService.currentUser.pipe(
+            takeUntilDestroyed(this.destroyRef),
+            map(user => {
+                if (!user) {
+                    return false;
+                }
+
+                return user.hasPermission(PyroPermissions.IssueManage);
+            }),
         );
     }
 
     public ngOnDestroy(): void {
         this.commentAddedTrigger$.complete();
+        this.refreshIssue$.complete();
     }
 
     public commentAdded(): void {
         // TODO: do not refresh all comments, just add the new one
         this.commentAddedTrigger$.next();
+    }
+
+    public lockIssue(): void {
+        this.issueService
+            .lockIssue(this.repositoryName(), this.issueNumber())
+            .subscribe(() => this.refreshIssue$.next());
+    }
+
+    public unlockIssue(): void {
+        this.issueService
+            .unlockIssue(this.repositoryName(), this.issueNumber())
+            .subscribe(() => this.refreshIssue$.next());
     }
 }

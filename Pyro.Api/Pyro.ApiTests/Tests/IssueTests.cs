@@ -39,6 +39,8 @@ public class IssueTests
         var repositoryName = await CreateRepository();
         var number = await CreateIssue(repositoryName);
         await UpdateIssue(repositoryName, number);
+        await LockIssue(repositoryName, number);
+        await UnlockIssue(repositoryName, number);
         await GetIssue(repositoryName, number);
 
         var commentId = await CreateComment(repositoryName, number);
@@ -158,6 +160,26 @@ public class IssueTests
             Assert.That(issue.Labels, Has.One.EqualTo(label));
             Assert.That(issue.Status.Id, Is.EqualTo(status.Id));
         });
+    }
+
+    private async Task LockIssue(string repositoryName, int number)
+    {
+        await issueClient.LockIssue(repositoryName, number);
+
+        var issue = await issueClient.GetIssue(repositoryName, number);
+
+        Assert.That(issue, Is.Not.Null);
+        Assert.That(issue.IsLocked, Is.True);
+    }
+
+    private async Task UnlockIssue(string repositoryName, int number)
+    {
+        await issueClient.UnlockIssue(repositoryName, number);
+
+        var issue = await issueClient.GetIssue(repositoryName, number);
+
+        Assert.That(issue, Is.Not.Null);
+        Assert.That(issue.IsLocked, Is.False);
     }
 
     private async Task GetIssue(string name, int number)

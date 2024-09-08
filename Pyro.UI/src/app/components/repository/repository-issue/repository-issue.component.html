@@ -10,7 +10,7 @@
             routerLink="edit"
             label="Edit"
             icon="pi pi-pencil"
-            [disabled]="!(hasEditPermission$ | async)"
+            [disabled]="!(canEdit$ | async)"
             [outlined]="true" />
         </div>
       </div>
@@ -24,17 +24,17 @@
               <comment-view
                 [comment]="comment"
                 [repositoryName]="repositoryName()"
-                [issueNumber]="issueNumber()"
+                [issue]="issue"
                 (commentAdded)="commentAdded()" />
             }
           </div>
         }
 
-        @if (hasEditPermission$ | async) {
+        @if (canEdit$ | async) {
           <div class="mt-2">
             <comment-new
               [repositoryName]="repositoryName()"
-              [issueNumber]="issueNumber()"
+              [issue]="issue"
               (commentAdded)="commentAdded()" />
           </div>
         }
@@ -94,6 +94,28 @@
               <span>No Labels</span>
             }
           </div>
+        </div>
+
+        <p-divider />
+
+        <div>
+          @if (issue.isLocked) {
+            <p-button
+              label="Unlock"
+              icon="pi pi-lock-open"
+              severity="secondary"
+              [outlined]="true"
+              (click)="unlockIssue()"
+              [disabled]="!(canManage$ | async)" />
+          } @else {
+            <p-button
+              label="Lock"
+              icon="pi pi-lock"
+              severity="secondary"
+              [outlined]="true"
+              (click)="lockIssue()"
+              [disabled]="!(canManage$ | async)" />
+          }
         </div>
       </div>
     </div>

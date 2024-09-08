@@ -79,6 +79,7 @@ internal class IssueRepository : IIssueRepository
             .ThenInclude(x => x.Author)
             .Include(x => x.Labels)
             .Include(x => x.Status)
+            .AsSingleQuery()
             .FirstOrDefaultAsync(
                 i => i.RepositoryId == gitRepository.Id &&
                      i.IssueNumber == number,
@@ -95,8 +96,5 @@ internal class IssueRepository : IIssueRepository
     }
 
     public void DeleteIssue(Issue issue)
-    {
-        issue.ClearLabels();
-        dbContext.Set<Issue>().Remove(issue);
-    }
+        => dbContext.Set<Issue>().Remove(issue);
 }

@@ -32,6 +32,12 @@ internal class IssueClient : BaseClient
     public async Task DeleteIssue(string repositoryName, int number)
         => await Delete($"/api/repositories/{repositoryName}/issues/{number}");
 
+    public async Task LockIssue(string repositoryName, int number)
+        => await Post($"/api/repositories/{repositoryName}/issues/{number}/lock");
+
+    public async Task UnlockIssue(string repositoryName, int number)
+        => await Post($"/api/repositories/{repositoryName}/issues/{number}/unlock");
+
     public async Task<IReadOnlyList<IssueCommentResponse>?> GetComments(string repositoryName, int number)
         => await Get<IReadOnlyList<IssueCommentResponse>>($"/api/repositories/{repositoryName}/issues/{number}/comments");
 

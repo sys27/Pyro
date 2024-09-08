@@ -160,6 +160,52 @@ internal static class IssueEndpoints
             .WithName("Delete Issue")
             .WithOpenApi();
 
+        issuesBuilder.MapPost("/{number:int}/lock", async (
+                IMediator mediator,
+                UnitOfWork unitOfWork,
+                string repositoryName,
+                int number,
+                CancellationToken cancellationToken) =>
+            {
+                var command = new LockIssue(repositoryName, number);
+                await mediator.Send(command, cancellationToken);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
+
+                return Results.Ok();
+            })
+            .RequirePermission(IssueManage)
+            .Produces(200)
+            .ProducesValidationProblem()
+            .Produces(401)
+            .Produces(403)
+            .Produces(404)
+            .ProducesProblem(500)
+            .WithName("Lock Issue")
+            .WithOpenApi();
+
+        issuesBuilder.MapPost("/{number:int}/unlock", async (
+                IMediator mediator,
+                UnitOfWork unitOfWork,
+                string repositoryName,
+                int number,
+                CancellationToken cancellationToken) =>
+            {
+                var command = new UnlockIssue(repositoryName, number);
+                await mediator.Send(command, cancellationToken);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
+
+                return Results.Ok();
+            })
+            .RequirePermission(IssueManage)
+            .Produces(200)
+            .ProducesValidationProblem()
+            .Produces(401)
+            .Produces(403)
+            .Produces(404)
+            .ProducesProblem(500)
+            .WithName("Unlock Issue")
+            .WithOpenApi();
+
         return issuesBuilder;
     }
 

@@ -32,6 +32,8 @@ public class Issue : Entity
 
     public User? Assignee { get; private set; }
 
+    public bool IsLocked { get; private set; }
+
     public IReadOnlyList<IssueComment> Comments
         => comments;
 
@@ -43,6 +45,8 @@ public class Issue : Entity
 
     public IssueComment AddComment(string content, User author, DateTimeOffset createdAt)
     {
+        ThrowIfLocked();
+
         var comment = new IssueComment
         {
             Issue = this,
@@ -57,37 +61,91 @@ public class Issue : Entity
     }
 
     public void DeleteComment(IssueComment comment)
-        => comments.Remove(comment);
+    {
+        ThrowIfLocked();
+
+        comments.Remove(comment);
+    }
 
     public void AssignTo(User? assignee)
-        => Assignee = assignee;
+    {
+        if (assignee?.Id == Assignee?.Id)
+            return;
+
+        ThrowIfLocked();
+
+        Assignee = assignee;
+    }
 
     public void AddLabel(Label label)
     {
         if (labels.Any(x => x.Name == label.Name))
             return;
 
+        ThrowIfLocked();
+
         labels.Add(label);
     }
 
-    public void ClearLabels()
-        => labels.Clear();
+    public void RemoveLabel(Label label)
+    {
+        ThrowIfLocked();
+
+        labels.Remove(label);
+    }
+
+    private void ClearLabels()
+    {
+        ThrowIfLocked();
+
+        labels.Clear();
+    }
+
+    public void UpdateLabels(IReadOnlyList<Label> newLabels)
+    {
+        if (newLabels.Count == 0)
+        {
+            ClearLabels();
+            return;
+        }
+
+        var labelsToRemove = labels.Except(newLabels).ToList();
+        foreach (var label in labelsToRemove)
+            RemoveLabel(label);
+
+        var labelsToAdd = newLabels.Except(labels).ToList();
+        foreach (var label in labelsToAdd)
+            AddLabel(label);
+    }
 
     public void TransitionTo(Guid statusId, GitRepository repository)
     {
-        if (repository.Id != RepositoryId)
-            throw new DomainException("The issue does not belong to the repository");
-
         if (Status.Id == statusId)
             return;
 
-        var issueStatus = repository.GetIssueStatus(statusId);
-        if (issueStatus is null)
-            throw new NotFoundException($"The issue status (Id: {statusId}) not found");
+        ThrowIfLocked();
+
+        if (repository.Id != RepositoryId)
+            throw new DomainException("The issue does not belong to the repository");
+
+        var issueStatus = repository.GetIssueStatus(statusId) ??
+                          throw new NotFoundException($"The issue status (Id: {statusId}) not found");
 
         if (!Status.CanTransitionTo(issueStatus))
             throw new DomainException($"The issue cannot be transitioned from '{Status.Name}' to '{issueStatus.Name}'");
 
         status = issueStatus;
+    }
+
+    public void Lock()
+        => IsLocked = true;
+
+    public void Unlock()
+        => IsLocked = false;
+
+    private void ThrowIfLocked()
+    {
+        if (IsLocked)
+            throw new DomainException($"The issue (Id: {Id}) is locked");
     }
 }

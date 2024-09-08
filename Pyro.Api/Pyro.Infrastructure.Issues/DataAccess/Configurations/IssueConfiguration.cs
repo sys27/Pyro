@@ -76,13 +76,13 @@ internal class IssueConfiguration : IEntityTypeConfiguration<Issue>
                     .WithMany()
                     .HasForeignKey(x => x.LabelId)
                     .HasPrincipalKey(x => x.Id)
-                    .OnDelete(DeleteBehavior.NoAction)
+                    .OnDelete(DeleteBehavior.ClientCascade)
                     .IsRequired(),
                 l => l.HasOne(x => x.Issue)
                     .WithMany()
                     .HasForeignKey(x => x.IssueId)
                     .HasPrincipalKey(x => x.Id)
-                    .OnDelete(DeleteBehavior.NoAction)
+                    .OnDelete(DeleteBehavior.ClientCascade)
                     .IsRequired(),
                 j =>
                 {
@@ -97,6 +97,10 @@ internal class IssueConfiguration : IEntityTypeConfiguration<Issue>
                     j.Property(x => x.LabelId)
                         .IsRequired();
                 });
+
+        builder.Property(x => x.IsLocked)
+            .IsRequired()
+            .HasDefaultValue(false);
     }
 }
 
