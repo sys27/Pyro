@@ -2,6 +2,7 @@ import { AsyncPipe, NgClass } from '@angular/common';
 import { Component, DestroyRef, input, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { PaginatorComponent, PaginatorState } from '@controls/paginator/paginator.component';
+import { TagComponent } from '@controls/tag/tag.component';
 import { PyroPermissions } from '@models/pyro-permissions';
 import { ColorPipe } from '@pipes/color.pipe';
 import { LuminanceColorPipe } from '@pipes/luminance-color.pipe';
@@ -10,7 +11,6 @@ import { Issue, IssueService } from '@services/issue.service';
 import { ButtonModule } from 'primeng/button';
 import { DataViewModule } from 'primeng/dataview';
 import { DividerModule } from 'primeng/divider';
-import { TagModule } from 'primeng/tag';
 import { map, Observable, of } from 'rxjs';
 
 @Component({
@@ -26,7 +26,7 @@ import { map, Observable, of } from 'rxjs';
         NgClass,
         PaginatorComponent,
         RouterLink,
-        TagModule,
+        TagComponent,
     ],
     templateUrl: './repository-issues.component.html',
     styleUrls: ['./repository-issues.component.css'],

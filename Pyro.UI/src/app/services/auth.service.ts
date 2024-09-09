@@ -1,7 +1,7 @@
 import { HttpClient, HttpContext } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { CurrentUser } from '@models/current-user';
-import { BehaviorSubject, Observable, catchError, switchMap, throwError } from 'rxjs';
+import { BehaviorSubject, Observable, catchError, finalize, switchMap, throwError } from 'rxjs';
 import { Endpoints } from '../endpoints';
 import { ALLOW_ANONYMOUS } from './auth.interceptor';
 
@@ -22,7 +22,7 @@ export class AuthService {
     public login(login: string, password: string): Observable<CurrentUser | null> {
         return this.httpClient.post<LoginResponse>(Endpoints.Login, { login, password }).pipe(
             catchError(error => {
-                this.logout();
+                this.removeTokens();
 
                 return throwError(() => error);
             }),
@@ -49,11 +49,7 @@ export class AuthService {
                 { context: new HttpContext().set(ALLOW_ANONYMOUS, true) },
             )
             .pipe(
-                catchError(error => {
-                    this.logout();
-
-                    return throwError(() => error);
-                }),
+                catchError(error => this.logout().pipe(switchMap(() => throwError(() => error)))),
                 switchMap(response => {
                     localStorage.setItem(AuthService.accessTokenKey, response.accessToken);
                     this.updateCurrentUser();
@@ -63,7 +59,13 @@ export class AuthService {
             );
     }
 
-    public logout(): void {
+    public logout(): Observable<void> {
+        return this.httpClient
+            .post<void>(Endpoints.Logout, {})
+            .pipe(finalize(() => this.removeTokens()));
+    }
+
+    private removeTokens(): void {
         localStorage.removeItem(AuthService.accessTokenKey);
         localStorage.removeItem(AuthService.refreshTokenKey);
         this.updateCurrentUser();

@@ -36,11 +36,20 @@
               [outlined]="true"
               [routerLink]="label.id"
               [disabled]="!(hasManagePermission$ | async)" />
-            <p-button
-              icon="pi pi-trash"
-              [outlined]="true"
-              (onClick)="deleteLabel(label)"
-              [disabled]="!(hasManagePermission$ | async)" />
+
+            @if (label.isDisabled) {
+              <p-button
+                icon="pi pi-eye"
+                [outlined]="true"
+                (onClick)="enableLabel(label)"
+                [disabled]="!(hasManagePermission$ | async)" />
+            } @else {
+              <p-button
+                icon="pi pi-eye-slash"
+                [outlined]="true"
+                (onClick)="disableLabel(label)"
+                [disabled]="!(hasManagePermission$ | async)" />
+            }
           </div>
         </td>
       </tr>

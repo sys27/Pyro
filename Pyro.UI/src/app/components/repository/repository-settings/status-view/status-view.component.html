@@ -24,10 +24,7 @@
       let-status>
       <tr>
         <td>
-          <p-tag
-            [value]="status.name"
-            [rounded]="true"
-            [style]="{ background: status.color | color, color: status.color | luminance }" />
+          <tag [value]="status" />
         </td>
         <td>
           <div class="flex flex-row gap-2">
@@ -36,11 +33,20 @@
               [outlined]="true"
               [routerLink]="status.id"
               [disabled]="!(hasManagePermission$ | async)" />
-            <p-button
-              icon="pi pi-trash"
-              [outlined]="true"
-              (onClick)="deleteStatus(status)"
-              [disabled]="!(hasManagePermission$ | async)" />
+
+            @if (status.isDisabled) {
+              <p-button
+                icon="pi pi-eye"
+                [outlined]="true"
+                (onClick)="enableStatus(status)"
+                [disabled]="!(hasManagePermission$ | async)" />
+            } @else {
+              <p-button
+                icon="pi pi-eye-slash"
+                [outlined]="true"
+                (onClick)="disableStatus(status)"
+                [disabled]="!(hasManagePermission$ | async)" />
+            }
           </div>
         </td>
       </tr>

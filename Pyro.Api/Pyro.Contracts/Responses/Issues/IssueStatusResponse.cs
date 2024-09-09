@@ -3,4 +3,4 @@
 
 namespace Pyro.Contracts.Responses.Issues;
 
-public record IssueStatusResponse(Guid Id, string Name, ColorResponse Color);
+public record IssueStatusResponse(Guid Id, string Name, ColorResponse Color, bool IsDisabled);

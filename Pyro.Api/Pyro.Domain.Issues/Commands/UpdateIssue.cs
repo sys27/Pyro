@@ -54,7 +54,7 @@ public class UpdateIssueHandler : IRequestHandler<UpdateIssue, Issue>
             ? await gitRepositoryRepository.GetUser(request.AssigneeId.Value, cancellationToken)
             : null;
 
-        issue.Title = request.Title;
+        issue.UpdateTitle(request.Title);
         issue.AssignTo(assignee);
         issue.TransitionTo(request.StatusId, repository);
 

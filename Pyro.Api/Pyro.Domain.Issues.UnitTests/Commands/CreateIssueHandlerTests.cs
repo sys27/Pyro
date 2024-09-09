@@ -15,7 +15,7 @@ public class CreateIssueHandlerTests
     public void MissingRepository()
     {
         var currentUser = new CurrentUser(Guid.NewGuid(), "TestUser", [], []);
-        var command = new CreateIssue("repo", "title", null, Guid.NewGuid(), []);
+        var command = new CreateIssue("repo", "title", null, Guid.NewGuid(), [], "comment");
 
         var currentUserProvider = Substitute.For<ICurrentUserProvider>();
         currentUserProvider
@@ -44,7 +44,7 @@ public class CreateIssueHandlerTests
     public void IncorrectCurrentUser()
     {
         var currentUser = new CurrentUser(Guid.NewGuid(), "TestUser", [], []);
-        var command = new CreateIssue("repo", "title", null, Guid.NewGuid(), []);
+        var command = new CreateIssue("repo", "title", null, Guid.NewGuid(), [], "comment");
 
         var currentUserProvider = Substitute.For<ICurrentUserProvider>();
         currentUserProvider
@@ -102,7 +102,8 @@ public class CreateIssueHandlerTests
             "title",
             assignee.Id,
             Guid.NewGuid(),
-            [repository.Labels[0].Id, Guid.NewGuid()]);
+            [repository.Labels[0].Id, Guid.NewGuid()],
+            "comment");
 
         var currentUserProvider = Substitute.For<ICurrentUserProvider>();
         currentUserProvider
@@ -177,7 +178,8 @@ public class CreateIssueHandlerTests
             "title",
             assignee?.Id,
             repository.IssueStatuses[0].Id,
-            [repository.Labels[0].Id, Guid.NewGuid()]);
+            [repository.Labels[0].Id, Guid.NewGuid()],
+            "comment");
 
         var currentUserProvider = Substitute.For<ICurrentUserProvider>();
         currentUserProvider
@@ -218,8 +220,11 @@ public class CreateIssueHandlerTests
             Assert.That(issue.Author, Is.EqualTo(author));
             Assert.That(issue.CreatedAt, Is.EqualTo(now));
             Assert.That(issue.Assignee, Is.EqualTo(assignee));
-            Assert.That(issue.Labels.Count, Is.EqualTo(1));
+            Assert.That(issue.Status, Is.EqualTo(repository.IssueStatuses[0]));
+            Assert.That(issue.Labels, Has.Count.EqualTo(1));
             Assert.That(issue.Labels[0], Is.EqualTo(repository.Labels[0]));
+            Assert.That(issue.Comments, Has.Count.EqualTo(1));
+            Assert.That(issue.Comments[0].Content, Is.EqualTo(command.InitialComment));
         });
     }
 }

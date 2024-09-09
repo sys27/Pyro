@@ -39,13 +39,6 @@ public class GitRepository : Entity
         return status;
     }
 
-    public void DeleteIssueStatus(IssueStatus status)
-    {
-        status.RemoveTransitions();
-
-        issueStatuses.Remove(status);
-    }
-
     public IReadOnlyList<IssueStatusTransition> GetTransitions()
         => IssueStatuses.SelectMany(x => x.FromTransitions)
             .Concat(IssueStatuses.SelectMany(x => x.ToTransitions))

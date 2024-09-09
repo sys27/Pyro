@@ -16,6 +16,8 @@ public class IssueStatus : Entity
 
     public required GitRepository Repository { get; init; }
 
+    public bool IsDisabled { get; set; }
+
     public IReadOnlyList<IssueStatusTransition> FromTransitions
         => fromTransitions;
 

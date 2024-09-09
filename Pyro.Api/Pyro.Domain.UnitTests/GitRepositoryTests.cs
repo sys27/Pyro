@@ -43,32 +43,4 @@ public class GitRepositoryTests
 
         Assert.Throws<DomainException>(() => repository.AddLabel(name, 0));
     }
-
-    [Test]
-    public void RemoveLabel()
-    {
-        var repository = new GitRepository
-        {
-            Name = "Test",
-            DefaultBranch = "main",
-        };
-
-        const string name = "Test";
-        var label = repository.AddLabel(name, 0);
-        repository.RemoveLabel(label.Id);
-
-        Assert.That(repository.Labels, Is.Empty);
-    }
-
-    [Test]
-    public void RemoveLabelMissingLabel()
-    {
-        var repository = new GitRepository
-        {
-            Name = "Test",
-            DefaultBranch = "main",
-        };
-
-        Assert.Throws<DomainException>(() => repository.RemoveLabel(Guid.NewGuid()));
-    }
 }

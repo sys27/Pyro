@@ -90,6 +90,32 @@ namespace Pyro.Infrastructure.Issues.Migrations
                     b.ToTable("Issues", (string)null);
                 });
 
+            modelBuilder.Entity("Pyro.Domain.Issues.IssueChangeLog", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("AuthorId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("CreatedAt")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("IssueId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id")
+                        .HasName("PK_IssueChangeLog");
+
+                    b.HasIndex("AuthorId");
+
+                    b.HasIndex("IssueId");
+
+                    b.ToTable((string)null);
+
+                    b.UseTpcMappingStrategy();
+                });
+
             modelBuilder.Entity("Pyro.Domain.Issues.IssueComment", b =>
                 {
                     b.Property<Guid>("Id")
@@ -126,6 +152,11 @@ namespace Pyro.Infrastructure.Issues.Migrations
 
                     b.Property<int>("Color")
                         .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsDisabled")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(false);
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -180,6 +211,9 @@ namespace Pyro.Infrastructure.Issues.Migrations
 
                     b.Property<Guid>("GitRepositoryId")
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsDisabled")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -253,6 +287,93 @@ namespace Pyro.Infrastructure.Issues.Migrations
                     b.ToTable("IssueNumberTracker", (string)null);
                 });
 
+            modelBuilder.Entity("Pyro.Domain.Issues.IssueAssigneeChangeLog", b =>
+                {
+                    b.HasBaseType("Pyro.Domain.Issues.IssueChangeLog");
+
+                    b.Property<Guid?>("NewAssigneeId")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("NewAssigneeId");
+
+                    b.Property<Guid?>("OldAssigneeId")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("OldAssigneeId");
+
+                    b.HasIndex("NewAssigneeId");
+
+                    b.HasIndex("OldAssigneeId");
+
+                    b.ToTable("IssueAssigneeChangeLogs", (string)null);
+                });
+
+            modelBuilder.Entity("Pyro.Domain.Issues.IssueLabelChangeLog", b =>
+                {
+                    b.HasBaseType("Pyro.Domain.Issues.IssueChangeLog");
+
+                    b.Property<Guid?>("NewLabelId")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("NewLabelId");
+
+                    b.Property<Guid?>("OldLabelId")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("OldLabelId");
+
+                    b.HasIndex("NewLabelId");
+
+                    b.HasIndex("OldLabelId");
+
+                    b.ToTable("IssueLabelChangeLogs", (string)null);
+                });
+
+            modelBuilder.Entity("Pyro.Domain.Issues.IssueLockChangeLog", b =>
+                {
+                    b.HasBaseType("Pyro.Domain.Issues.IssueChangeLog");
+
+                    b.Property<bool>("NewValue")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("NewValue");
+
+                    b.Property<bool>("OldValue")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("OldValue");
+
+                    b.ToTable("IssueLockChangeLogs", (string)null);
+                });
+
+            modelBuilder.Entity("Pyro.Domain.Issues.IssueStatusChangeLog", b =>
+                {
+                    b.HasBaseType("Pyro.Domain.Issues.IssueChangeLog");
+
+                    b.Property<Guid?>("NewStatusId")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("NewStatusId");
+
+                    b.Property<Guid?>("OldStatusId")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("OldStatusId");
+
+                    b.HasIndex("NewStatusId");
+
+                    b.HasIndex("OldStatusId");
+
+                    b.ToTable("IssueStatusChangeLogs", (string)null);
+                });
+
+            modelBuilder.Entity("Pyro.Domain.Issues.IssueTitleChangeLog", b =>
+                {
+                    b.HasBaseType("Pyro.Domain.Issues.IssueChangeLog");
+
+                    b.Property<string>("NewTitle")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("NewValue");
+
+                    b.Property<string>("OldTitle")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("OldValue");
+
+                    b.ToTable("IssueTitleChangeLog");
+                });
+
             modelBuilder.Entity("Pyro.Domain.Issues.Issue", b =>
                 {
                     b.HasOne("Pyro.Domain.Issues.User", "Assignee")
@@ -284,6 +405,25 @@ namespace Pyro.Infrastructure.Issues.Migrations
                     b.Navigation("Author");
 
                     b.Navigation("Status");
+                });
+
+            modelBuilder.Entity("Pyro.Domain.Issues.IssueChangeLog", b =>
+                {
+                    b.HasOne("Pyro.Domain.Issues.User", "Author")
+                        .WithMany()
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Pyro.Domain.Issues.Issue", "Issue")
+                        .WithMany("ChangeLogs")
+                        .HasForeignKey("IssueId")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
+
+                    b.Navigation("Author");
+
+                    b.Navigation("Issue");
                 });
 
             modelBuilder.Entity("Pyro.Domain.Issues.IssueComment", b =>
@@ -373,6 +513,57 @@ namespace Pyro.Infrastructure.Issues.Migrations
                         .HasConstraintName("FK_IssueNumberTracker_Repository");
                 });
 
+            modelBuilder.Entity("Pyro.Domain.Issues.IssueAssigneeChangeLog", b =>
+                {
+                    b.HasOne("Pyro.Domain.Issues.User", "NewAssignee")
+                        .WithMany()
+                        .HasForeignKey("NewAssigneeId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Pyro.Domain.Issues.User", "OldAssignee")
+                        .WithMany()
+                        .HasForeignKey("OldAssigneeId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("NewAssignee");
+
+                    b.Navigation("OldAssignee");
+                });
+
+            modelBuilder.Entity("Pyro.Domain.Issues.IssueLabelChangeLog", b =>
+                {
+                    b.HasOne("Pyro.Domain.Issues.Label", "NewLabel")
+                        .WithMany()
+                        .HasForeignKey("NewLabelId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Pyro.Domain.Issues.Label", "OldLabel")
+                        .WithMany()
+                        .HasForeignKey("OldLabelId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("NewLabel");
+
+                    b.Navigation("OldLabel");
+                });
+
+            modelBuilder.Entity("Pyro.Domain.Issues.IssueStatusChangeLog", b =>
+                {
+                    b.HasOne("Pyro.Domain.Issues.IssueStatus", "NewStatus")
+                        .WithMany()
+                        .HasForeignKey("NewStatusId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Pyro.Domain.Issues.IssueStatus", "OldStatus")
+                        .WithMany()
+                        .HasForeignKey("OldStatusId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("NewStatus");
+
+                    b.Navigation("OldStatus");
+                });
+
             modelBuilder.Entity("Pyro.Domain.Issues.GitRepository", b =>
                 {
                     b.Navigation("IssueStatuses");
@@ -382,6 +573,8 @@ namespace Pyro.Infrastructure.Issues.Migrations
 
             modelBuilder.Entity("Pyro.Domain.Issues.Issue", b =>
                 {
+                    b.Navigation("ChangeLogs");
+
                     b.Navigation("Comments");
                 });
 

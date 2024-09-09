@@ -25,7 +25,8 @@ internal static class IssueEndpoints
             .MapIssues()
             .MapIssueComments()
             .MapIssueStatuses()
-            .MapIssueStatusTransitions();
+            .MapIssueStatusTransitions()
+            .MapIssueChangeLogs();
 
         return app;
     }
@@ -89,7 +90,8 @@ internal static class IssueEndpoints
                     request.Title,
                     request.AssigneeId,
                     request.StatusId,
-                    request.Labels);
+                    request.Labels,
+                    request.InitialComment);
                 var issue = await mediator.Send(command, cancellationToken);
                 await unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -287,6 +289,7 @@ internal static class IssueEndpoints
             .WithName("Update Issue Comment")
             .WithOpenApi();
 
+        // TODO: hide instead of delete?
         commentsBuilder.MapDelete("/{id:guid}", async (
                 IMediator mediator,
                 UnitOfWork unitOfWork,
@@ -440,14 +443,14 @@ internal static class IssueEndpoints
             .WithName("Update Status")
             .WithOpenApi();
 
-        statusBuilder.MapDelete("/{id:guid}", async (
+        statusBuilder.MapPost("/{id:guid}/enable", async (
                 IMediator mediator,
                 UnitOfWork unitOfWork,
                 string repositoryName,
                 Guid id,
                 CancellationToken cancellationToken) =>
             {
-                var command = new DeleteIssueStatus(repositoryName, id);
+                var command = new EnableIssueStatus(repositoryName, id);
                 await mediator.Send(command, cancellationToken);
                 await unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -460,7 +463,30 @@ internal static class IssueEndpoints
             .Produces(403)
             .Produces(404)
             .ProducesProblem(500)
-            .WithName("Delete Status")
+            .WithName("Enable Status")
+            .WithOpenApi();
+
+        statusBuilder.MapPost("/{id:guid}/disable", async (
+                IMediator mediator,
+                UnitOfWork unitOfWork,
+                string repositoryName,
+                Guid id,
+                CancellationToken cancellationToken) =>
+            {
+                var command = new DisableIssueStatus(repositoryName, id);
+                await mediator.Send(command, cancellationToken);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
+
+                return Results.Ok();
+            })
+            .RequirePermission(IssueManage)
+            .Produces(200)
+            .ProducesValidationProblem()
+            .Produces(401)
+            .Produces(403)
+            .Produces(404)
+            .ProducesProblem(500)
+            .WithName("Disable Status")
             .WithOpenApi();
 
         return app;
@@ -538,6 +564,36 @@ internal static class IssueEndpoints
             .Produces(404)
             .ProducesProblem(500)
             .WithName("Delete Status Transition")
+            .WithOpenApi();
+
+        return app;
+    }
+
+    private static IEndpointRouteBuilder MapIssueChangeLogs(this IEndpointRouteBuilder app)
+    {
+        var changeLogBuilder = app.MapGroup("/{number:int}/change-logs")
+            .WithTags("Issue Change Logs");
+
+        changeLogBuilder.MapGet("/", async (
+                IMediator mediator,
+                string repositoryName,
+                int number,
+                CancellationToken cancellationToken) =>
+            {
+                var query = new GetIssueChangeLogs(repositoryName, number);
+                var changeLogs = await mediator.Send(query, cancellationToken);
+                var result = changeLogs.ToResponse();
+
+                return Results.Ok(result);
+            })
+            .RequirePermission(IssueView)
+            .Produces<IReadOnlyList<IssueChangeLogResponse>>()
+            .ProducesValidationProblem()
+            .Produces(401)
+            .Produces(403)
+            .Produces(404)
+            .ProducesProblem(500)
+            .WithName("Get Issue Change Logs")
             .WithOpenApi();
 
         return app;

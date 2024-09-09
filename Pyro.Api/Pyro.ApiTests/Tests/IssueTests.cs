@@ -48,6 +48,8 @@ public class IssueTests
         await DeleteComment(repositoryName, number, commentId);
         await GetCommentsAfterCommentDelete(repositoryName, number);
 
+        await ChangeLogs(repositoryName, number);
+
         await DeleteIssue(repositoryName, number);
         await GetIssuesAfterIssueDelete(repositoryName, number);
     }
@@ -123,7 +125,8 @@ public class IssueTests
             faker.Lorem.Sentence(),
             null,
             status.Id,
-            [label.Id]);
+            [label.Id],
+            "Initial comment");
         var issue = await issueClient.CreateIssue(repositoryName, createRequest);
 
         Assert.That(issue, Is.Not.Null);
@@ -228,6 +231,14 @@ public class IssueTests
     {
         var comments = await issueClient.GetComments(name, number);
 
-        Assert.That(comments, Is.Empty);
+        Assert.That(comments, Has.Count.EqualTo(1));
+    }
+
+    private async Task ChangeLogs(string repositoryName, int number)
+    {
+        var changeLogs = await issueClient.GetIssueChangeLogs(repositoryName, number);
+
+        Assert.That(changeLogs, Is.Not.Null);
+        Assert.That(changeLogs, Is.Not.Empty);
     }
 }

@@ -48,14 +48,4 @@ public class GitRepository : DomainEntity
 
         return label;
     }
-
-    public void RemoveLabel(Guid id)
-    {
-        var label = labels.FirstOrDefault(x => x.Id == id) ??
-                    throw new DomainException($"The label (Id: {id}) does not exist.");
-
-        labels.Remove(label);
-
-        PublishEvent(new LabelDeleted(label.Id));
-    }
 }

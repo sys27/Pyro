@@ -269,27 +269,50 @@ internal static class GitRepositoryEndpoints
             .WithName("Update Label")
             .WithOpenApi();
 
-        labelsBuilder.MapDelete("/{id:guid}", async (
+        labelsBuilder.MapPost("/{id:guid}/enable", async (
                 IMediator mediator,
                 UnitOfWork unitOfWork,
-                string repositoryName,
-                Guid id,
+                [FromRoute] string repositoryName,
+                [FromRoute] Guid id,
                 CancellationToken cancellationToken) =>
             {
-                var command = new DeleteLabel(repositoryName, id);
+                var command = new EnableLabel(repositoryName, id);
                 await mediator.Send(command, cancellationToken);
                 await unitOfWork.SaveChangesAsync(cancellationToken);
 
                 return Results.Ok();
             })
-            .RequirePermission(IssueEdit)
+            .RequirePermission(RepositoryManage)
             .Produces(200)
             .ProducesValidationProblem()
             .Produces(401)
             .Produces(403)
             .Produces(404)
             .ProducesProblem(500)
-            .WithName("Delete Label")
+            .WithName("Enable Label")
+            .WithOpenApi();
+
+        labelsBuilder.MapPost("/{id:guid}/disable", async (
+                IMediator mediator,
+                UnitOfWork unitOfWork,
+                [FromRoute] string repositoryName,
+                [FromRoute] Guid id,
+                CancellationToken cancellationToken) =>
+            {
+                var command = new DisableLabel(repositoryName, id);
+                await mediator.Send(command, cancellationToken);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
+
+                return Results.Ok();
+            })
+            .RequirePermission(RepositoryManage)
+            .Produces(200)
+            .ProducesValidationProblem()
+            .Produces(401)
+            .Produces(403)
+            .Produces(404)
+            .ProducesProblem(500)
+            .WithName("Disable Label")
             .WithOpenApi();
 
         return app;

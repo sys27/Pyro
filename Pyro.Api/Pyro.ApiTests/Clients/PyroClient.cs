@@ -47,6 +47,9 @@ internal class PyroClient : BaseClient
     public async Task<LabelResponse?> UpdateLabel(string repositoryName, Guid id, UpdateLabelRequest request)
         => await Put<LabelResponse>($"/api/repositories/{repositoryName}/labels/{id}", request);
 
-    public async Task DeleteLabel(string repositoryName, Guid id)
-        => await Delete($"/api/repositories/{repositoryName}/labels/{id}");
+    public async Task EnableLabel(string repositoryName, Guid id)
+        => await Post($"/api/repositories/{repositoryName}/labels/{id}/enable");
+
+    public async Task DisableLabel(string repositoryName, Guid id)
+        => await Post($"/api/repositories/{repositoryName}/labels/{id}/disable");
 }

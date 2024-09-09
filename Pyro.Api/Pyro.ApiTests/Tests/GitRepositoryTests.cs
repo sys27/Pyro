@@ -41,6 +41,8 @@ public class GitRepositoryTests
 
         var label = await CreateLabel(repository.Name);
         label = await UpdateLabel(repository.Name, label.Id);
+        await DisableLabel(repository.Name, label.Id);
+        await EnableLabel(repository.Name, label.Id);
         await GetLabel(repository.Name, label.Id);
         await GetLabels(repository.Name, label);
     }
@@ -151,6 +153,24 @@ public class GitRepositoryTests
         });
 
         return label;
+    }
+
+    private async Task DisableLabel(string repositoryName, Guid id)
+    {
+        await client.DisableLabel(repositoryName, id);
+        var label = await client.GetLabel(repositoryName, id);
+
+        Assert.That(label, Is.Not.Null);
+        Assert.That(label.IsDisabled, Is.True);
+    }
+
+    private async Task EnableLabel(string repositoryName, Guid id)
+    {
+        await client.EnableLabel(repositoryName, id);
+        var label = await client.GetLabel(repositoryName, id);
+
+        Assert.That(label, Is.Not.Null);
+        Assert.That(label.IsDisabled, Is.False);
     }
 
     private async Task GetLabel(string repositoryName, Guid id)

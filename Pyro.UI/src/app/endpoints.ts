@@ -1,5 +1,6 @@
 export class Endpoints {
     public static readonly Login: string = '/api/identity/login';
+    public static readonly Logout: string = '/api/identity/logout';
     public static readonly Refresh: string = '/api/identity/refresh';
 
     public static readonly Users: string = '/api/users';
@@ -25,5 +26,9 @@ export class Endpoints {
 
     public static StatusTransitions(repositoryName: string): string {
         return `/api/repositories/${repositoryName}/issues/statuses/transitions`;
+    }
+
+    public static IssueChangeLogs(repositoryName: string, issueNumber: number): string {
+        return `/api/repositories/${repositoryName}/issues/${issueNumber}/change-logs`;
     }
 }

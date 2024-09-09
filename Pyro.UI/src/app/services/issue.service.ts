@@ -39,6 +39,7 @@ export class IssueService {
             assigneeId: issue.assigneeId,
             labels: issue.labels,
             statusId: issue.statusId,
+            initialComment: issue.initialComment,
         };
 
         return this.httpClient.post<void>(Endpoints.Issues(repositoryName), request);
@@ -110,6 +111,15 @@ export class IssueService {
     public getUsers(): Observable<User[]> {
         return this.httpClient.get<User[]>(Endpoints.IssueUsers);
     }
+
+    public getIssueChangeLogs(
+        repositoryName: string,
+        issueNumber: number,
+    ): Observable<ChangeLogs[]> {
+        return this.httpClient.get<ChangeLogs[]>(
+            Endpoints.IssueChangeLogs(repositoryName, issueNumber),
+        );
+    }
 }
 
 export interface Issue {
@@ -131,6 +141,58 @@ export interface Comment {
     createdAt: Date;
 }
 
+export type ChangeLogs =
+    | IssueAssigneeChangeLog
+    | IssueLabelChangeLog
+    | IssueLockChangeLog
+    | IssueStatusChangeLog
+    | IssueTitleChangeLog;
+
+export enum IssueChangeLogType {
+    Assignee = 1,
+    Label = 2,
+    Lock = 3,
+    Status = 4,
+    Title = 5,
+}
+
+export interface IssueChangeLog {
+    id: string;
+    author: User;
+    createdAt: Date;
+    $type: IssueChangeLogType;
+}
+
+export interface IssueAssigneeChangeLog extends IssueChangeLog {
+    oldAssignee: User | null;
+    newAssignee: User | null;
+    $type: IssueChangeLogType.Assignee;
+}
+
+export interface IssueLabelChangeLog extends IssueChangeLog {
+    oldLabel: Label;
+    newLabel: Label;
+    $type: IssueChangeLogType.Label;
+}
+
+export interface IssueLockChangeLog extends IssueChangeLog {
+    oldValue: boolean;
+    newValue: boolean;
+    $type: IssueChangeLogType.Lock;
+}
+
+export interface IssueStatusChangeLog extends IssueChangeLog {
+    oldStatus: IssueStatus | null;
+    newStatus: IssueStatus;
+    $type: IssueChangeLogType.Status;
+}
+
+export interface IssueTitleChangeLog extends IssueChangeLog {
+    oldTitle: string;
+    newTitle: string;
+    $type: IssueChangeLogType.Title;
+}
+
 export interface User {
     id: string;
     name: string;
@@ -141,6 +203,7 @@ export interface CreateIssue {
     assigneeId: string | null;
     labels: string[];
     statusId: string;
+    initialComment: string;
 }
 
 export interface UpdateIssue {

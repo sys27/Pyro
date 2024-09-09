@@ -2,6 +2,7 @@ import { AsyncPipe } from '@angular/common';
 import { Component, DestroyRef, Injector, input, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
+import { TagComponent } from '@controls/tag/tag.component';
 import { PyroPermissions } from '@models/pyro-permissions';
 import { ColorPipe } from '@pipes/color.pipe';
 import { LuminanceColorPipe } from '@pipes/luminance-color.pipe';
@@ -11,7 +12,6 @@ import { createErrorHandler } from '@services/operators';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
-import { TagModule } from 'primeng/tag';
 import { BehaviorSubject, map, Observable, switchMap } from 'rxjs';
 
 @Component({
@@ -24,7 +24,7 @@ import { BehaviorSubject, map, Observable, switchMap } from 'rxjs';
         LuminanceColorPipe,
         RouterLink,
         TableModule,
-        TagModule,
+        TagComponent,
     ],
     templateUrl: './status-view.component.html',
     styleUrl: './status-view.component.css',
@@ -50,19 +50,34 @@ export class StatusListComponent implements OnInit {
         );
         this.hasManagePermission$ = this.authService.currentUser.pipe(
             takeUntilDestroyed(this.destroyRef),
-            map(user => user?.hasPermission(PyroPermissions.RepositoryManage) ?? false),
+            map(user => user?.hasPermission(PyroPermissions.IssueManage) ?? false),
         );
     }
 
-    public deleteStatus(status: IssueStatus): void {
+    public enableStatus(status: IssueStatus): void {
         this.statusService
-            .deleteStatus(this.repositoryName(), status.id)
+            .enableStatus(this.repositoryName(), status.id)
             .pipe(createErrorHandler(this.injector))
             .subscribe(() => {
                 this.messageService.add({
                     severity: 'success',
                     summary: 'Success',
-                    detail: `Status '${status.name}' deleted`,
+                    detail: `Status '${status.name}' enabled`,
+                });
+
+                this.refreshStatuses$.next();
+            });
+    }
+
+    public disableStatus(status: IssueStatus): void {
+        this.statusService
+            .disableStatus(this.repositoryName(), status.id)
+            .pipe(createErrorHandler(this.injector))
+            .subscribe(() => {
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Success',
+                    detail: `Status '${status.name}' disabled`,
                 });
 
                 this.refreshStatuses$.next();

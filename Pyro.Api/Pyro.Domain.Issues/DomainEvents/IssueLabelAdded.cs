@@ -3,6 +3,6 @@
 
 using Pyro.Domain.Shared.Models;
 
-namespace Pyro.Domain.GitRepositories;
+namespace Pyro.Domain.Issues.DomainEvents;
 
-public record LabelDeleted(Guid Id) : IDomainEvent;
+public record IssueLabelAdded(Issue Issue, Label Label) : IDomainEvent;

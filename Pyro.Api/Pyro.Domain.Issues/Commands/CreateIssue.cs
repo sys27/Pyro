@@ -13,7 +13,8 @@ public record CreateIssue(
     string Title,
     Guid? AssigneeId,
     Guid StatusId,
-    IReadOnlyList<Guid> Labels) : IRequest<Issue>;
+    IReadOnlyList<Guid> Labels,
+    string InitialComment) : IRequest<Issue>;
 
 public class CreateIssueValidator : AbstractValidator<CreateIssue>
 {
@@ -32,6 +33,10 @@ public class CreateIssueValidator : AbstractValidator<CreateIssue>
 
         RuleFor(x => x.Labels)
             .ForEach(x => x.NotEmpty());
+
+        RuleFor(x => x.InitialComment)
+            .NotEmpty()
+            .MaximumLength(2000);
     }
 }
 
@@ -67,14 +72,13 @@ public class CreateIssueHandler : IRequestHandler<CreateIssue, Issue>
         var status = repository.GetIssueStatus(request.StatusId) ??
                      throw new NotFoundException($"The issue status (Id: {request.StatusId}) not found");
 
-        var issue = new Issue
-        {
-            Title = request.Title,
-            Status = status,
-            RepositoryId = repository.Id,
-            Author = author,
-            CreatedAt = timeProvider.GetUtcNow(),
-        };
+        var issue = new Issue.Builder(timeProvider)
+            .WithTitle(request.Title)
+            .WithRepository(repository)
+            .WithAuthor(author)
+            .WithStatus(status)
+            .WithInitialComment(request.InitialComment)
+            .Build();
         issue.AssignTo(assignee);
 
         foreach (var labelId in request.Labels)

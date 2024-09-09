@@ -49,15 +49,30 @@ export class LabelListComponent implements OnInit, OnDestroy {
         this.refreshLabels$.complete();
     }
 
-    public deleteLabel(label: Label): void {
+    public enableLabel(label: Label): void {
         this.labelService
-            .deleteLabel(this.repositoryName(), label.id)
+            .enableLabel(this.repositoryName(), label.id)
             .pipe(createErrorHandler(this.injector))
             .subscribe(() => {
                 this.messageService.add({
                     severity: 'success',
                     summary: 'Success',
-                    detail: `Label ${label.name} deleted`,
+                    detail: `Label '${label.name}' enabled`,
+                });
+
+                this.refreshLabels$.next();
+            });
+    }
+
+    public disableLabel(label: Label): void {
+        this.labelService
+            .disableLabel(this.repositoryName(), label.id)
+            .pipe(createErrorHandler(this.injector))
+            .subscribe(() => {
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Success',
+                    detail: `Label '${label.name}' disabled`,
                 });
 
                 this.refreshLabels$.next();

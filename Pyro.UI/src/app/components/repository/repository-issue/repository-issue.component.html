@@ -6,26 +6,57 @@
         <span class="text-400">#{{ issue.issueNumber }}</span>
         <div class="flex-grow-1"></div>
         <div>
-          <p-button
-            routerLink="edit"
-            label="Edit"
-            icon="pi pi-pencil"
-            [disabled]="!(canEdit$ | async)"
-            [outlined]="true" />
+          <p-buttonGroup>
+            <p-button
+              routerLink="edit"
+              label="Edit"
+              icon="pi pi-pencil"
+              [disabled]="!(canEdit$ | async)"
+              [outlined]="true" />
+
+            @if (issue.isLocked) {
+              <p-button
+                label="Unlock"
+                icon="pi pi-lock-open"
+                [outlined]="true"
+                (click)="unlockIssue()"
+                [disabled]="!(canManage$ | async)" />
+            } @else {
+              <p-button
+                label="Lock"
+                icon="pi pi-lock"
+                [outlined]="true"
+                (click)="lockIssue()"
+                [disabled]="!(canManage$ | async)" />
+            }
+
+            <p-button
+              label="Delete"
+              icon="pi pi-trash"
+              severity="danger"
+              [outlined]="true"
+              [disabled]="!(canManage$ | async)" />
+          </p-buttonGroup>
         </div>
       </div>
     </div>
 
     <div class="col-12 grid">
       <div class="col-10">
-        @if (comments$ | async; as comments) {
+        @if (items$ | async; as items) {
           <div class="flex flex-column gap-2">
-            @for (comment of comments; track comment.id) {
-              <comment-view
-                [comment]="comment"
-                [repositoryName]="repositoryName()"
-                [issue]="issue"
-                (commentAdded)="commentAdded()" />
+            @for (item of items; track item.id) {
+              @if (isChangeLog(item)) {
+                <div>
+                  <change-log-view [changeLog]="item" />
+                </div>
+              } @else {
+                <comment-view
+                  [comment]="item"
+                  [repositoryName]="repositoryName()"
+                  [issue]="issue"
+                  (commentAdded)="commentAdded()" />
+              }
             }
           </div>
         }
@@ -43,13 +74,7 @@
         <div>
           <div>Status:</div>
           <div>
-            <p-tag
-              [value]="issue.status.name"
-              [rounded]="true"
-              [style]="{
-                background: issue.status.color | color,
-                color: issue.status.color | luminance,
-              }" />
+            <tag [value]="issue.status" />
           </div>
         </div>
 
@@ -86,36 +111,11 @@
           <div>Labels:</div>
           <div class="flex flex-column gap-2">
             @for (label of issue.labels; track label.id) {
-              <p-tag
-                [value]="label.name"
-                [rounded]="true"
-                [style]="{ background: label.color | color, color: label.color | luminance }" />
+              <tag [value]="label" />
             } @empty {
               <span>No Labels</span>
             }
           </div>
-        </div>
-
-        <p-divider />
-
-        <div>
-          @if (issue.isLocked) {
-            <p-button
-              label="Unlock"
-              icon="pi pi-lock-open"
-              severity="secondary"
-              [outlined]="true"
-              (click)="unlockIssue()"
-              [disabled]="!(canManage$ | async)" />
-          } @else {
-            <p-button
-              label="Lock"
-              icon="pi pi-lock"
-              severity="secondary"
-              [outlined]="true"
-              (click)="lockIssue()"
-              [disabled]="!(canManage$ | async)" />
-          }
         </div>
       </div>
     </div>

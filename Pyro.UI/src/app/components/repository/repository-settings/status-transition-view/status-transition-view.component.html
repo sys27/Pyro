@@ -25,26 +25,15 @@
       let-transition>
       <tr>
         <td>
-          <p-tag
-            [value]="transition.from.name"
-            [rounded]="true"
-            [style]="{
-              background: transition.from.color | color,
-              color: transition.from.color | luminance,
-            }" />
+          <tag [value]="transition.from" />
         </td>
         <td>
-          <p-tag
-            [value]="transition.to.name"
-            [rounded]="true"
-            [style]="{
-              background: transition.to.color | color,
-              color: transition.to.color | luminance,
-            }" />
+          <tag [value]="transition.to" />
         </td>
         <td>
           <p-button
             icon="pi pi-trash"
+            severity="danger"
             [outlined]="true"
             (onClick)="deleteTransition(transition)"
             [disabled]="!(hasManagePermission$ | async)" />

@@ -2,6 +2,7 @@ import { AsyncPipe } from '@angular/common';
 import { Component, DestroyRef, Injector, input, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
+import { TagComponent } from '@controls/tag/tag.component';
 import { PyroPermissions } from '@models/pyro-permissions';
 import { ColorPipe } from '@pipes/color.pipe';
 import { LuminanceColorPipe } from '@pipes/luminance-color.pipe';
@@ -11,7 +12,6 @@ import { createErrorHandler } from '@services/operators';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
-import { TagModule } from 'primeng/tag';
 import { BehaviorSubject, map, Observable, switchMap } from 'rxjs';
 
 @Component({
@@ -24,7 +24,7 @@ import { BehaviorSubject, map, Observable, switchMap } from 'rxjs';
         LuminanceColorPipe,
         RouterLink,
         TableModule,
-        TagModule,
+        TagComponent,
     ],
     templateUrl: './status-transition-view.component.html',
     styleUrl: './status-transition-view.component.css',

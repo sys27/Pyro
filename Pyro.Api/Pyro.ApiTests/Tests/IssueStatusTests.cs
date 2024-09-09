@@ -52,7 +52,8 @@ public class IssueStatusTests
         var transition = await CreateIssueStatusTransition(status.Id);
         await DeleteIssueStatusTransition(transition.Id);
 
-        await DeleteIssueStatus(status.Id);
+        await DisableIssueStatus(status.Id);
+        await EnableIssueStatus(status.Id);
     }
 
     private async Task<IssueStatusResponse> CreateIssueStatus()
@@ -90,13 +91,22 @@ public class IssueStatusTests
         return status;
     }
 
-    private async Task DeleteIssueStatus(Guid id)
+    private async Task DisableIssueStatus(Guid id)
     {
-        await issueClient.DeleteIssueStatus(repositoryName, id);
+        await issueClient.DisableIssueStatus(repositoryName, id);
+        var status = await issueClient.GetIssueStatus(repositoryName, id);
 
-        var statuses = await issueClient.GetIssueStatuses(repositoryName);
+        Assert.That(status, Is.Not.Null);
+        Assert.That(status.IsDisabled, Is.True);
+    }
 
-        Assert.That(statuses, Has.None.Matches<IssueStatusResponse>(x => x.Id == id));
+    private async Task EnableIssueStatus(Guid id)
+    {
+        await issueClient.EnableIssueStatus(repositoryName, id);
+        var status = await issueClient.GetIssueStatus(repositoryName, id);
+
+        Assert.That(status, Is.Not.Null);
+        Assert.That(status.IsDisabled, Is.False);
     }
 
     private async Task<IssueStatusTransitionResponse> CreateIssueStatusTransition(Guid fromId)
