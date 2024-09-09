@@ -2,17 +2,26 @@ import { AsyncPipe, DatePipe } from '@angular/common';
 import { Component, DestroyRef, Injector, input, OnDestroy, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterModule } from '@angular/router';
+import { TagComponent } from '@controls/tag/tag.component';
 import { PyroPermissions } from '@models/pyro-permissions';
 import { ColorPipe } from '@pipes/color.pipe';
 import { LuminanceColorPipe } from '@pipes/luminance-color.pipe';
 import { AuthService } from '@services/auth.service';
-import { Comment, Issue, IssueService } from '@services/issue.service';
+import {
+    ChangeLogs,
+    Comment,
+    Issue,
+    IssueChangeLogType,
+    IssueService,
+} from '@services/issue.service';
 import { createErrorHandler } from '@services/operators';
 import { ButtonModule } from 'primeng/button';
+import { ButtonGroupModule } from 'primeng/buttongroup';
 import { DividerModule } from 'primeng/divider';
-import { TagModule } from 'primeng/tag';
+import { TooltipModule } from 'primeng/tooltip';
 import { BehaviorSubject, combineLatest, map, Observable, shareReplay, switchMap } from 'rxjs';
 import { MarkdownPipe } from '../../../pipes/markdown.pipe';
+import { ChangeLogViewComponent } from './change-log-view/change-log-view.component';
 import { CommentNewComponent } from './comment-new/comment-new.component';
 import { CommentViewComponent } from './comment-view/comment-view.component';
 
@@ -22,6 +31,8 @@ import { CommentViewComponent } from './comment-view/comment-view.component';
     imports: [
         AsyncPipe,
         ButtonModule,
+        ButtonGroupModule,
+        ChangeLogViewComponent,
         ColorPipe,
         CommentNewComponent,
         CommentViewComponent,
@@ -30,7 +41,8 @@ import { CommentViewComponent } from './comment-view/comment-view.component';
         LuminanceColorPipe,
         MarkdownPipe,
         RouterModule,
-        TagModule,
+        TagComponent,
+        TooltipModule,
     ],
     templateUrl: './repository-issue.component.html',
     styleUrl: './repository-issue.component.css',
@@ -40,6 +52,8 @@ export class RepositoryIssueComponent implements OnInit, OnDestroy {
     public readonly issueNumber = input.required<number>();
     public issue$: Observable<Issue | null> | undefined;
     public comments$: Observable<Comment[]> | undefined;
+    public changeLogs$: Observable<ChangeLogs[]> | undefined;
+    public items$: Observable<(Comment | ChangeLogs)[]> | undefined;
     public canEdit$: Observable<boolean> | undefined;
     public canManage$: Observable<boolean> | undefined;
     private readonly commentAddedTrigger$ = new BehaviorSubject<void>(undefined);
@@ -68,6 +82,27 @@ export class RepositoryIssueComponent implements OnInit, OnDestroy {
             }),
             createErrorHandler(this.injector),
             shareReplay(1),
+        );
+        this.changeLogs$ = this.issue$.pipe(
+            switchMap(issue => {
+                if (!issue) {
+                    return [];
+                }
+
+                return this.issueService.getIssueChangeLogs(
+                    this.repositoryName(),
+                    issue.issueNumber,
+                );
+            }),
+            createErrorHandler(this.injector),
+            shareReplay(1),
+        );
+        this.items$ = combineLatest([this.comments$, this.changeLogs$]).pipe(
+            map(([comments, changeLogs]) => {
+                return [...comments, ...changeLogs].sort(
+                    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+                );
+            }),
         );
         this.canEdit$ = combineLatest([this.authService.currentUser, this.issue$]).pipe(
             takeUntilDestroyed(this.destroyRef),
@@ -104,12 +139,22 @@ export class RepositoryIssueComponent implements OnInit, OnDestroy {
     public lockIssue(): void {
         this.issueService
             .lockIssue(this.repositoryName(), this.issueNumber())
+            .pipe(createErrorHandler(this.injector))
             .subscribe(() => this.refreshIssue$.next());
     }
 
     public unlockIssue(): void {
         this.issueService
             .unlockIssue(this.repositoryName(), this.issueNumber())
+            .pipe(createErrorHandler(this.injector))
             .subscribe(() => this.refreshIssue$.next());
+    }
+
+    public isChangeLog(obj: any): obj is ChangeLogs {
+        return (
+            obj &&
+            typeof obj.$type === 'number' &&
+            Object.values(IssueChangeLogType).includes(obj.$type)
+        );
     }
 }

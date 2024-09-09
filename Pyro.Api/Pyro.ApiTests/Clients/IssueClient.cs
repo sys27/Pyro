@@ -67,8 +67,11 @@ internal class IssueClient : BaseClient
         UpdateIssueStatusRequest request)
         => await Put<IssueStatusResponse>($"/api/repositories/{repositoryName}/issues/statuses/{id}", request);
 
-    public async Task DeleteIssueStatus(string repositoryName, Guid id)
-        => await Delete($"/api/repositories/{repositoryName}/issues/statuses/{id}");
+    public async Task EnableIssueStatus(string repositoryName, Guid id)
+        => await Post($"/api/repositories/{repositoryName}/issues/statuses/{id}/enable");
+
+    public async Task DisableIssueStatus(string repositoryName, Guid id)
+        => await Post($"/api/repositories/{repositoryName}/issues/statuses/{id}/disable");
 
     public async Task<IReadOnlyList<IssueStatusTransitionResponse>?> GetIssueStatusTransitions(string repositoryName)
         => await Get<IReadOnlyList<IssueStatusTransitionResponse>>($"/api/repositories/{repositoryName}/issues/statuses/transitions");
@@ -80,4 +83,12 @@ internal class IssueClient : BaseClient
 
     public async Task DeleteIssueStatusTransition(string repositoryName, Guid id)
         => await Delete($"/api/repositories/{repositoryName}/issues/statuses/transitions/{id}");
+
+    public async Task<IReadOnlyList<IssueChangeLogResponse>?> GetIssueChangeLogs(
+        string repositoryName,
+        int issueNumber)
+        => await Get<IReadOnlyList<IssueChangeLogResponse>>($"/api/repositories/{repositoryName}/issues/{issueNumber}/change-logs");
+
+    public async Task<IReadOnlyList<UserResponse>?> GetUsers()
+        => await Get<IReadOnlyList<UserResponse>>("/api/repositories/issues/users");
 }

@@ -63,6 +63,16 @@
     </div>
 
     <div class="field">
+      <label for="description">Description:</label>
+      <textarea
+        id="description"
+        class="w-full"
+        pInputTextarea
+        formControlName="initialComment"></textarea>
+      <validation-summary controlName="description" />
+    </div>
+
+    <div class="field">
       <p-button
         label="Save"
         type="submit"

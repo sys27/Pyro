@@ -10,4 +10,6 @@ public class Label : Entity
     public required string Name { get; init; }
 
     public required int Color { get; init; }
+
+    public bool IsDisabled { get; init; }
 }

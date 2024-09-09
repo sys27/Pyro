@@ -29,6 +29,7 @@ export class AccessTokenListComponent implements OnInit, OnDestroy {
     public ngOnInit(): void {
         this.accessTokens$ = this.refresh$.pipe(
             switchMap(() => this.service.getAccessTokens().pipe(shareReplay(1))),
+            createErrorHandler(this.injector),
         );
     }
 

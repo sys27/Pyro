@@ -28,6 +28,12 @@ public class UpdateIssueHandlerTests
     [Test]
     public void MissingRepository()
     {
+        var now = DateTimeOffset.Now;
+        var timeProvider = Substitute.For<TimeProvider>();
+        timeProvider
+            .GetUtcNow()
+            .Returns(now);
+
         var gitRepository = new GitRepository
         {
             Id = Guid.NewGuid(),
@@ -35,22 +41,21 @@ public class UpdateIssueHandlerTests
         };
         gitRepository.AddIssueStatus("Open", 0);
         var command = new UpdateIssue("repo", 1, "title", null, gitRepository.IssueStatuses[0].Id, []);
-        var issue = new Issue
+        var issueStatus = new IssueStatus
         {
-            Id = Guid.NewGuid(),
-            IssueNumber = command.IssueNumber,
-            Title = "title",
-            Status = new IssueStatus
-            {
-                Id = Guid.NewGuid(),
-                Name = "Open",
-                Color = 0,
-                Repository = gitRepository,
-            },
-            RepositoryId = gitRepository.Id,
-            Author = new User(Guid.NewGuid(), "User"),
-            CreatedAt = DateTimeOffset.Now,
+            Name = "Open",
+            Color = 0,
+            Repository = gitRepository,
         };
+        var author = new User(Guid.NewGuid(), "User");
+        var issue = new Issue.Builder(timeProvider)
+            .WithTitle("title")
+            .WithIssueNumber(command.IssueNumber)
+            .WithStatus(issueStatus)
+            .WithRepository(gitRepository)
+            .WithAuthor(author)
+            .WithInitialComment("comment")
+            .Build();
 
         var repository = Substitute.For<IIssueRepository>();
         repository
@@ -69,6 +74,12 @@ public class UpdateIssueHandlerTests
     [Test]
     public async Task UpdateIssue()
     {
+        var now = DateTimeOffset.Now;
+        var timeProvider = Substitute.For<TimeProvider>();
+        timeProvider
+            .GetUtcNow()
+            .Returns(now);
+
         var author = new User(Guid.NewGuid(), "User");
         var gitRepository = new GitRepository
         {
@@ -99,16 +110,14 @@ public class UpdateIssueHandlerTests
         var open = gitRepository.AddIssueStatus("Open", 0);
         var done = gitRepository.AddIssueStatus("Done", 0);
         open.AddTransition(done);
-        var issue = new Issue
-        {
-            Id = Guid.NewGuid(),
-            IssueNumber = 1,
-            Title = "title",
-            Status = open,
-            RepositoryId = gitRepository.Id,
-            Author = author,
-            CreatedAt = DateTimeOffset.Now,
-        };
+        var issue = new Issue.Builder(timeProvider)
+            .WithTitle("title")
+            .WithIssueNumber(1)
+            .WithStatus(open)
+            .WithRepository(gitRepository)
+            .WithAuthor(author)
+            .WithInitialComment("comment")
+            .Build();
         issue.AddLabel(gitRepository.Labels[0]);
         var command = new UpdateIssue(
             gitRepository.Name,

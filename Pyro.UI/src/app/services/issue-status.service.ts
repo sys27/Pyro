@@ -53,8 +53,12 @@ export class IssueStatusService {
         );
     }
 
-    public deleteStatus(repositoryName: string, id: string): Observable<void> {
-        return this.httpClient.delete<void>(`${Endpoints.Statuses(repositoryName)}/${id}`);
+    public enableStatus(repositoryName: string, id: string): Observable<void> {
+        return this.httpClient.post<void>(`${Endpoints.Statuses(repositoryName)}/${id}/enable`, null);
+    }
+
+    public disableStatus(repositoryName: string, id: string): Observable<void> {
+        return this.httpClient.post<void>(`${Endpoints.Statuses(repositoryName)}/${id}/disable`, null);
     }
 
     public getStatusTransitions(repositoryName: string): Observable<IssueStatusTransition[]> {
@@ -87,6 +91,7 @@ export interface IssueStatus {
     id: string;
     name: string;
     color: Color;
+    isDisabled: boolean;
 }
 
 export interface IssueStatusTransition {

@@ -1,8 +1,9 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, Injector, OnDestroy, OnInit, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '@services/auth.service';
 import { NotificationService } from '@services/notification.service';
+import { createErrorHandler } from '@services/operators';
 import { ThemeService } from '@services/theme.service';
 import { MenuItem, PrimeNGConfig } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
@@ -13,6 +14,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SplitButtonModule } from 'primeng/splitbutton';
 import { ToastModule } from 'primeng/toast';
 import { ToolbarModule } from 'primeng/toolbar';
+import { finalize, noop } from 'rxjs';
 
 @Component({
     selector: 'app-root',
@@ -43,13 +45,19 @@ export class AppComponent implements OnInit, OnDestroy {
             label: 'Logout',
             icon: 'pi pi-sign-out',
             command: () => {
-                this.authService.logout();
-                this.router.navigate(['login']);
+                this.authService
+                    .logout()
+                    .pipe(
+                        createErrorHandler(this.injector),
+                        finalize(() => this.router.navigate(['login'])),
+                    )
+                    .subscribe(noop);
             },
         },
     ];
 
     public constructor(
+        private readonly injector: Injector,
         private readonly primeNg: PrimeNGConfig,
         private readonly router: Router,
         public readonly authService: AuthService,

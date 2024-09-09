@@ -1,68 +1,61 @@
 // Copyright (c) Dmytro Kyshchenko. All rights reserved.
 // Licensed under the GPL-3.0 license. See LICENSE file in the project root for full license information.
 
+using NSubstitute;
+using Pyro.Domain.Issues.DomainEvents;
 using Pyro.Domain.Shared.Exceptions;
 
 namespace Pyro.Domain.Issues.UnitTests.Models;
 
 public class IssueTests
 {
+    private static Issue GetIssue()
+    {
+        var user = new User(Guid.NewGuid(), "user");
+        var gitRepository = new GitRepository
+        {
+            Name = "test",
+        };
+        var issueStatus = new IssueStatus
+        {
+            Name = "status",
+            Color = 0,
+            Repository = gitRepository,
+        };
+
+        var timeProvider = Substitute.For<TimeProvider>();
+        timeProvider
+            .GetUtcNow()
+            .Returns(DateTimeOffset.Now);
+        var issue = new Issue.Builder(timeProvider)
+            .WithTitle("title")
+            .WithStatus(issueStatus)
+            .WithRepository(gitRepository)
+            .WithAuthor(user)
+            .WithInitialComment("comment")
+            .Build();
+
+        return issue;
+    }
+
     [Test]
     public void AssignToTest()
     {
         var user = new User(Guid.NewGuid(), "user");
-
-        var gitRepository = new GitRepository
-        {
-            Id = Guid.NewGuid(),
-            Name = "test",
-        };
-        var issue = new Issue
-        {
-            Id = Guid.NewGuid(),
-            IssueNumber = 1,
-            Title = "title",
-            Status = new IssueStatus
-            {
-                Id = Guid.NewGuid(),
-                Name = "status",
-                Color = 0,
-                Repository = gitRepository,
-            },
-            RepositoryId = gitRepository.Id,
-            Author = user,
-            CreatedAt = DateTimeOffset.Now,
-        };
+        var issue = GetIssue();
         issue.AssignTo(user);
 
-        Assert.That(issue.Assignee, Is.EqualTo(user));
+        Assert.Multiple(() =>
+        {
+            Assert.That(issue.Assignee, Is.EqualTo(user));
+            Assert.That(issue.DomainEvents, Has.One.EqualTo(new IssueAssigneeChanged(issue, null, user)));
+        });
     }
 
     [Test]
     public void AddExistingLabel()
     {
-        var user = new User(Guid.NewGuid(), "user");
-        var gitRepository = new GitRepository
-        {
-            Id = Guid.NewGuid(),
-            Name = "test",
-        };
-        var issue = new Issue
-        {
-            Id = Guid.NewGuid(),
-            IssueNumber = 1,
-            Title = "title",
-            Status = new IssueStatus
-            {
-                Id = Guid.NewGuid(),
-                Name = "status",
-                Color = 0,
-                Repository = gitRepository,
-            },
-            RepositoryId = gitRepository.Id,
-            Author = user,
-            CreatedAt = DateTimeOffset.Now,
-        };
+        var issue = GetIssue();
 
         var label = new Label
         {
@@ -73,35 +66,33 @@ public class IssueTests
         issue.AddLabel(label);
         issue.AddLabel(label);
 
-        Assert.That(issue.Labels, Has.Count.EqualTo(1));
-        Assert.That(issue.Labels, Has.One.EqualTo(label));
+        Assert.Multiple(() =>
+        {
+            Assert.That(issue.Labels, Has.Count.EqualTo(1));
+            Assert.That(issue.Labels, Has.One.EqualTo(label));
+            Assert.That(issue.DomainEvents, Has.One.EqualTo(new IssueLabelAdded(issue, label)));
+        });
+    }
+
+    [Test]
+    public void AddDisabledLabel()
+    {
+        var issue = GetIssue();
+        var label = new Label
+        {
+            Id = Guid.NewGuid(),
+            Name = "tag",
+            Color = 0,
+            IsDisabled = true,
+        };
+
+        Assert.Throws<DomainException>(() => issue.AddLabel(label));
     }
 
     [Test]
     public void RemoveLabel()
     {
-        var gitRepository = new GitRepository
-        {
-            Id = Guid.NewGuid(),
-            Name = "test",
-        };
-        var issue = new Issue
-        {
-            Id = Guid.NewGuid(),
-            IssueNumber = 1,
-            Title = "title",
-            Status = new IssueStatus
-            {
-                Id = Guid.NewGuid(),
-                Name = "status",
-                Color = 0,
-                Repository = gitRepository,
-            },
-            RepositoryId = gitRepository.Id,
-            Author = new User(Guid.NewGuid(), "user"),
-            CreatedAt = DateTimeOffset.Now,
-        };
-
+        var issue = GetIssue();
         var label = new Label
         {
             Id = Guid.NewGuid(),
@@ -111,34 +102,17 @@ public class IssueTests
         issue.AddLabel(label);
         issue.RemoveLabel(label);
 
-        Assert.That(issue.Labels, Is.Empty);
+        Assert.Multiple(() =>
+        {
+            Assert.That(issue.Labels, Is.Empty);
+            Assert.That(issue.DomainEvents, Has.One.EqualTo(new IssueLabelRemoved(issue, label)));
+        });
     }
 
     [Test]
     public void UpdateLabels()
     {
-        var user = new User(Guid.NewGuid(), "user");
-        var gitRepository = new GitRepository
-        {
-            Id = Guid.NewGuid(),
-            Name = "test",
-        };
-        var issue = new Issue
-        {
-            Id = Guid.NewGuid(),
-            IssueNumber = 1,
-            Title = "title",
-            Status = new IssueStatus
-            {
-                Id = Guid.NewGuid(),
-                Name = "status",
-                Color = 0,
-                Repository = gitRepository,
-            },
-            RepositoryId = gitRepository.Id,
-            Author = user,
-            CreatedAt = DateTimeOffset.Now,
-        };
+        var issue = GetIssue();
 
         var label = new Label
         {
@@ -173,26 +147,12 @@ public class IssueTests
     [Test]
     public void TransitionToWithIncorrectRepositoryTest()
     {
-        var repository = new GitRepository
-        {
-            Name = "test",
-        };
-        var issue = new Issue
-        {
-            IssueNumber = 1,
-            Title = "title",
-            Status = new IssueStatus
-            {
-                Name = "status",
-                Color = 0,
-                Repository = repository,
-            },
-            RepositoryId = repository.Id,
-            Author = new User(Guid.NewGuid(), "user"),
-            CreatedAt = DateTimeOffset.Now,
-        };
+        var issue = GetIssue();
 
-        Assert.Throws<DomainException>(() => issue.TransitionTo(Guid.NewGuid(), new GitRepository { Name = "repo2" }));
+        Assert.Throws<DomainException>(() => issue.TransitionTo(Guid.NewGuid(), new GitRepository
+        {
+            Name = "repo2",
+        }));
     }
 
     [Test]
@@ -202,20 +162,7 @@ public class IssueTests
         {
             Name = "test",
         };
-        var issue = new Issue
-        {
-            IssueNumber = 1,
-            Title = "title",
-            Status = new IssueStatus
-            {
-                Name = "status",
-                Color = 0,
-                Repository = repository,
-            },
-            RepositoryId = repository.Id,
-            Author = new User(Guid.NewGuid(), "user"),
-            CreatedAt = DateTimeOffset.Now,
-        };
+        var issue = GetIssue();
 
         var statusId = issue.Status.Id;
         issue.TransitionTo(statusId, repository);
@@ -226,23 +173,11 @@ public class IssueTests
     [Test]
     public void TransitionToIncorrectStatusTest()
     {
+        var issue = GetIssue();
         var repository = new GitRepository
         {
+            Id = issue.RepositoryId,
             Name = "test",
-        };
-        var issue = new Issue
-        {
-            IssueNumber = 1,
-            Title = "title",
-            Status = new IssueStatus
-            {
-                Name = "status",
-                Color = 0,
-                Repository = repository,
-            },
-            RepositoryId = repository.Id,
-            Author = new User(Guid.NewGuid(), "user"),
-            CreatedAt = DateTimeOffset.Now,
         };
 
         Assert.Throws<NotFoundException>(() => issue.TransitionTo(Guid.NewGuid(), repository));
@@ -251,6 +186,7 @@ public class IssueTests
     [Test]
     public void TransitionToWithoutTransitionTest()
     {
+        var user = new User(Guid.NewGuid(), "user");
         var repository = new GitRepository
         {
             Name = "test",
@@ -258,15 +194,17 @@ public class IssueTests
         var open = repository.AddIssueStatus("Open", 0);
         var done = repository.AddIssueStatus("Done", 0);
 
-        var issue = new Issue
-        {
-            IssueNumber = 1,
-            Title = "title",
-            Status = open,
-            RepositoryId = repository.Id,
-            Author = new User(Guid.NewGuid(), "user"),
-            CreatedAt = DateTimeOffset.Now,
-        };
+        var timeProvider = Substitute.For<TimeProvider>();
+        timeProvider
+            .GetUtcNow()
+            .Returns(DateTimeOffset.Now);
+        var issue = new Issue.Builder(timeProvider)
+            .WithTitle("title")
+            .WithStatus(open)
+            .WithRepository(repository)
+            .WithAuthor(user)
+            .WithInitialComment("comment")
+            .Build();
 
         Assert.Throws<DomainException>(() => issue.TransitionTo(done.Id, repository));
     }
@@ -274,6 +212,7 @@ public class IssueTests
     [Test]
     public void TransitionToTest()
     {
+        var user = new User(Guid.NewGuid(), "user");
         var repository = new GitRepository
         {
             Name = "test",
@@ -282,80 +221,54 @@ public class IssueTests
         var done = repository.AddIssueStatus("Done", 0);
         open.AddTransition(done);
 
-        var issue = new Issue
-        {
-            IssueNumber = 1,
-            Title = "title",
-            Status = open,
-            RepositoryId = repository.Id,
-            Author = new User(Guid.NewGuid(), "user"),
-            CreatedAt = DateTimeOffset.Now,
-        };
+        var timeProvider = Substitute.For<TimeProvider>();
+        timeProvider
+            .GetUtcNow()
+            .Returns(DateTimeOffset.Now);
+        var issue = new Issue.Builder(timeProvider)
+            .WithTitle("title")
+            .WithStatus(open)
+            .WithRepository(repository)
+            .WithAuthor(user)
+            .WithInitialComment("comment")
+            .Build();
 
         issue.TransitionTo(done.Id, repository);
 
-        Assert.That(issue.Status.Id, Is.EqualTo(done.Id));
+        Assert.Multiple(() =>
+        {
+            Assert.That(issue.Status.Id, Is.EqualTo(done.Id));
+            Assert.That(issue.DomainEvents, Has.One.EqualTo(new IssueStatusChanged(issue, open, done)));
+        });
     }
 
     [Test]
     public void LockIssue()
     {
-        var gitRepository = new GitRepository
-        {
-            Id = Guid.NewGuid(),
-            Name = "test",
-        };
-        var issue = new Issue
-        {
-            Id = Guid.NewGuid(),
-            IssueNumber = 1,
-            Title = "title",
-            Status = new IssueStatus
-            {
-                Id = Guid.NewGuid(),
-                Name = "status",
-                Color = 0,
-                Repository = gitRepository,
-            },
-            RepositoryId = gitRepository.Id,
-            Author = new User(Guid.NewGuid(), "user"),
-            CreatedAt = DateTimeOffset.Now,
-        };
+        var issue = GetIssue();
 
         issue.Lock();
 
-        Assert.That(issue.IsLocked, Is.True);
+        Assert.Multiple(() =>
+        {
+            Assert.That(issue.IsLocked, Is.True);
+            Assert.That(issue.DomainEvents, Has.One.EqualTo(new IssueLocked(issue)));
+        });
     }
 
     [Test]
     public void UnlockIssue()
     {
-        var gitRepository = new GitRepository
-        {
-            Id = Guid.NewGuid(),
-            Name = "test",
-        };
-        var issue = new Issue
-        {
-            Id = Guid.NewGuid(),
-            IssueNumber = 1,
-            Title = "title",
-            Status = new IssueStatus
-            {
-                Id = Guid.NewGuid(),
-                Name = "status",
-                Color = 0,
-                Repository = gitRepository,
-            },
-            RepositoryId = gitRepository.Id,
-            Author = new User(Guid.NewGuid(), "user"),
-            CreatedAt = DateTimeOffset.Now,
-        };
+        var issue = GetIssue();
 
         issue.Lock();
         issue.Unlock();
 
-        Assert.That(issue.IsLocked, Is.False);
+        Assert.Multiple(() =>
+        {
+            Assert.That(issue.IsLocked, Is.False);
+            Assert.That(issue.DomainEvents, Has.One.EqualTo(new IssueUnlocked(issue)));
+        });
     }
 
     private static IEnumerable<TestCaseData> GetDataForUpdateLockedIssue()
@@ -383,30 +296,27 @@ public class IssueTests
     [TestCaseSource(nameof(GetDataForUpdateLockedIssue))]
     public void UpdateLockedIssue(Action<Issue> update)
     {
-        var gitRepository = new GitRepository
-        {
-            Id = Guid.NewGuid(),
-            Name = "test",
-        };
-        var issue = new Issue
-        {
-            Id = Guid.NewGuid(),
-            IssueNumber = 1,
-            Title = "title",
-            Status = new IssueStatus
-            {
-                Id = Guid.NewGuid(),
-                Name = "status",
-                Color = 0,
-                Repository = gitRepository,
-            },
-            RepositoryId = gitRepository.Id,
-            Author = new User(Guid.NewGuid(), "user"),
-            CreatedAt = DateTimeOffset.Now,
-        };
+        var issue = GetIssue();
 
         issue.Lock();
 
         Assert.Throws<DomainException>(() => update(issue));
+    }
+
+    [Test]
+    public void UpdateTitle()
+    {
+        const string oldTitle = "title";
+        const string newTitle = "title 2";
+
+        var issue = GetIssue();
+
+        issue.UpdateTitle(newTitle);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(issue.Title, Is.EqualTo(newTitle));
+            Assert.That(issue.DomainEvents, Has.One.EqualTo(new IssueTitleChanged(issue, oldTitle, newTitle)));
+        });
     }
 }

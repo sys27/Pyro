@@ -30,6 +30,12 @@ public class UpdateIssueCommentHandlerTests
     [Test]
     public void MissingIssueComment()
     {
+        var now = DateTimeOffset.Now;
+        var timeProvider = Substitute.For<TimeProvider>();
+        timeProvider
+            .GetUtcNow()
+            .Returns(now);
+
         const string repositoryName = "repo";
         const int issueNumber = 1;
         var currentUser = new CurrentUser(Guid.NewGuid(), "User", [], []);
@@ -39,22 +45,20 @@ public class UpdateIssueCommentHandlerTests
             Id = Guid.NewGuid(),
             Name = "test",
         };
-        var issue = new Issue
+        var issueStatus = new IssueStatus
         {
-            Id = Guid.NewGuid(),
-            IssueNumber = issueNumber,
-            Title = "title",
-            Status = new IssueStatus
-            {
-                Id = Guid.NewGuid(),
-                Name = "Open",
-                Color = 0,
-                Repository = gitRepository,
-            },
-            RepositoryId = gitRepository.Id,
-            Author = author,
-            CreatedAt = DateTimeOffset.Now,
+            Name = "Open",
+            Color = 0,
+            Repository = gitRepository,
         };
+        var issue = new Issue.Builder(timeProvider)
+            .WithTitle("title")
+            .WithIssueNumber(issueNumber)
+            .WithStatus(issueStatus)
+            .WithRepository(gitRepository)
+            .WithAuthor(author)
+            .WithInitialComment("comment")
+            .Build();
         var comment = issue.AddComment("test", author, DateTimeOffset.Now);
         var command = new UpdateIssueComment(repositoryName, issueNumber, Guid.NewGuid(), "content");
 
@@ -72,31 +76,34 @@ public class UpdateIssueCommentHandlerTests
     [Test]
     public void CurrentUserCantUpdateIssueComment()
     {
+        var now = DateTimeOffset.Now;
+        var timeProvider = Substitute.For<TimeProvider>();
+        timeProvider
+            .GetUtcNow()
+            .Returns(now);
+
         const string repositoryName = "repo";
         const int issueNumber = 1;
         var currentUser = new CurrentUser(Guid.NewGuid(), "User", [], []);
         var author = new User(currentUser.Id, currentUser.Login);
         var gitRepository = new GitRepository
         {
-            Id = Guid.NewGuid(),
             Name = "test",
         };
-        var issue = new Issue
+        var issueStatus = new IssueStatus
         {
-            Id = Guid.NewGuid(),
-            IssueNumber = issueNumber,
-            Title = "title",
-            Status = new IssueStatus
-            {
-                Id = Guid.NewGuid(),
-                Name = "Open",
-                Color = 0,
-                Repository = gitRepository,
-            },
-            RepositoryId = gitRepository.Id,
-            Author = author,
-            CreatedAt = DateTimeOffset.Now,
+            Name = "Open",
+            Color = 0,
+            Repository = gitRepository,
         };
+        var issue = new Issue.Builder(timeProvider)
+            .WithTitle("title")
+            .WithIssueNumber(issueNumber)
+            .WithStatus(issueStatus)
+            .WithRepository(gitRepository)
+            .WithAuthor(author)
+            .WithInitialComment("comment")
+            .Build();
         var comment = issue.AddComment("test", new User(Guid.NewGuid(), "test"), DateTimeOffset.Now);
         var command = new UpdateIssueComment(repositoryName, issueNumber, comment.Id, "content");
 
@@ -117,31 +124,34 @@ public class UpdateIssueCommentHandlerTests
     [Test]
     public async Task UpdateIssueComment()
     {
+        var now = DateTimeOffset.Now;
+        var timeProvider = Substitute.For<TimeProvider>();
+        timeProvider
+            .GetUtcNow()
+            .Returns(now);
+
         const string repositoryName = "repo";
         const int issueNumber = 1;
         var currentUser = new CurrentUser(Guid.NewGuid(), "User", [], []);
         var author = new User(currentUser.Id, currentUser.Login);
         var gitRepository = new GitRepository
         {
-            Id = Guid.NewGuid(),
             Name = "test",
         };
-        var issue = new Issue
+        var issueStatus = new IssueStatus
         {
-            Id = Guid.NewGuid(),
-            IssueNumber = issueNumber,
-            Title = "title",
-            Status = new IssueStatus
-            {
-                Id = Guid.NewGuid(),
-                Name = "Open",
-                Color = 0,
-                Repository = gitRepository,
-            },
-            RepositoryId = gitRepository.Id,
-            Author = author,
-            CreatedAt = DateTimeOffset.Now,
+            Name = "Open",
+            Color = 0,
+            Repository = gitRepository,
         };
+        var issue = new Issue.Builder(timeProvider)
+            .WithTitle("title")
+            .WithIssueNumber(issueNumber)
+            .WithStatus(issueStatus)
+            .WithRepository(gitRepository)
+            .WithAuthor(author)
+            .WithInitialComment("comment")
+            .Build();
         var comment = issue.AddComment("test", author, DateTimeOffset.Now);
         var command = new UpdateIssueComment(repositoryName, issueNumber, comment.Id, "content");
 

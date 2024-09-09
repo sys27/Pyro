@@ -1,0 +1,66 @@
+@if (changeLog(); as changeLog) {
+  @switch (changeLog.$type) {
+    @case (issueChangeLogType.Assignee) {
+      <p-divider>
+        <span [pTooltip]="getTooltipMessage(changeLog)">
+          The assignee was changed from <span class="pi pi-user"></span>
+          {{ getAssigneeName(changeLog.oldAssignee) }} to
+          <span class="pi pi-user"></span>
+          {{ getAssigneeName(changeLog.newAssignee) }}
+        </span>
+      </p-divider>
+    }
+    @case (issueChangeLogType.Label) {
+      <p-divider>
+        @if (changeLog.oldLabel === null) {
+          <span [pTooltip]="getTooltipMessage(changeLog)"
+            >The
+            <tag [value]="changeLog.newLabel" />
+            label was added</span
+          >
+        } @else if (changeLog.newLabel === null) {
+          <span [pTooltip]="getTooltipMessage(changeLog)"
+            >The
+            <tag [value]="changeLog.oldLabel" />
+            label was removed</span
+          >
+        }
+      </p-divider>
+    }
+    @case (issueChangeLogType.Lock) {
+      <p-divider>
+        <span [pTooltip]="getTooltipMessage(changeLog)">
+          @if (changeLog.newValue) {
+            The issue was locked
+          } @else {
+            The issue was unlocked
+          }
+        </span>
+      </p-divider>
+    }
+    @case (issueChangeLogType.Status) {
+      <p-divider>
+        <span [pTooltip]="getTooltipMessage(changeLog)">
+          @if (changeLog.oldStatus) {
+            The status was changed from
+            <tag [value]="changeLog.oldStatus" />
+            to
+            <tag [value]="changeLog.newStatus" />
+          } @else {
+            The status was changed to
+            <tag [value]="changeLog.newStatus" />
+          }
+        </span>
+      </p-divider>
+    }
+    @case (issueChangeLogType.Title) {
+      <p-divider>
+        <span [pTooltip]="getTooltipMessage(changeLog)"
+          >The title was changed from
+          <span class="line-through font-bold">{{ changeLog.oldTitle }}</span> to
+          <span class="font-bold">{{ changeLog.newTitle }}</span></span
+        >
+      </p-divider>
+    }
+  }
+}

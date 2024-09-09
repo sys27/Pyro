@@ -34,6 +34,10 @@ internal class IssueStatusConfiguration : IEntityTypeConfiguration<IssueStatus>
             .HasForeignKey("RepositoryId")
             .OnDelete(DeleteBehavior.ClientCascade);
 
+        builder.Property(x => x.IsDisabled)
+            .IsRequired()
+            .HasDefaultValue(false);
+
         builder.HasMany(x => x.FromTransitions)
             .WithOne(x => x.From)
             .HasForeignKey("FromId")

@@ -12,4 +12,6 @@ public class Label : Entity
     public required int Color { get; set; }
 
     public required GitRepository GitRepository { get; init; }
+
+    public bool IsDisabled { get; set; }
 }

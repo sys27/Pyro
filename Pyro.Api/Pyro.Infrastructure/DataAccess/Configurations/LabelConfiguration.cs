@@ -29,6 +29,10 @@ internal class LabelConfiguration : IEntityTypeConfiguration<Label>
         builder.Property<Guid>("GitRepositoryId")
             .IsRequired();
 
+        builder.Property(x => x.IsDisabled)
+            .IsRequired()
+            .HasDefaultValue(false);
+
         builder.HasIndex(x => x.Name)
             .IsUnique()
             .HasDatabaseName("IX_Label_Name");

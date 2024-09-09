@@ -3,4 +3,9 @@
 
 namespace Pyro.Contracts.Requests.Issues;
 
-public record CreateIssueRequest(string Title, Guid? AssigneeId, Guid StatusId, IReadOnlyList<Guid> Labels);
+public record CreateIssueRequest(
+    string Title,
+    Guid? AssigneeId,
+    Guid StatusId,
+    IReadOnlyList<Guid> Labels,
+    string InitialComment);

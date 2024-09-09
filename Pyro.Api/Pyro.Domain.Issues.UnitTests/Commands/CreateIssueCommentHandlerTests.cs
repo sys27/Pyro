@@ -71,6 +71,12 @@ public class CreateIssueCommentHandlerTests
     [Test]
     public async Task CreateComment()
     {
+        var now = DateTimeOffset.Now;
+        var timeProvider = Substitute.For<TimeProvider>();
+        timeProvider
+            .GetUtcNow()
+            .Returns(now);
+
         var currentUser = new CurrentUser(Guid.NewGuid(), "TestUser", [], []);
         var author = new User(currentUser.Id, currentUser.Login);
         var command = new CreateIssueComment("test", 1, "text");
@@ -79,23 +85,20 @@ public class CreateIssueCommentHandlerTests
             Id = Guid.NewGuid(),
             Name = "test",
         };
-        var issue = new Issue
+        var issueStatus = new IssueStatus
         {
             Id = Guid.NewGuid(),
-            IssueNumber = command.IssueNumber,
-            Title = "title",
-            Status = new IssueStatus
-            {
-                Id = Guid.NewGuid(),
-                Name = "status",
-                Color = 0,
-                Repository = gitRepository,
-            },
-            RepositoryId = gitRepository.Id,
-            Author = author,
-            CreatedAt = DateTimeOffset.Now,
+            Name = "status",
+            Color = 0,
+            Repository = gitRepository,
         };
-        var now = DateTimeOffset.Now;
+        var issue = new Issue.Builder(timeProvider)
+            .WithTitle("title")
+            .WithStatus(issueStatus)
+            .WithRepository(gitRepository)
+            .WithAuthor(author)
+            .WithInitialComment("comment")
+            .Build();
 
         var currentUserProvider = Substitute.For<ICurrentUserProvider>();
         currentUserProvider
@@ -109,10 +112,6 @@ public class CreateIssueCommentHandlerTests
         gitRepositoryRepository
             .GetUser(currentUser.Id, Arg.Any<CancellationToken>())
             .Returns(author);
-        var timeProvider = Substitute.For<TimeProvider>();
-        timeProvider
-            .GetUtcNow()
-            .Returns(now);
 
         var handler = new CreateIssueCommentHandler(
             issueRepository,

@@ -1,0 +1,7 @@
+<p-tag
+  [value]="value().name"
+  [rounded]="true"
+  [style]="{
+    background: value().color | color,
+    color: value().color | luminance,
+  }" />

@@ -13,8 +13,10 @@ namespace Pyro.DtoMappings;
 [Mapper]
 public static partial class IssueMapper
 {
+    [MapperIgnoreSource(nameof(Issue.DomainEvents))]
     [MapperIgnoreSource(nameof(Issue.RepositoryId))]
     [MapperIgnoreSource(nameof(Issue.Comments))]
+    [MapperIgnoreSource(nameof(Issue.ChangeLogs))]
     public static partial IssueResponse ToResponse(this Issue gitRepository);
 
     public static partial IReadOnlyList<IssueResponse> ToResponse(this IReadOnlyList<Issue> gitRepository);
@@ -53,4 +55,30 @@ public static partial class IssueMapper
 
     public static partial IReadOnlyList<IssueStatusTransitionResponse> ToResponse(
         this IReadOnlyList<IssueStatusTransition> request);
+
+    [MapperIgnoreSource(nameof(IssueChangeLog.Issue))]
+    [MapDerivedType<IssueAssigneeChangeLog, IssueAssigneeChangeLogResponse>]
+    [MapDerivedType<IssueLabelChangeLog, IssueLabelChangeLogResponse>]
+    [MapDerivedType<IssueLockChangeLog, IssueLockChangeLogResponse>]
+    [MapDerivedType<IssueStatusChangeLog, IssueStatusChangeLogResponse>]
+    [MapDerivedType<IssueTitleChangeLog, IssueTitleChangeLogResponse>]
+    public static partial IssueChangeLogResponse ToResponse(this IssueChangeLog request);
+
+    public static partial IReadOnlyList<IssueChangeLogResponse> ToResponse(
+        this IReadOnlyList<IssueChangeLog> request);
+
+    [MapperIgnoreSource(nameof(IssueChangeLog.Issue))]
+    public static partial IssueAssigneeChangeLogResponse ToResponse(this IssueAssigneeChangeLog request);
+
+    [MapperIgnoreSource(nameof(IssueChangeLog.Issue))]
+    public static partial IssueLabelChangeLogResponse ToResponse(this IssueLabelChangeLog request);
+
+    [MapperIgnoreSource(nameof(IssueChangeLog.Issue))]
+    public static partial IssueLockChangeLogResponse ToResponse(this IssueLockChangeLog request);
+
+    [MapperIgnoreSource(nameof(IssueChangeLog.Issue))]
+    public static partial IssueStatusChangeLogResponse ToResponse(this IssueStatusChangeLog request);
+
+    [MapperIgnoreSource(nameof(IssueChangeLog.Issue))]
+    public static partial IssueTitleChangeLogResponse ToResponse(this IssueTitleChangeLog request);
 }

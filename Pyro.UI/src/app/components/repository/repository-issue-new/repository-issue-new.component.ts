@@ -11,7 +11,7 @@ import { ButtonModule } from 'primeng/button';
 import { DropdownModule } from 'primeng/dropdown';
 import { InputTextModule } from 'primeng/inputtext';
 import { MultiSelectModule } from 'primeng/multiselect';
-import { finalize, Observable, shareReplay } from 'rxjs';
+import { finalize, map, Observable, shareReplay } from 'rxjs';
 
 @Component({
     selector: 'repo-issue-new',
@@ -38,6 +38,10 @@ export class RepositoryIssueNewComponent implements OnInit {
         assigneeId: new FormControl<string | null>(null),
         labelIds: new FormControl<string[]>([]),
         statusId: ['', Validators.required('Status')],
+        initialComment: [
+            '',
+            [Validators.required('Initial comment'), Validators.maxLength('Initial comment', 2000)],
+        ],
     });
     public readonly isLoading = signal<boolean>(false);
 
@@ -55,12 +59,16 @@ export class RepositoryIssueNewComponent implements OnInit {
         this.users$ = this.issueService
             .getUsers()
             .pipe(createErrorHandler(this.injector), shareReplay(1));
-        this.labels$ = this.labelService
-            .getLabels(this.repositoryName())
-            .pipe(createErrorHandler(this.injector), shareReplay(1));
-        this.statuses$ = this.statusService
-            .getStatuses(this.repositoryName())
-            .pipe(createErrorHandler(this.injector), shareReplay(1));
+        this.labels$ = this.labelService.getLabels(this.repositoryName()).pipe(
+            createErrorHandler(this.injector),
+            shareReplay(1),
+            map(labels => labels.filter(label => !label.isDisabled)),
+        );
+        this.statuses$ = this.statusService.getStatuses(this.repositoryName()).pipe(
+            createErrorHandler(this.injector),
+            shareReplay(1),
+            map(statuses => statuses.filter(status => !status.isDisabled)),
+        );
     }
 
     public onSubmit(): void {
@@ -73,6 +81,7 @@ export class RepositoryIssueNewComponent implements OnInit {
             assigneeId: this.form.value.assigneeId!,
             labels: this.form.value.labelIds || [],
             statusId: this.form.value.statusId!,
+            initialComment: this.form.value.initialComment!,
         };
 
         this.isLoading.set(true);

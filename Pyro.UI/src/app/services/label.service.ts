@@ -41,8 +41,15 @@ export class LabelService {
         return this.httpClient.put<Label>(`${Endpoints.Labels(repositoryName)}/${id}`, request);
     }
 
-    public deleteLabel(repositoryName: string, id: string): Observable<void> {
-        return this.httpClient.delete<void>(`${Endpoints.Labels(repositoryName)}/${id}`);
+    public enableLabel(repositoryName: string, id: string): Observable<void> {
+        return this.httpClient.post<void>(`${Endpoints.Labels(repositoryName)}/${id}/enable`, null);
+    }
+
+    public disableLabel(repositoryName: string, id: string): Observable<void> {
+        return this.httpClient.post<void>(
+            `${Endpoints.Labels(repositoryName)}/${id}/disable`,
+            null,
+        );
     }
 }
 
@@ -50,6 +57,7 @@ export interface Label {
     id: string;
     name: string;
     color: Color;
+    isDisabled: boolean;
 }
 
 export interface CreateLabel {
