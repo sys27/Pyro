@@ -5,6 +5,7 @@ import { ValidationSummaryComponent, Validators } from '@controls/validation-sum
 import { Color } from '@models/color';
 import { IssueStatusService } from '@services/issue-status.service';
 import { createErrorHandler } from '@services/operators';
+import { AutoFocusModule } from 'primeng/autofocus';
 import { ButtonModule } from 'primeng/button';
 import { ColorPickerModule } from 'primeng/colorpicker';
 import { InputTextModule } from 'primeng/inputtext';
@@ -14,6 +15,7 @@ import { finalize } from 'rxjs';
     selector: 'status-edit',
     standalone: true,
     imports: [
+        AutoFocusModule,
         ButtonModule,
         ColorPickerModule,
         InputTextModule,

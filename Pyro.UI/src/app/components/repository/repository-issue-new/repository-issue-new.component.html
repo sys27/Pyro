@@ -11,8 +11,10 @@
         id="title"
         type="text"
         class="w-full"
+        formControlName="title"
         pInputText
-        formControlName="title" />
+        pAutoFocus
+        [autofocus]="true" />
       <validation-summary controlName="title" />
     </div>
 

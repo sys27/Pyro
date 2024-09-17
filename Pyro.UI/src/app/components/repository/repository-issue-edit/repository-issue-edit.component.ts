@@ -17,6 +17,7 @@ import {
 import { Issue, IssueService, User } from '@services/issue.service';
 import { Label, LabelService } from '@services/label.service';
 import { createErrorHandler } from '@services/operators';
+import { AutoFocusModule } from 'primeng/autofocus';
 import { ButtonModule } from 'primeng/button';
 import { DropdownModule } from 'primeng/dropdown';
 import { InputTextModule } from 'primeng/inputtext';
@@ -27,6 +28,7 @@ import { finalize, map, Observable, of, shareReplay, take } from 'rxjs';
     selector: 'repository-issue-edit',
     standalone: true,
     imports: [
+        AutoFocusModule,
         ButtonModule,
         DropdownModule,
         InputTextModule,

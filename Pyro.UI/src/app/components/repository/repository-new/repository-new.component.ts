@@ -5,6 +5,7 @@ import { ValidationSummaryComponent, Validators } from '@controls/validation-sum
 import { NotificationEvent, NotificationService } from '@services/notification.service';
 import { createErrorHandler } from '@services/operators';
 import { CreateRepository, RepositoryService } from '@services/repository.service';
+import { AutoFocusModule } from 'primeng/autofocus';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { filter, finalize, Observable, Subject, switchMap, takeUntil } from 'rxjs';
@@ -12,7 +13,13 @@ import { filter, finalize, Observable, Subject, switchMap, takeUntil } from 'rxj
 @Component({
     selector: 'repository-new',
     standalone: true,
-    imports: [ButtonModule, InputTextModule, ReactiveFormsModule, ValidationSummaryComponent],
+    imports: [
+        AutoFocusModule,
+        ButtonModule,
+        InputTextModule,
+        ReactiveFormsModule,
+        ValidationSummaryComponent,
+    ],
     templateUrl: './repository-new.component.html',
     styleUrls: ['./repository-new.component.css'],
 })
