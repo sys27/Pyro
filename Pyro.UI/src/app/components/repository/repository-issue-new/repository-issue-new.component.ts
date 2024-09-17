@@ -1,8 +1,8 @@
-import { AsyncPipe } from '@angular/common';
 import { Component, Injector, input, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ValidationSummaryComponent, Validators } from '@controls/validation-summary';
+import { ObservableOptionsDirective } from '@directives/observable-options.directive';
 import { IssueStatus, IssueStatusService } from '@services/issue-status.service';
 import { IssueService, User } from '@services/issue.service';
 import { Label, LabelService } from '@services/label.service';
@@ -17,11 +17,11 @@ import { finalize, map, Observable, shareReplay } from 'rxjs';
     selector: 'repo-issue-new',
     standalone: true,
     imports: [
-        AsyncPipe,
         ButtonModule,
         DropdownModule,
         InputTextModule,
         MultiSelectModule,
+        ObservableOptionsDirective,
         ReactiveFormsModule,
         ValidationSummaryComponent,
     ],

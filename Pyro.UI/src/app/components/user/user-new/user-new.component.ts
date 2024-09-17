@@ -1,8 +1,8 @@
-import { AsyncPipe } from '@angular/common';
 import { Component, Injector, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ValidationSummaryComponent, Validators } from '@controls/validation-summary';
+import { ObservableOptionsDirective } from '@directives/observable-options.directive';
 import { createErrorHandler } from '@services/operators';
 import { CreateUser, Role, User, UserService } from '@services/user.service';
 import { ButtonModule } from 'primeng/button';
@@ -16,12 +16,12 @@ import { Observable } from 'rxjs';
     selector: 'user-new',
     standalone: true,
     imports: [
-        AsyncPipe,
         ButtonModule,
         CheckboxModule,
         InputTextModule,
         MultiSelectModule,
         ListboxModule,
+        ObservableOptionsDirective,
         ReactiveFormsModule,
         ValidationSummaryComponent,
     ],

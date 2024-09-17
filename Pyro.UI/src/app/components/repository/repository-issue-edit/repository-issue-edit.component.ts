@@ -1,4 +1,3 @@
-import { AsyncPipe } from '@angular/common';
 import { Component, Injector, input, signal } from '@angular/core';
 import {
     AbstractControl,
@@ -9,6 +8,7 @@ import {
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ValidationSummaryComponent, Validators } from '@controls/validation-summary';
+import { ObservableOptionsDirective } from '@directives/observable-options.directive';
 import {
     IssueStatus,
     IssueStatusService,
@@ -27,11 +27,11 @@ import { finalize, map, Observable, of, shareReplay, take } from 'rxjs';
     selector: 'repository-issue-edit',
     standalone: true,
     imports: [
-        AsyncPipe,
         ButtonModule,
         DropdownModule,
         InputTextModule,
         MultiSelectModule,
+        ObservableOptionsDirective,
         ReactiveFormsModule,
         ValidationSummaryComponent,
     ],

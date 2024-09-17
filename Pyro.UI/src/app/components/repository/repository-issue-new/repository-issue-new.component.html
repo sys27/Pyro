@@ -17,49 +17,43 @@
     </div>
 
     <div class="field">
-      @if (users$ | async; as users) {
-        <label for="assignee">Assignee:</label>
-        <p-dropdown
-          id="assignee"
-          formControlName="assigneeId"
-          [options]="users"
-          optionLabel="name"
-          optionValue="id"
-          styleClass="w-full"
-          placeholder="Select User" />
-        <validation-summary controlName="assigneeId" />
-      }
+      <label for="assignee">Assignee:</label>
+      <p-dropdown
+        id="assignee"
+        formControlName="assigneeId"
+        [observableOptions]="users$"
+        optionLabel="name"
+        optionValue="id"
+        styleClass="w-full"
+        placeholder="Select User" />
+      <validation-summary controlName="assigneeId" />
     </div>
 
     <div class="field">
-      @if (labels$ | async; as labels) {
-        <label for="labels">Labels:</label>
-        <p-multiSelect
-          id="labels"
-          formControlName="labelIds"
-          [options]="labels"
-          optionLabel="name"
-          optionValue="id"
-          styleClass="w-full"
-          placeholder="Select Labels"
-          [filter]="false" />
-        <validation-summary controlName="labelIds" />
-      }
+      <label for="labels">Labels:</label>
+      <p-multiSelect
+        id="labels"
+        formControlName="labelIds"
+        [observableOptions]="labels$"
+        optionLabel="name"
+        optionValue="id"
+        styleClass="w-full"
+        placeholder="Select Labels"
+        [filter]="false" />
+      <validation-summary controlName="labelIds" />
     </div>
 
     <div class="field">
-      @if (statuses$ | async; as statuses) {
-        <label for="status">Status:</label>
-        <p-dropdown
-          id="status"
-          formControlName="statusId"
-          [options]="statuses"
-          optionLabel="name"
-          optionValue="id"
-          styleClass="w-full"
-          placeholder="Select Status" />
-        <validation-summary controlName="statusId" />
-      }
+      <label for="status">Status:</label>
+      <p-dropdown
+        id="status"
+        formControlName="statusId"
+        [observableOptions]="statuses$"
+        optionLabel="name"
+        optionValue="id"
+        styleClass="w-full"
+        placeholder="Select Status" />
+      <validation-summary controlName="statusId" />
     </div>
 
     <div class="field">

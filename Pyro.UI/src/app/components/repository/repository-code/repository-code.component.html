@@ -2,15 +2,13 @@
   @if (directoryView$ | async; as view) {
     <div class="col">
       <p-toolbar>
-        @if (branches$ | async; as branches) {
-          <div class="p-toolbar-group-start">
-            <p-dropdown
-              [options]="branches"
-              optionLabel="name"
-              [ngModel]="selectedBranch$ | async"
-              (ngModelChange)="selectBranch($event)" />
-          </div>
-        }
+        <div class="p-toolbar-group-start">
+          <p-dropdown
+            [observableOptions]="branches$"
+            optionLabel="name"
+            [ngModel]="selectedBranch$ | async"
+            (ngModelChange)="selectBranch($event)" />
+        </div>
 
         <div class="p-toolbar-group-end">
           <p-button
