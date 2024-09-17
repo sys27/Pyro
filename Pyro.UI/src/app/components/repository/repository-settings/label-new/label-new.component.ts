@@ -5,6 +5,7 @@ import { ValidationSummaryComponent, Validators } from '@controls/validation-sum
 import { Color } from '@models/color';
 import { LabelService } from '@services/label.service';
 import { createErrorHandler } from '@services/operators';
+import { AutoFocusModule } from 'primeng/autofocus';
 import { ButtonModule } from 'primeng/button';
 import { ColorPickerModule } from 'primeng/colorpicker';
 import { InputTextModule } from 'primeng/inputtext';
@@ -14,6 +15,7 @@ import { filter, finalize } from 'rxjs';
     selector: 'label-new',
     standalone: true,
     imports: [
+        AutoFocusModule,
         ButtonModule,
         ColorPickerModule,
         InputTextModule,

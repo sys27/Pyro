@@ -9,8 +9,10 @@
         id="login"
         type="text"
         class="w-full"
+        formControlName="login"
         pInputText
-        formControlName="login" />
+        pAutoFocus
+        [autofocus]="true" />
       <validation-summary controlName="login" />
     </div>
 

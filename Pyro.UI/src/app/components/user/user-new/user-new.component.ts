@@ -5,6 +5,7 @@ import { ValidationSummaryComponent, Validators } from '@controls/validation-sum
 import { ObservableOptionsDirective } from '@directives/observable-options.directive';
 import { createErrorHandler } from '@services/operators';
 import { CreateUser, Role, User, UserService } from '@services/user.service';
+import { AutoFocusModule } from 'primeng/autofocus';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { InputTextModule } from 'primeng/inputtext';
@@ -16,6 +17,7 @@ import { Observable } from 'rxjs';
     selector: 'user-new',
     standalone: true,
     imports: [
+        AutoFocusModule,
         ButtonModule,
         CheckboxModule,
         InputTextModule,

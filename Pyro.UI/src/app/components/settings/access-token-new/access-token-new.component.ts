@@ -3,6 +3,7 @@ import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { ValidationSummaryComponent, Validators } from '@controls/validation-summary';
 import { AccessTokenService, CreateAccessToken } from '@services/access-token.service';
 import { createErrorHandler } from '@services/operators';
+import { AutoFocusModule } from 'primeng/autofocus';
 import { ButtonModule } from 'primeng/button';
 import { CalendarModule } from 'primeng/calendar';
 import { InputGroupModule } from 'primeng/inputgroup';
@@ -13,6 +14,7 @@ import { filter } from 'rxjs';
     selector: 'access-token-new',
     standalone: true,
     imports: [
+        AutoFocusModule,
         ButtonModule,
         CalendarModule,
         InputGroupModule,

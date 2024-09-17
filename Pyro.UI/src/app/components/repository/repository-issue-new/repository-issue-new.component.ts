@@ -7,6 +7,7 @@ import { IssueStatus, IssueStatusService } from '@services/issue-status.service'
 import { IssueService, User } from '@services/issue.service';
 import { Label, LabelService } from '@services/label.service';
 import { createErrorHandler } from '@services/operators';
+import { AutoFocusModule } from 'primeng/autofocus';
 import { ButtonModule } from 'primeng/button';
 import { DropdownModule } from 'primeng/dropdown';
 import { InputTextModule } from 'primeng/inputtext';
@@ -17,6 +18,7 @@ import { finalize, map, Observable, shareReplay } from 'rxjs';
     selector: 'repo-issue-new',
     standalone: true,
     imports: [
+        AutoFocusModule,
         ButtonModule,
         DropdownModule,
         InputTextModule,

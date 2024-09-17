@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { ValidationSummaryComponent, Validators } from '@controls/validation-summary';
 import { AuthService } from '@services/auth.service';
 import { createErrorHandler } from '@services/operators';
+import { AutoFocusModule } from 'primeng/autofocus';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
@@ -12,6 +13,7 @@ import { PasswordModule } from 'primeng/password';
     selector: 'login',
     standalone: true,
     imports: [
+        AutoFocusModule,
         ButtonModule,
         InputTextModule,
         PasswordModule,
