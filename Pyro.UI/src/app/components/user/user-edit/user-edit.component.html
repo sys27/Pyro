@@ -17,18 +17,16 @@
     </div>
 
     <div class="field">
-      @if (roles$ | async; as roles) {
-        <label for="roles">Roles:</label>
-        <p-multiSelect
-          id="roles"
-          formControlName="roles"
-          styleClass="w-full"
-          [options]="roles"
-          optionLabel="name"
-          placeholder="Select Roles"
-          [filter]="false" />
-        <validation-summary controlName="roles" />
-      }
+      <label for="roles">Roles:</label>
+      <p-multiSelect
+        id="roles"
+        formControlName="roles"
+        styleClass="w-full"
+        [observableOptions]="roles$"
+        optionLabel="name"
+        placeholder="Select Roles"
+        [filter]="false" />
+      <validation-summary controlName="roles" />
     </div>
 
     <!-- TODO: permissions -->

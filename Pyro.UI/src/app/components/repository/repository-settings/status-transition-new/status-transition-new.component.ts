@@ -1,8 +1,8 @@
-import { AsyncPipe } from '@angular/common';
 import { Component, Injector, input, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ValidationSummaryComponent } from '@controls/validation-summary';
+import { ObservableOptionsDirective } from '@directives/observable-options.directive';
 import { IssueStatus, IssueStatusService } from '@services/issue-status.service';
 import { createErrorHandler } from '@services/operators';
 import { ButtonModule } from 'primeng/button';
@@ -13,9 +13,9 @@ import { finalize, Observable, shareReplay } from 'rxjs';
     selector: 'status-transition-new',
     standalone: true,
     imports: [
-        AsyncPipe,
         ButtonModule,
         DropdownModule,
+        ObservableOptionsDirective,
         ReactiveFormsModule,
         ValidationSummaryComponent,
     ],

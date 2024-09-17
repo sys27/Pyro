@@ -27,6 +27,9 @@
       "@controls/*": [
         "./src/app/controls/*"
       ],
+      "@directives/*": [
+        "./src/app/directives/*"
+      ],
       "@models/*": [
         "./src/app/models/*"
       ],

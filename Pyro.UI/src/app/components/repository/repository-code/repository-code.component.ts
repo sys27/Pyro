@@ -2,6 +2,7 @@ import { AsyncPipe, DatePipe, SlicePipe } from '@angular/common';
 import { Component, computed, Injector, input, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { ObservableOptionsDirective } from '@directives/observable-options.directive';
 import { MarkdownService } from '@services/markdown.service';
 import { createErrorHandler } from '@services/operators';
 import { BranchItem, Repository, RepositoryService, TreeView } from '@services/repository.service';
@@ -43,6 +44,7 @@ import {
         FormsModule,
         InputGroupModule,
         InputTextModule,
+        ObservableOptionsDirective,
         OverlayPanelModule,
         RouterModule,
         SkeletonModule,

@@ -7,33 +7,29 @@
     <validation-summary />
 
     <div class="field">
-      @if (statuses$ | async; as statuses) {
-        <label for="from">From:</label>
-        <p-dropdown
-          id="from"
-          formControlName="fromId"
-          [options]="statuses"
-          optionLabel="name"
-          optionValue="id"
-          styleClass="w-full"
-          placeholder="Select Status" />
-        <validation-summary controlName="fromId" />
-      }
+      <label for="from">From:</label>
+      <p-dropdown
+        id="from"
+        formControlName="fromId"
+        [observableOptions]="statuses$"
+        optionLabel="name"
+        optionValue="id"
+        styleClass="w-full"
+        placeholder="Select Status" />
+      <validation-summary controlName="fromId" />
     </div>
 
     <div class="field">
-      @if (statuses$ | async; as statuses) {
-        <label for="to">To:</label>
-        <p-dropdown
-          id="to"
-          formControlName="toId"
-          [options]="statuses"
-          optionLabel="name"
-          optionValue="id"
-          styleClass="w-full"
-          placeholder="Select Status" />
-        <validation-summary controlName="toId" />
-      }
+      <label for="to">To:</label>
+      <p-dropdown
+        id="to"
+        formControlName="toId"
+        [observableOptions]="statuses$"
+        optionLabel="name"
+        optionValue="id"
+        styleClass="w-full"
+        placeholder="Select Status" />
+      <validation-summary controlName="toId" />
     </div>
 
     <div class="field">
