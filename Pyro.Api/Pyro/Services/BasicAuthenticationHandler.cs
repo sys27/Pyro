@@ -66,6 +66,12 @@ public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSc
             return AuthenticateResult.Fail("Invalid username or password");
         }
 
+        if (user.IsLocked)
+        {
+            Logger.LogInformation("User is locked");
+            return AuthenticateResult.Fail("User is locked");
+        }
+
         // TODO: implement shared logic with TokenService?
         var roles = user.Roles.Select(x => x.Name);
         var permissions = user.Roles.SelectMany(x => x.Permissions).Select(x => x.Name).Distinct();

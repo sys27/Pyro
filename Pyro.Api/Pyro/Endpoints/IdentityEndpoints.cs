@@ -74,10 +74,12 @@ internal static class IdentityEndpoints
                 CancellationToken cancellationToken) =>
             {
                 var command = request.ToCommand();
-                await mediator.Send(command, cancellationToken);
+                var user = await mediator.Send(command, cancellationToken);
                 await unitOfWork.SaveChangesAsync(cancellationToken);
 
-                return Results.Created($"/api/users/{request.Login}", null);
+                var result = user.ToResponse();
+
+                return Results.Created($"/api/users/{request.Login}", result);
             })
             .RequirePermission(Permission.UserEdit)
             .Produces(201)
@@ -113,6 +115,50 @@ internal static class IdentityEndpoints
             .Produces(404)
             .ProducesProblem(500)
             .WithName("Update User")
+            .WithOpenApi();
+
+        usersBuilder.MapPost("/{login}/lock", async (
+                IMediator mediator,
+                UnitOfWork unitOfWork,
+                string login,
+                CancellationToken cancellationToken) =>
+            {
+                var command = new LockUser(login);
+                await mediator.Send(command, cancellationToken);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
+
+                return Results.Ok();
+            })
+            .RequirePermission(Permission.UserManage)
+            .Produces(200)
+            .ProducesValidationProblem()
+            .Produces(401)
+            .Produces(403)
+            .Produces(404)
+            .ProducesProblem(500)
+            .WithName("Lock User")
+            .WithOpenApi();
+
+        usersBuilder.MapPost("/{login}/unlock", async (
+                IMediator mediator,
+                UnitOfWork unitOfWork,
+                string login,
+                CancellationToken cancellationToken) =>
+            {
+                var command = new UnlockUser(login);
+                await mediator.Send(command, cancellationToken);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
+
+                return Results.Ok();
+            })
+            .RequirePermission(Permission.UserManage)
+            .Produces(200)
+            .ProducesValidationProblem()
+            .Produces(401)
+            .Produces(403)
+            .Produces(404)
+            .ProducesProblem(500)
+            .WithName("Unlock User")
             .WithOpenApi();
 
         var accessTokenBuilder = usersBuilder.MapGroup("/access-tokens")

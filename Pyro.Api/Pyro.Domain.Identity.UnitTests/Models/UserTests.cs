@@ -158,4 +158,29 @@ public class UserTests
 
         Assert.That(result, Is.False);
     }
+
+    [Test]
+    public void LockUser()
+    {
+        var user = new User { Login = "test" };
+        user.AddAuthenticationToken(new AuthenticationToken());
+
+        user.Lock();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(user.IsLocked, Is.True);
+            Assert.That(user.AuthenticationTokens, Is.Empty);
+        });
+    }
+
+    [Test]
+    public void UnlockUser()
+    {
+        var user = new User { Login = "test" };
+
+        user.Unlock();
+
+        Assert.That(user.IsLocked, Is.False);
+    }
 }
