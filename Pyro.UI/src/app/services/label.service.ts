@@ -54,10 +54,10 @@ export class LabelService {
 }
 
 export interface Label {
-    id: string;
-    name: string;
-    color: Color;
-    isDisabled: boolean;
+    get id(): string;
+    get name(): string;
+    get color(): Color;
+    get isDisabled(): boolean;
 }
 
 export interface CreateLabel {

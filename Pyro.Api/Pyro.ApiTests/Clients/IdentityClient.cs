@@ -23,11 +23,17 @@ internal class IdentityClient : BaseClient
     public async Task<UserResponse?> GetUser(string login)
         => await Get<UserResponse>($"/api/users/{login}");
 
-    public async Task CreateUser(CreateUserRequest request)
-        => await Post("/api/users", request);
+    public async Task<UserResponse?> CreateUser(CreateUserRequest request)
+        => await Post<UserResponse>("/api/users", request);
 
     public async Task<UserResponse?> UpdateUser(string login, UpdateUserRequest request)
         => await Put<UserResponse>($"/api/users/{login}", request);
+
+    public async Task LockUser(string login)
+        => await Post($"/api/users/{login}/lock");
+
+    public async Task UnlockUser(string login)
+        => await Post($"/api/users/{login}/unlock");
 
     public async Task<IReadOnlyList<AccessTokenResponse>?> GetAccessTokens()
         => await Get<IReadOnlyList<AccessTokenResponse>>("/api/users/access-tokens");

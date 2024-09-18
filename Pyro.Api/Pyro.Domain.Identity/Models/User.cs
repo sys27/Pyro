@@ -79,7 +79,14 @@ public class User : DomainEntity
         => accessTokens;
 
     public void Lock()
-        => IsLocked = true;
+    {
+        IsLocked = true;
+
+        ClearAuthenticationTokens();
+    }
+
+    public void Unlock()
+        => IsLocked = false;
 
     public void AddRole(Role role)
     {

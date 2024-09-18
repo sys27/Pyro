@@ -54,11 +54,17 @@ export class IssueStatusService {
     }
 
     public enableStatus(repositoryName: string, id: string): Observable<void> {
-        return this.httpClient.post<void>(`${Endpoints.Statuses(repositoryName)}/${id}/enable`, null);
+        return this.httpClient.post<void>(
+            `${Endpoints.Statuses(repositoryName)}/${id}/enable`,
+            null,
+        );
     }
 
     public disableStatus(repositoryName: string, id: string): Observable<void> {
-        return this.httpClient.post<void>(`${Endpoints.Statuses(repositoryName)}/${id}/disable`, null);
+        return this.httpClient.post<void>(
+            `${Endpoints.Statuses(repositoryName)}/${id}/disable`,
+            null,
+        );
     }
 
     public getStatusTransitions(repositoryName: string): Observable<IssueStatusTransition[]> {
@@ -88,16 +94,16 @@ export class IssueStatusService {
 }
 
 export interface IssueStatus {
-    id: string;
-    name: string;
-    color: Color;
-    isDisabled: boolean;
+    get id(): string;
+    get name(): string;
+    get color(): Color;
+    get isDisabled(): boolean;
 }
 
 export interface IssueStatusTransition {
-    id: string;
-    from: IssueStatus;
-    to: IssueStatus;
+    get id(): string;
+    get from(): IssueStatus;
+    get to(): IssueStatus;
 }
 
 export interface CreateIssueStatus {

@@ -25,7 +25,7 @@ export class NotificationService {
                 transport: HttpTransportType.WebSockets | HttpTransportType.ServerSentEvents,
             })
             .withAutomaticReconnect()
-            .configureLogging(isDevMode() ? LogLevel.Trace : LogLevel.Warning)
+            .configureLogging(isDevMode() ? LogLevel.Trace : LogLevel.None)
             .build();
 
         authService.currentUser.pipe(takeUntil(this.destroy$)).subscribe(user => {

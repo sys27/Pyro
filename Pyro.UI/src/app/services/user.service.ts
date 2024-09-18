@@ -52,6 +52,14 @@ export class UserService {
 
         return this.httpClient.put<void>(`${Endpoints.Users}/${login}`, request);
     }
+
+    public lockUser(login: string): Observable<void> {
+        return this.httpClient.post<void>(`${Endpoints.Users}/${login}/lock`, null);
+    }
+
+    public unlockUser(login: string): Observable<void> {
+        return this.httpClient.post<void>(`${Endpoints.Users}/${login}/unlock`, null);
+    }
 }
 
 export interface Permission {
@@ -73,6 +81,7 @@ export interface User {
 
 export interface UserItem {
     get login(): string;
+    get isLocked(): boolean;
 }
 
 export interface CreateUser {

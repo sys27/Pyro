@@ -123,22 +123,22 @@ export class IssueService {
 }
 
 export interface Issue {
-    id: string;
-    issueNumber: number;
-    title: string;
-    author: User;
-    createdAt: Date;
-    assignee: User | null;
-    labels: Label[];
-    status: IssueStatus;
-    isLocked: boolean;
+    get id(): string;
+    get issueNumber(): number;
+    get title(): string;
+    get author(): User;
+    get createdAt(): Date;
+    get assignee(): User | null;
+    get labels(): Label[];
+    get status(): IssueStatus;
+    get isLocked(): boolean;
 }
 
 export interface Comment {
-    id: string;
-    content: string;
-    author: User;
-    createdAt: Date;
+    get id(): string;
+    get content(): string;
+    get author(): User;
+    get createdAt(): Date;
 }
 
 export type ChangeLogs =
@@ -157,45 +157,45 @@ export enum IssueChangeLogType {
 }
 
 export interface IssueChangeLog {
-    id: string;
-    author: User;
-    createdAt: Date;
-    $type: IssueChangeLogType;
+    get id(): string;
+    get author(): User;
+    get createdAt(): Date;
+    get $type(): IssueChangeLogType;
 }
 
 export interface IssueAssigneeChangeLog extends IssueChangeLog {
-    oldAssignee: User | null;
-    newAssignee: User | null;
-    $type: IssueChangeLogType.Assignee;
+    get oldAssignee(): User | null;
+    get newAssignee(): User | null;
+    get $type(): IssueChangeLogType.Assignee;
 }
 
 export interface IssueLabelChangeLog extends IssueChangeLog {
-    oldLabel: Label;
-    newLabel: Label;
-    $type: IssueChangeLogType.Label;
+    get oldLabel(): Label;
+    get newLabel(): Label;
+    get $type(): IssueChangeLogType.Label;
 }
 
 export interface IssueLockChangeLog extends IssueChangeLog {
-    oldValue: boolean;
-    newValue: boolean;
-    $type: IssueChangeLogType.Lock;
+    get oldValue(): boolean;
+    get newValue(): boolean;
+    get $type(): IssueChangeLogType.Lock;
 }
 
 export interface IssueStatusChangeLog extends IssueChangeLog {
-    oldStatus: IssueStatus | null;
-    newStatus: IssueStatus;
-    $type: IssueChangeLogType.Status;
+    get oldStatus(): IssueStatus | null;
+    get newStatus(): IssueStatus;
+    get $type(): IssueChangeLogType.Status;
 }
 
 export interface IssueTitleChangeLog extends IssueChangeLog {
-    oldTitle: string;
-    newTitle: string;
-    $type: IssueChangeLogType.Title;
+    get oldTitle(): string;
+    get newTitle(): string;
+    get $type(): IssueChangeLogType.Title;
 }
 
 export interface User {
-    id: string;
-    name: string;
+    get id(): string;
+    get name(): string;
 }
 
 export interface CreateIssue {
