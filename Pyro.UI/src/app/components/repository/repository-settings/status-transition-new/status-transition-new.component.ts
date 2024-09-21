@@ -1,21 +1,25 @@
+import { createStatusTransition, loadStatuses } from '@actions/repository-statuses.actions';
 import { Component, Injector, input, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ValidationSummaryComponent } from '@controls/validation-summary';
-import { ObservableOptionsDirective } from '@directives/observable-options.directive';
+import { DataSourceDirective } from '@directives/data-source.directive';
+import { Store } from '@ngrx/store';
 import { IssueStatus, IssueStatusService } from '@services/issue-status.service';
-import { createErrorHandler } from '@services/operators';
+import { AppState } from '@states/app.state';
+import { DataSourceState } from '@states/data-source.state';
+import { selectStatuses } from '@states/repository.state';
 import { ButtonModule } from 'primeng/button';
 import { DropdownModule } from 'primeng/dropdown';
-import { finalize, Observable, shareReplay } from 'rxjs';
+import { Observable } from 'rxjs';
 
 @Component({
     selector: 'status-transition-new',
     standalone: true,
     imports: [
         ButtonModule,
+        DataSourceDirective,
         DropdownModule,
-        ObservableOptionsDirective,
         ReactiveFormsModule,
         ValidationSummaryComponent,
     ],
@@ -44,20 +48,20 @@ export class StatusTransitionNewComponent implements OnInit {
     );
     public readonly isLoading = signal<boolean>(false);
 
-    public statuses$: Observable<IssueStatus[]> | undefined;
+    public statuses$: Observable<DataSourceState<IssueStatus>> =
+        this.store.select(selectStatuses);
 
     public constructor(
         private readonly injector: Injector,
         private readonly formBuilder: FormBuilder,
         private readonly router: Router,
         private readonly route: ActivatedRoute,
+        private readonly store: Store<AppState>,
         private readonly statusService: IssueStatusService,
     ) {}
 
     public ngOnInit(): void {
-        this.statuses$ = this.statusService
-            .getStatuses(this.repositoryName())
-            .pipe(createErrorHandler(this.injector), shareReplay(1));
+        this.store.dispatch(loadStatuses({ repositoryName: this.repositoryName() }));
     }
 
     public onSubmit(): void {
@@ -65,21 +69,14 @@ export class StatusTransitionNewComponent implements OnInit {
             return;
         }
 
-        this.isLoading.set(true);
-
         let transition = {
             fromId: this.form.value.fromId!,
             toId: this.form.value.toId!,
         };
 
-        this.statusService
-            .createStatusTransition(this.repositoryName(), transition)
-            .pipe(
-                createErrorHandler(this.injector),
-                finalize(() => this.isLoading.set(false)),
-            )
-            .subscribe(() => {
-                this.router.navigate(['../'], { relativeTo: this.route });
-            });
+        this.isLoading.set(true);
+        this.store.dispatch(
+            createStatusTransition({ repositoryName: this.repositoryName(), transition }),
+        );
     }
 }

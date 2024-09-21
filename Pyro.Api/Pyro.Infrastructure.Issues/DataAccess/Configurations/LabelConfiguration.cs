@@ -32,7 +32,7 @@ internal class LabelConfiguration : IEntityTypeConfiguration<Label>
         builder.Property(x => x.IsDisabled)
             .IsRequired();
 
-        builder.HasIndex(x => x.Name)
+        builder.HasIndex("GitRepositoryId", "Name")
             .IsUnique()
             .HasDatabaseName("IX_Label_Name");
     }

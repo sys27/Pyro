@@ -1,6 +1,7 @@
 export class CurrentUser {
     public constructor(
         private readonly _accessToken: string,
+        private readonly _refreshToken: string,
         private readonly _expiresIn: Date,
         private readonly _id: string,
         private readonly _login: string,
@@ -14,6 +15,10 @@ export class CurrentUser {
 
     public get accessToken(): string {
         return this._accessToken;
+    }
+
+    public get refreshToken(): string {
+        return this._refreshToken;
     }
 
     public get expiresIn(): Date {

@@ -1,31 +1,51 @@
-import { Component, signal } from '@angular/core';
+import {
+    loadRepositories,
+    repositoriesNextPage,
+    repositoriesPreviousPage,
+} from '@actions/repositories.actions';
+import { AsyncPipe } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { PaginatorComponent, PaginatorState } from '@controls/paginator/paginator.component';
-import { RepositoryItem, RepositoryService } from '@services/repository.service';
+import { DataSourceDirective } from '@directives/data-source.directive';
+import { Store } from '@ngrx/store';
+import { RepositoryItem } from '@services/repository.service';
+import { AppState } from '@states/app.state';
+import { DataSourceState } from '@states/data-source.state';
+import { selectCurrentPage, selectHasNext, selectHasPrevious } from '@states/paged.state';
+import { selectRepositoriesFeature } from '@states/repositories.state';
+import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { Observable } from 'rxjs';
 
 @Component({
     selector: 'repo-list',
     standalone: true,
-    imports: [PaginatorComponent, RouterModule, TableModule],
+    imports: [AsyncPipe, ButtonModule, DataSourceDirective, RouterModule, TableModule],
     templateUrl: './repository-list.component.html',
     styleUrl: './repository-list.component.css',
 })
-export class RepositoryListComponent {
-    public repositories = signal<RepositoryItem[]>([]);
+export class RepositoryListComponent implements OnInit {
+    public repositories$: Observable<DataSourceState<RepositoryItem>> = this.store.select(
+        selectCurrentPage(selectRepositoriesFeature),
+    );
+    public readonly isPreviousEnabled$: Observable<boolean> = this.store.select(
+        selectHasPrevious(selectRepositoriesFeature),
+    );
+    public readonly isNextEnabled$: Observable<boolean> = this.store.select(
+        selectHasNext(selectRepositoriesFeature),
+    );
 
-    public constructor(private readonly repoService: RepositoryService) {}
+    public constructor(private readonly store: Store<AppState>) {}
 
-    public paginatorLoader = (state: PaginatorState): Observable<RepositoryItem[]> => {
-        return this.repoService.getRepositories(state.before, state.after);
-    };
-
-    public paginatorOffsetSelector(item: RepositoryItem): string {
-        return item.name;
+    public ngOnInit(): void {
+        this.store.dispatch(loadRepositories());
     }
 
-    public paginatorDataChanged(items: RepositoryItem[]): void {
-        this.repositories.set(items);
+    public onPrevious(): void {
+        this.store.dispatch(repositoriesPreviousPage());
+    }
+
+    public onNext(): void {
+        this.store.dispatch(repositoriesNextPage());
     }
 }

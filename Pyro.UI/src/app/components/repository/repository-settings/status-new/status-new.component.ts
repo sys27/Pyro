@@ -1,15 +1,16 @@
-import { Component, Injector, input, signal } from '@angular/core';
+import { createStatus } from '@actions/repository-statuses.actions';
+import { Component, input, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
 import { ValidationSummaryComponent, Validators } from '@controls/validation-summary';
 import { Color } from '@models/color';
+import { Store } from '@ngrx/store';
 import { IssueStatusService } from '@services/issue-status.service';
-import { createErrorHandler } from '@services/operators';
+import { AppState } from '@states/app.state';
 import { AutoFocusModule } from 'primeng/autofocus';
 import { ButtonModule } from 'primeng/button';
 import { ColorPickerModule } from 'primeng/colorpicker';
 import { InputTextModule } from 'primeng/inputtext';
-import { filter, finalize } from 'rxjs';
+import { filter } from 'rxjs';
 
 @Component({
     selector: 'status-new',
@@ -46,10 +47,8 @@ export class StatusNewComponent {
     public readonly isLoading = signal<boolean>(false);
 
     public constructor(
-        private readonly injector: Injector,
         private readonly formBuilder: FormBuilder,
-        private readonly router: Router,
-        private readonly route: ActivatedRoute,
+        private readonly store: Store<AppState>,
         private readonly statusService: IssueStatusService,
     ) {}
 
@@ -58,21 +57,12 @@ export class StatusNewComponent {
             return;
         }
 
-        this.isLoading.set(true);
-
-        let label = {
+        let status = {
             name: this.form.value.name!,
             color: this.form.value.color!,
         };
 
-        this.statusService
-            .createStatus(this.repositoryName(), label)
-            .pipe(
-                createErrorHandler(this.injector),
-                finalize(() => this.isLoading.set(false)),
-            )
-            .subscribe(() => {
-                this.router.navigate(['../'], { relativeTo: this.route });
-            });
+        this.isLoading.set(true);
+        this.store.dispatch(createStatus({ repositoryName: this.repositoryName(), status }));
     }
 }

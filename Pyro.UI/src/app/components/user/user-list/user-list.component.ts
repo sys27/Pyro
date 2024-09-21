@@ -1,78 +1,85 @@
+import {
+    loadUsers,
+    lockUser,
+    unlockUser,
+    usersNextPage,
+    usersPreviousPage,
+} from '@actions/users.actions';
 import { AsyncPipe } from '@angular/common';
-import { Component, DestroyRef, Injector, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterModule } from '@angular/router';
-import { PaginatorComponent, PaginatorState } from '@controls/paginator/paginator.component';
+import { PaginatorComponent } from '@controls/paginator/paginator.component';
+import { DataSourceDirective } from '@directives/data-source.directive';
 import { PyroPermissions } from '@models/pyro-permissions';
-import { AuthService } from '@services/auth.service';
-import { createErrorHandler } from '@services/operators';
-import { User, UserItem, UserService } from '@services/user.service';
+import { Store } from '@ngrx/store';
+import { User, UserItem } from '@services/user.service';
+import { AppState } from '@states/app.state';
+import { selectCurrentUser, selectHasPermission } from '@states/auth.state';
+import { DataSourceState } from '@states/data-source.state';
+import { selectCurrentPage, selectHasNext, selectHasPrevious } from '@states/paged.state';
+import { selectUsers } from '@states/users.state';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
-import { BehaviorSubject, map, Observable, switchMap } from 'rxjs';
+import { map, Observable } from 'rxjs';
 
 @Component({
     selector: 'user-list',
     standalone: true,
-    imports: [AsyncPipe, ButtonModule, PaginatorComponent, RouterModule, TableModule],
+    imports: [
+        AsyncPipe,
+        ButtonModule,
+        DataSourceDirective,
+        PaginatorComponent,
+        RouterModule,
+        TableModule,
+    ],
     templateUrl: './user-list.component.html',
     styleUrl: './user-list.component.css',
 })
-export class UserListComponent implements OnInit, OnDestroy {
-    public readonly users = signal<UserItem[]>([]);
-    private readonly refreshUsers$ = new BehaviorSubject<void>(undefined);
-    public hasEditPermission$: Observable<boolean> | undefined;
+export class UserListComponent implements OnInit {
+    public readonly users$: Observable<DataSourceState<UserItem>> = this.store.select(
+        selectCurrentPage(selectUsers),
+    );
+    public readonly isPreviousEnabled$: Observable<boolean> = this.store.select(
+        selectHasPrevious(selectUsers),
+    );
+    public readonly isNextEnabled$: Observable<boolean> = this.store.select(
+        selectHasNext(selectUsers),
+    );
+    public readonly hasEditPermission$: Observable<boolean> = this.store.select(
+        selectHasPermission(PyroPermissions.UserEdit),
+    );
 
     public constructor(
-        private readonly injector: Injector,
         private readonly destroyRef: DestroyRef,
-        private readonly userService: UserService,
-        private readonly authService: AuthService,
+        private readonly store: Store<AppState>,
     ) {}
 
     public ngOnInit(): void {
-        this.hasEditPermission$ = this.authService.currentUser.pipe(
-            takeUntilDestroyed(this.destroyRef),
-            map(user => user?.hasPermission(PyroPermissions.UserEdit) ?? false),
-        );
+        this.store.dispatch(loadUsers());
     }
 
-    public ngOnDestroy(): void {
-        this.refreshUsers$.complete();
+    public lockUserHandler(user: User): void {
+        this.store.dispatch(lockUser({ login: user.login }));
     }
 
-    public paginatorLoader = (state: PaginatorState): Observable<UserItem[]> => {
-        return this.refreshUsers$.pipe(
-            switchMap(() => this.userService.getUsers(state.before, state.after)),
-        );
-    };
-
-    public paginatorOffsetSelector(item: UserItem): string {
-        return item.login;
-    }
-
-    public paginatorDataChanged(items: UserItem[]): void {
-        this.users.set(items);
-    }
-
-    public lockUser(user: User): void {
-        this.userService
-            .lockUser(user.login)
-            .pipe(createErrorHandler(this.injector))
-            .subscribe(() => this.refreshUsers$.next());
-    }
-
-    public unlockUser(user: User): void {
-        this.userService
-            .unlockUser(user.login)
-            .pipe(createErrorHandler(this.injector))
-            .subscribe(() => this.refreshUsers$.next());
+    public unlockUserHandler(user: User): void {
+        this.store.dispatch(unlockUser({ login: user.login }));
     }
 
     public isCurrentUser(user: User): Observable<boolean> {
-        return this.authService.currentUser.pipe(
+        return this.store.select(selectCurrentUser).pipe(
             takeUntilDestroyed(this.destroyRef),
             map(currentUser => currentUser?.login === user.login),
         );
+    }
+
+    public onPrevious(): void {
+        this.store.dispatch(usersPreviousPage());
+    }
+
+    public onNext(): void {
+        this.store.dispatch(usersNextPage());
     }
 }

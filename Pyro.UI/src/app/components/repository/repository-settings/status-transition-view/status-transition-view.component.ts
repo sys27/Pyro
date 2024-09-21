@@ -1,18 +1,24 @@
+import {
+    deleteStatusTransition,
+    loadStatusTransitions,
+} from '@actions/repository-statuses.actions';
 import { AsyncPipe } from '@angular/common';
-import { Component, DestroyRef, Injector, input, OnInit } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Component, input, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TagComponent } from '@controls/tag/tag.component';
+import { DataSourceDirective } from '@directives/data-source.directive';
 import { PyroPermissions } from '@models/pyro-permissions';
+import { Store } from '@ngrx/store';
 import { ColorPipe } from '@pipes/color.pipe';
 import { LuminanceColorPipe } from '@pipes/luminance-color.pipe';
-import { AuthService } from '@services/auth.service';
-import { IssueStatusService, IssueStatusTransition } from '@services/issue-status.service';
-import { createErrorHandler } from '@services/operators';
-import { MessageService } from 'primeng/api';
+import { IssueStatusTransition } from '@services/issue-status.service';
+import { AppState } from '@states/app.state';
+import { selectHasPermission } from '@states/auth.state';
+import { DataSourceState } from '@states/data-source.state';
+import { selectStatusTransitions } from '@states/repository.state';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
-import { BehaviorSubject, map, Observable, switchMap } from 'rxjs';
+import { Observable } from 'rxjs';
 
 @Component({
     selector: 'status-transition-view',
@@ -21,6 +27,7 @@ import { BehaviorSubject, map, Observable, switchMap } from 'rxjs';
         AsyncPipe,
         ButtonModule,
         ColorPipe,
+        DataSourceDirective,
         LuminanceColorPipe,
         RouterLink,
         TableModule,
@@ -31,41 +38,24 @@ import { BehaviorSubject, map, Observable, switchMap } from 'rxjs';
 })
 export class StatusTransitionViewComponent implements OnInit {
     public readonly repositoryName = input.required<string>();
-    public transitions$: Observable<IssueStatusTransition[]> | undefined;
-    public hasManagePermission$: Observable<boolean> | undefined;
-    private readonly refreshTransitions$ = new BehaviorSubject<void>(undefined);
+    public transitions$: Observable<DataSourceState<IssueStatusTransition>> =
+        this.store.select(selectStatusTransitions);
+    public hasManagePermission$: Observable<boolean> = this.store.select(
+        selectHasPermission(PyroPermissions.RepositoryManage),
+    );
 
-    public constructor(
-        private readonly injector: Injector,
-        private readonly destroyRef: DestroyRef,
-        private readonly messageService: MessageService,
-        private readonly statusService: IssueStatusService,
-        private readonly authService: AuthService,
-    ) {}
+    public constructor(private readonly store: Store<AppState>) {}
 
     public ngOnInit(): void {
-        this.transitions$ = this.refreshTransitions$.pipe(
-            switchMap(() => this.statusService.getStatusTransitions(this.repositoryName())),
-            createErrorHandler(this.injector),
-        );
-        this.hasManagePermission$ = this.authService.currentUser.pipe(
-            takeUntilDestroyed(this.destroyRef),
-            map(user => user?.hasPermission(PyroPermissions.RepositoryManage) ?? false),
-        );
+        this.store.dispatch(loadStatusTransitions({ repositoryName: this.repositoryName() }));
     }
 
     public deleteTransition(transition: IssueStatusTransition): void {
-        this.statusService
-            .deleteStatusTransition(this.repositoryName(), transition.id)
-            .pipe(createErrorHandler(this.injector))
-            .subscribe(() => {
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Success',
-                    detail: `Status Transition deleted`,
-                });
-
-                this.refreshTransitions$.next();
-            });
+        this.store.dispatch(
+            deleteStatusTransition({
+                repositoryName: this.repositoryName(),
+                transitionId: transition.id,
+            }),
+        );
     }
 }

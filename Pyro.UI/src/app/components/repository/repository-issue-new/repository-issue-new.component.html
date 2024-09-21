@@ -23,7 +23,7 @@
       <p-dropdown
         id="assignee"
         formControlName="assigneeId"
-        [observableOptions]="users$"
+        [dataSource]="users$"
         optionLabel="name"
         optionValue="id"
         styleClass="w-full"
@@ -36,7 +36,7 @@
       <p-multiSelect
         id="labels"
         formControlName="labelIds"
-        [observableOptions]="labels$"
+        [dataSource]="labels$"
         optionLabel="name"
         optionValue="id"
         styleClass="w-full"
@@ -50,7 +50,7 @@
       <p-dropdown
         id="status"
         formControlName="statusId"
-        [observableOptions]="statuses$"
+        [dataSource]="statuses$"
         optionLabel="name"
         optionValue="id"
         styleClass="w-full"

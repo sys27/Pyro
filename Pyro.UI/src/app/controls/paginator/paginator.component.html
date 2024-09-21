@@ -3,12 +3,12 @@
     icon="pi pi-angle-left"
     severity="secondary"
     [outlined]="true"
-    [disabled]="!(isPreviousEnabled | async)"
+    [disabled]="(isPreviousEnabled | async) === false"
     (onClick)="onPrevious()" />
   <p-button
     icon="pi pi-angle-right"
     severity="secondary"
     [outlined]="true"
-    [disabled]="!(isNextEnabled | async)"
+    [disabled]="(isNextEnabled | async) === false"
     (onClick)="onNext()" />
 </div>

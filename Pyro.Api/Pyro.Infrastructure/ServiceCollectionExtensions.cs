@@ -29,7 +29,13 @@ public static class ServiceCollectionExtensions
                 .UseSqlite(configuration.GetConnectionString("DefaultConnection"))
                 .EnableDetailedErrors(env.IsDevelopment())
                 .EnableSensitiveDataLogging(env.IsDevelopment())
-                .AddInterceptors(provider.GetRequiredService<DomainEventInterceptor>());
+                .AddInterceptors(provider.GetRequiredService<DomainEventInterceptor>())
+                .ConfigureWarnings(w =>
+                {
+#if DEBUG
+                    w.Throw(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.MultipleCollectionIncludeWarning);
+#endif
+                });
         });
         services.AddScoped<DbContext, PyroDbContext>(sp => sp.GetRequiredService<PyroDbContext>());
 

@@ -1,17 +1,19 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, RedirectCommand, Router } from '@angular/router';
 import { PyroPermissions } from '@models/pyro-permissions';
-import { AuthService } from '@services/auth.service';
+import { Store } from '@ngrx/store';
+import { AppState } from '@states/app.state';
+import { selectCurrentUser } from '@states/auth.state';
 import { map } from 'rxjs';
 
 export function authGuard(args?: PyroPermissions | PyroPermissions[] | undefined): CanActivateFn {
     let permissions = args === undefined ? [] : Array.isArray(args) ? args : [args];
 
     return (route, state) => {
-        let authService = inject(AuthService);
+        let store = inject(Store<AppState>);
         let router = inject(Router);
 
-        return authService.currentUser.pipe(
+        return store.select(selectCurrentUser).pipe(
             map(currentUser => {
                 if (currentUser === null) {
                     let urlTree = router.createUrlTree(['/login'], {

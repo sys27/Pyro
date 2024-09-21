@@ -1,15 +1,20 @@
-import { Component, Injector, OnInit, input } from '@angular/core';
+import { loadUser, updateUser } from '@actions/users.actions';
+import { Component, input, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ValidationSummaryComponent, Validators } from '@controls/validation-summary';
-import { ObservableOptionsDirective } from '@directives/observable-options.directive';
-import { createErrorHandler } from '@services/operators';
-import { Role, UpdateUser, UserService } from '@services/user.service';
+import { DataSourceDirective } from '@directives/data-source.directive';
+import { Store } from '@ngrx/store';
+import { Role, UpdateUser } from '@services/user.service';
+import { AppState } from '@states/app.state';
+import { DataSourceState } from '@states/data-source.state';
+import { selectRolesFeature } from '@states/roles.state';
+import { selectSelectedUser } from '@states/users.state';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { InputTextModule } from 'primeng/inputtext';
 import { ListboxModule } from 'primeng/listbox';
 import { MultiSelectModule } from 'primeng/multiselect';
-import { Observable, shareReplay } from 'rxjs';
+import { filter, Observable } from 'rxjs';
 
 @Component({
     selector: 'user',
@@ -17,10 +22,10 @@ import { Observable, shareReplay } from 'rxjs';
     imports: [
         ButtonModule,
         CheckboxModule,
+        DataSourceDirective,
         InputTextModule,
         MultiSelectModule,
         ListboxModule,
-        ObservableOptionsDirective,
         ReactiveFormsModule,
         ValidationSummaryComponent,
     ],
@@ -29,34 +34,31 @@ import { Observable, shareReplay } from 'rxjs';
 })
 export class UserEditComponent implements OnInit {
     public readonly login = input.required<string>();
-    public roles$: Observable<Role[]> | undefined;
+    public roles$: Observable<DataSourceState<Role>> = this.store.select(selectRolesFeature);
     public readonly form = this.formBuilder.nonNullable.group({
         login: ['', [Validators.required('Login')]],
         roles: new FormControl<Role[]>([], Validators.required('Roles')),
     });
 
     public constructor(
-        private readonly injector: Injector,
         private readonly formBuilder: FormBuilder,
-        private readonly userService: UserService,
-    ) {}
-
-    public ngOnInit(): void {
-        this.form.get('login')?.disable();
-
-        this.roles$ = this.userService
-            .getRoles()
-            .pipe(createErrorHandler(this.injector), shareReplay(1));
-
-        this.userService
-            .getUser(this.login())
-            .pipe(createErrorHandler(this.injector))
+        private readonly store: Store<AppState>,
+    ) {
+        this.store
+            .select(selectSelectedUser)
+            .pipe(filter(user => !!user))
             .subscribe(user => {
                 this.form.patchValue({
-                    login: user?.login,
-                    roles: user?.roles,
+                    login: user.login,
+                    roles: user.roles,
                 });
             });
+    }
+
+    public ngOnInit(): void {
+        this.store.dispatch(loadUser({ login: this.login() }));
+
+        this.form.get('login')?.disable();
     }
 
     public onSubmit(): void {
@@ -64,9 +66,9 @@ export class UserEditComponent implements OnInit {
             return;
         }
 
-        this.userService
-            .updateUser(this.login(), this.form.value as UpdateUser)
-            .pipe(createErrorHandler(this.injector))
-            .subscribe(() => {});
+        let user: UpdateUser = {
+            roles: this.form.value.roles!,
+        };
+        this.store.dispatch(updateUser({ login: this.login(), user }));
     }
 }

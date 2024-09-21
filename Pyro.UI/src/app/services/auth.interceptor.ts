@@ -1,17 +1,22 @@
+import { refreshAction, refreshedAction } from '@actions/auth.actions';
 import { HttpContextToken, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { catchError, of, switchMap, take, throwError } from 'rxjs';
+import { Actions, ofType } from '@ngrx/effects';
+import { Store } from '@ngrx/store';
+import { AppState } from '@states/app.state';
+import { selectCurrentUser } from '@states/auth.state';
+import { catchError, map, of, switchMap, take, throwError } from 'rxjs';
 import { Endpoints } from '../endpoints';
-import { AuthService } from './auth.service';
 
 export const ALLOW_ANONYMOUS = new HttpContextToken<boolean>(() => false);
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-    let authService = inject(AuthService);
     let router = inject(Router);
+    let store: Store<AppState> = inject(Store<AppState>);
+    let actions$ = inject(Actions);
 
-    return authService.currentUser.pipe(
+    return store.select(selectCurrentUser).pipe(
         take(1),
         switchMap(currentUser => {
             if (
@@ -21,9 +26,14 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
                 currentUser &&
                 currentUser.expiresIn <= new Date()
             ) {
+                store.dispatch(refreshAction({ refreshToken: currentUser.refreshToken }));
+
                 // TODO: catch errors
                 // TODO: handle multiple requests
-                return authService.refresh().pipe(
+                return actions$.pipe(
+                    ofType(refreshedAction),
+                    take(1),
+                    map(({ currentUser }) => currentUser),
                     catchError(error => {
                         router.navigate(['/login']);
 

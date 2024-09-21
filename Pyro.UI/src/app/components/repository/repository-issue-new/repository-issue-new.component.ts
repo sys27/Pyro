@@ -1,18 +1,21 @@
-import { Component, Injector, input, OnInit, signal } from '@angular/core';
+import { createIssue, newIssueComponentOpened } from '@actions/issues.actions';
+import { Component, input, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
 import { ValidationSummaryComponent, Validators } from '@controls/validation-summary';
-import { ObservableOptionsDirective } from '@directives/observable-options.directive';
-import { IssueStatus, IssueStatusService } from '@services/issue-status.service';
-import { IssueService, User } from '@services/issue.service';
-import { Label, LabelService } from '@services/label.service';
-import { createErrorHandler } from '@services/operators';
+import { DataSourceDirective } from '@directives/data-source.directive';
+import { Store } from '@ngrx/store';
+import { IssueStatus } from '@services/issue-status.service';
+import { User } from '@services/issue.service';
+import { Label } from '@services/label.service';
+import { AppState } from '@states/app.state';
+import { DataSourceState } from '@states/data-source.state';
+import { selectEnabledLabels, selectEnabledStatuses, selectUsers } from '@states/repository.state';
 import { AutoFocusModule } from 'primeng/autofocus';
 import { ButtonModule } from 'primeng/button';
 import { DropdownModule } from 'primeng/dropdown';
 import { InputTextModule } from 'primeng/inputtext';
 import { MultiSelectModule } from 'primeng/multiselect';
-import { finalize, map, Observable, shareReplay } from 'rxjs';
+import { Observable } from 'rxjs';
 
 @Component({
     selector: 'repo-issue-new',
@@ -20,10 +23,10 @@ import { finalize, map, Observable, shareReplay } from 'rxjs';
     imports: [
         AutoFocusModule,
         ButtonModule,
+        DataSourceDirective,
         DropdownModule,
         InputTextModule,
         MultiSelectModule,
-        ObservableOptionsDirective,
         ReactiveFormsModule,
         ValidationSummaryComponent,
     ],
@@ -32,9 +35,10 @@ import { finalize, map, Observable, shareReplay } from 'rxjs';
 })
 export class RepositoryIssueNewComponent implements OnInit {
     public readonly repositoryName = input.required<string>();
-    public users$: Observable<User[]> | undefined;
-    public labels$: Observable<Label[]> | undefined;
-    public statuses$: Observable<IssueStatus[]> | undefined;
+    public users$: Observable<DataSourceState<User>> = this.store.select(selectUsers);
+    public labels$: Observable<DataSourceState<Label>> = this.store.select(selectEnabledLabels);
+    public statuses$: Observable<DataSourceState<IssueStatus>> =
+        this.store.select(selectEnabledStatuses);
     public readonly form = this.formBuilder.group({
         title: ['', [Validators.required('Title'), Validators.maxLength('Title', 200)]],
         assigneeId: new FormControl<string | null>(null),
@@ -48,29 +52,12 @@ export class RepositoryIssueNewComponent implements OnInit {
     public readonly isLoading = signal<boolean>(false);
 
     public constructor(
-        private readonly injector: Injector,
         private readonly formBuilder: FormBuilder,
-        private readonly router: Router,
-        private readonly route: ActivatedRoute,
-        private readonly issueService: IssueService,
-        private readonly labelService: LabelService,
-        private readonly statusService: IssueStatusService,
+        private readonly store: Store<AppState>,
     ) {}
 
     public ngOnInit(): void {
-        this.users$ = this.issueService
-            .getUsers()
-            .pipe(createErrorHandler(this.injector), shareReplay(1));
-        this.labels$ = this.labelService.getLabels(this.repositoryName()).pipe(
-            createErrorHandler(this.injector),
-            shareReplay(1),
-            map(labels => labels.filter(label => !label.isDisabled)),
-        );
-        this.statuses$ = this.statusService.getStatuses(this.repositoryName()).pipe(
-            createErrorHandler(this.injector),
-            shareReplay(1),
-            map(statuses => statuses.filter(status => !status.isDisabled)),
-        );
+        this.store.dispatch(newIssueComponentOpened({ repositoryName: this.repositoryName() }));
     }
 
     public onSubmit(): void {
@@ -87,15 +74,6 @@ export class RepositoryIssueNewComponent implements OnInit {
         };
 
         this.isLoading.set(true);
-
-        this.issueService
-            .createIssue(this.repositoryName(), issue)
-            .pipe(
-                createErrorHandler(this.injector),
-                finalize(() => this.isLoading.set(false)),
-            )
-            .subscribe(() => {
-                this.router.navigate(['../'], { relativeTo: this.route });
-            });
+        this.store.dispatch(createIssue({ repositoryName: this.repositoryName(), issue }));
     }
 }

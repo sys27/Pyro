@@ -1,54 +1,35 @@
-import { AsyncPipe, DatePipe } from '@angular/common';
-import { Component, Injector, OnDestroy, OnInit } from '@angular/core';
+import { deleteAccessToken, loadAccessTokens } from '@actions/access-tokens.actions';
+import { DatePipe } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { AccessToken, AccessTokenService } from '@services/access-token.service';
-import { createErrorHandler } from '@services/operators';
-
-import { MessageService } from 'primeng/api';
+import { DataSourceDirective } from '@directives/data-source.directive';
+import { Store } from '@ngrx/store';
+import { AccessToken } from '@services/access-token.service';
+import { AppState } from '@states/app.state';
+import { DataSourceState } from '@states/data-source.state';
+import { selectAccessTokens } from '@states/profile.state';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
-import { BehaviorSubject, Observable, shareReplay, switchMap } from 'rxjs';
+import { Observable } from 'rxjs';
 
 @Component({
     selector: 'access-token-list',
     standalone: true,
-    imports: [AsyncPipe, ButtonModule, DatePipe, RouterModule, TableModule],
+    imports: [ButtonModule, DataSourceDirective, DatePipe, RouterModule, TableModule],
     templateUrl: './access-token-list.component.html',
     styleUrl: './access-token-list.component.css',
 })
-export class AccessTokenListComponent implements OnInit, OnDestroy {
-    public accessTokens$: Observable<AccessToken[]> | undefined;
-    private readonly refresh$ = new BehaviorSubject<void>(undefined);
+export class AccessTokenListComponent implements OnInit {
+    public accessTokens$: Observable<DataSourceState<AccessToken>> =
+        this.store.select(selectAccessTokens);
 
-    public constructor(
-        private readonly injector: Injector,
-        private readonly service: AccessTokenService,
-        private readonly messageService: MessageService,
-    ) {}
+    public constructor(private readonly store: Store<AppState>) {}
 
     public ngOnInit(): void {
-        this.accessTokens$ = this.refresh$.pipe(
-            switchMap(() => this.service.getAccessTokens().pipe(shareReplay(1))),
-            createErrorHandler(this.injector),
-        );
-    }
-
-    public ngOnDestroy(): void {
-        this.refresh$.complete();
+        this.store.dispatch(loadAccessTokens());
     }
 
     public deleteAccessToken(tokenName: string): void {
-        this.service
-            .deleteAccessToken(tokenName)
-            .pipe(createErrorHandler(this.injector))
-            .subscribe(() => {
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Success',
-                    detail: `Access token ${tokenName} deleted`,
-                });
-
-                this.refresh$.next();
-            });
+        this.store.dispatch(deleteAccessToken({ tokenName }));
     }
 }

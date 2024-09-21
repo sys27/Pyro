@@ -1,19 +1,24 @@
-import { Component, Injector, OnInit } from '@angular/core';
+import { loadProfile, updateProfile } from '@actions/profile.actions';
+import { Component, DestroyRef, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { ValidationSummaryComponent, Validators } from '@controls/validation-summary';
-import { createErrorHandler } from '@services/operators';
-import { ProfileService, UpdateProfile } from '@services/profile.service';
+import { Store } from '@ngrx/store';
+import { UpdateProfile } from '@services/profile.service';
+import { AppState } from '@states/app.state';
+import { selectCurrentProfile } from '@states/profile.state';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
+import { filter } from 'rxjs';
 
 @Component({
-    selector: 'profile',
+    selector: 'profile-edit',
     standalone: true,
     imports: [ButtonModule, InputTextModule, ReactiveFormsModule, ValidationSummaryComponent],
-    templateUrl: './profile.component.html',
-    styleUrl: './profile.component.css',
+    templateUrl: './profile-edit.component.html',
+    styleUrl: './profile-edit.component.css',
 })
-export class ProfileComponent implements OnInit {
+export class ProfileEditComponent implements OnInit {
     public readonly form = this.formBuilder.group({
         email: [
             '',
@@ -28,17 +33,22 @@ export class ProfileComponent implements OnInit {
     });
 
     public constructor(
-        private readonly injector: Injector,
         private readonly formBuilder: FormBuilder,
-        private readonly profileService: ProfileService,
+        private readonly destroyRef: DestroyRef,
+        private readonly store: Store<AppState>,
     ) {}
 
     public ngOnInit(): void {
+        this.store.dispatch(loadProfile());
+
         this.form.get('email')!.disable();
 
-        this.profileService
-            .getProfile()
-            .pipe(createErrorHandler(this.injector))
+        this.store
+            .select(selectCurrentProfile)
+            .pipe(
+                takeUntilDestroyed(this.destroyRef),
+                filter(profile => !!profile),
+            )
             .subscribe(profile => {
                 this.form.patchValue({
                     email: profile?.email,
@@ -53,9 +63,11 @@ export class ProfileComponent implements OnInit {
             return;
         }
 
-        this.profileService
-            .updateProfile(this.form.value as UpdateProfile)
-            .pipe(createErrorHandler(this.injector))
-            .subscribe(() => {});
+        let profile: UpdateProfile = {
+            name: this.form.get('name')!.value,
+            status: this.form.get('status')!.value,
+        };
+
+        this.store.dispatch(updateProfile({ profile }));
     }
 }

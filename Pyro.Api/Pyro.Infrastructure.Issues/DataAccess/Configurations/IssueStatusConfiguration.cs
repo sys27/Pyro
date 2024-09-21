@@ -48,7 +48,7 @@ internal class IssueStatusConfiguration : IEntityTypeConfiguration<IssueStatus>
             .HasForeignKey("ToId")
             .OnDelete(DeleteBehavior.ClientCascade);
 
-        builder.HasIndex(x => x.Name)
+        builder.HasIndex("RepositoryId", "Name")
             .IsUnique()
             .HasDatabaseName("IX_IssueStatuses_Name");
     }

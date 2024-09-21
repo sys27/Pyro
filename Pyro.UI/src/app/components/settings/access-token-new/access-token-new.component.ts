@@ -1,8 +1,12 @@
-import { Component, Injector, signal } from '@angular/core';
+import { createAccessToken } from '@actions/access-tokens.actions';
+import { Component, DestroyRef, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { ValidationSummaryComponent, Validators } from '@controls/validation-summary';
+import { Store } from '@ngrx/store';
 import { AccessTokenService, CreateAccessToken } from '@services/access-token.service';
-import { createErrorHandler } from '@services/operators';
+import { AppState } from '@states/app.state';
+import { selectSelectedAccessToken } from '@states/profile.state';
 import { AutoFocusModule } from 'primeng/autofocus';
 import { ButtonModule } from 'primeng/button';
 import { CalendarModule } from 'primeng/calendar';
@@ -47,24 +51,35 @@ export class AccessTokenNewComponent {
     public readonly isViewMode = signal<boolean>(false);
 
     public constructor(
-        private readonly injector: Injector,
+        private readonly destroyRef: DestroyRef,
         private readonly formBuilder: FormBuilder,
+        private readonly store: Store<AppState>,
         private readonly service: AccessTokenService,
-    ) {}
+    ) {
+        this.store
+            .select(selectSelectedAccessToken)
+            .pipe(
+                takeUntilDestroyed(this.destroyRef),
+                filter(accessToken => !!accessToken),
+            )
+            .subscribe(accessToken => {
+                this.form.disable();
+                this.isViewMode.set(true);
+                this.form.controls.token.setValue(accessToken.token);
+            });
+    }
 
     public onSubmit(): void {
         if (this.form.invalid) {
             return;
         }
 
-        this.service
-            .createAccessToken(this.form.value as CreateAccessToken)
-            .pipe(createErrorHandler(this.injector))
-            .subscribe(response => {
-                this.form.disable();
-                this.isViewMode.set(true);
-                this.form.controls.token.setValue(response.token);
-            });
+        let accessToken: CreateAccessToken = {
+            name: this.form.controls.name.value,
+            expiresAt: this.form.controls.expiresAt.value,
+        };
+
+        this.store.dispatch(createAccessToken({ accessToken }));
     }
 
     public copyToken() {

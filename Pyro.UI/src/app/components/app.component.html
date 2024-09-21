@@ -46,7 +46,7 @@
           [outlined]="true"
           (onClick)="toggleThemeClick()" />
 
-        @if (authService.currentUser | async) {
+        @if (isLoggedIn$ | async) {
           <p-splitButton
             icon="pi pi-user"
             [outlined]="true"

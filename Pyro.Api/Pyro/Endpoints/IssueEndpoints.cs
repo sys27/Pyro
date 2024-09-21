@@ -35,7 +35,7 @@ internal static class IssueEndpoints
     {
         issuesBuilder.MapGet("/", async (
                 IMediator mediator,
-                [AsParameters] GetUsersRequest request,
+                [AsParameters] GetIssuesRequest request,
                 CancellationToken cancellationToken) =>
             {
                 var query = request.ToGetIssues();

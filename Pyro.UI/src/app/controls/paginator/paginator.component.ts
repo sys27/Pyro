@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { AsyncPipe } from '@angular/common';
 import { Component, Injector, input, OnDestroy, OnInit, output } from '@angular/core';
 import { createErrorHandler } from '@services/operators';
