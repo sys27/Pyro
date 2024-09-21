@@ -28,7 +28,7 @@ import {
 import {
     AccessTokenListComponent,
     AccessTokenNewComponent,
-    ProfileComponent,
+    ProfileEditComponent,
     SettingsComponent,
 } from './components/settings';
 import { UserEditComponent, UserListComponent, UserNewComponent } from './components/user';
@@ -150,7 +150,7 @@ export const routes: Routes = [
         component: SettingsComponent,
         canActivate: [authGuard()],
         children: [
-            { path: 'profile', component: ProfileComponent, canActivate: [authGuard()] },
+            { path: 'profile', component: ProfileEditComponent, canActivate: [authGuard()] },
             {
                 path: 'access-tokens/new',
                 component: AccessTokenNewComponent,

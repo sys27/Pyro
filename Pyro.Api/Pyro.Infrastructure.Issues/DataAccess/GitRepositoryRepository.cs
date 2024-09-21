@@ -20,6 +20,7 @@ internal class GitRepositoryRepository : IGitRepositoryRepository
             .Include(x => x.Labels)
             .Include(x => x.IssueStatuses).ThenInclude(x => x.FromTransitions)
             .Include(x => x.IssueStatuses).ThenInclude(x => x.ToTransitions)
+            .AsSplitQuery()
             .FirstOrDefaultAsync(x => x.Name == name, cancellationToken);
 
         return repository;

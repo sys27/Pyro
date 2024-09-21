@@ -12,8 +12,8 @@ export { LabelListComponent } from './repository-settings/label-list/label-list.
 export { LabelNewComponent } from './repository-settings/label-new/label-new.component';
 export { RepositorySettingsComponent } from './repository-settings/repository-settings.component';
 export { StatusEditComponent } from './repository-settings/status-edit/status-edit.component';
+export { StatusListComponent } from './repository-settings/status-list/status-list.component';
 export { StatusNewComponent } from './repository-settings/status-new/status-new.component';
 export { StatusTransitionNewComponent } from './repository-settings/status-transition-new/status-transition-new.component';
 export { StatusTransitionViewComponent } from './repository-settings/status-transition-view/status-transition-view.component';
-export { StatusListComponent } from './repository-settings/status-view/status-view.component';
 export { RepositoryComponent } from './repository.component';

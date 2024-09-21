@@ -1,13 +1,17 @@
-import { Component, Injector, input } from '@angular/core';
+import { loginAction } from '@actions/auth.actions';
+import { Component, DestroyRef, input } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ValidationSummaryComponent, Validators } from '@controls/validation-summary';
-import { AuthService } from '@services/auth.service';
-import { createErrorHandler } from '@services/operators';
+import { Store } from '@ngrx/store';
+import { AppState } from '@states/app.state';
+import { isLoggedInSelector } from '@states/auth.state';
 import { AutoFocusModule } from 'primeng/autofocus';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
+import { distinctUntilChanged } from 'rxjs';
 
 @Component({
     selector: 'login',
@@ -31,11 +35,20 @@ export class LoginComponent {
     });
 
     public constructor(
-        private readonly injector: Injector,
+        private readonly destroyRef: DestroyRef,
         private readonly formBuilder: FormBuilder,
         private readonly router: Router,
-        private readonly authService: AuthService,
-    ) {}
+        private readonly store: Store<AppState>,
+    ) {
+        this.store
+            .select(isLoggedInSelector)
+            .pipe(distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
+            .subscribe(isLoggedIn => {
+                if (isLoggedIn) {
+                    this.router.navigateByUrl(LoginComponent.sanitizeReturnUrl(this.returnUrl()));
+                }
+            });
+    }
 
     private static sanitizeReturnUrl(returnUrl: string): string {
         returnUrl ??= '/';
@@ -58,15 +71,6 @@ export class LoginComponent {
         let login = this.formGroup.value.login!;
         let password = this.formGroup.value.password!;
 
-        this.authService
-            .login(login, password)
-            .pipe(createErrorHandler(this.injector))
-            .subscribe(currentUser => {
-                if (!currentUser) {
-                    return;
-                }
-
-                this.router.navigateByUrl(LoginComponent.sanitizeReturnUrl(this.returnUrl()));
-            });
+        this.store.dispatch(loginAction({ login, password }));
     }
 }

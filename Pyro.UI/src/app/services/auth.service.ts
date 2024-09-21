@@ -1,7 +1,7 @@
 import { HttpClient, HttpContext } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { CurrentUser } from '@models/current-user';
-import { BehaviorSubject, Observable, catchError, finalize, switchMap, throwError } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { Endpoints } from '../endpoints';
 import { ALLOW_ANONYMOUS } from './auth.interceptor';
 
@@ -9,39 +9,23 @@ import { ALLOW_ANONYMOUS } from './auth.interceptor';
     providedIn: 'root',
 })
 export class AuthService {
-    private static readonly accessTokenKey: string = 'accessToken';
-    private static readonly refreshTokenKey: string = 'refreshToken';
+    public constructor(private readonly httpClient: HttpClient) {}
 
-    private readonly currentUserSubject: BehaviorSubject<CurrentUser | null> =
-        new BehaviorSubject<CurrentUser | null>(null);
-
-    public constructor(private readonly httpClient: HttpClient) {
-        this.updateCurrentUser();
-    }
-
-    public login(login: string, password: string): Observable<CurrentUser | null> {
+    public login(login: string, password: string): Observable<CurrentUser> {
         return this.httpClient.post<LoginResponse>(Endpoints.Login, { login, password }).pipe(
-            catchError(error => {
-                this.removeTokens();
+            map(response => {
+                let currentUser = this.getUserFromJwt(response.accessToken, response.refreshToken);
 
-                return throwError(() => error);
-            }),
-            switchMap(response => {
-                localStorage.setItem(AuthService.accessTokenKey, response.accessToken);
-                localStorage.setItem(AuthService.refreshTokenKey, response.refreshToken);
-                this.updateCurrentUser();
-
-                return this.currentUser;
+                return currentUser;
             }),
         );
     }
 
-    public refresh(): Observable<CurrentUser | null> {
-        let refreshToken = localStorage.getItem(AuthService.refreshTokenKey);
-        if (!refreshToken) {
-            throw new Error('No refresh token');
-        }
+    public logout(): Observable<void> {
+        return this.httpClient.post<void>(Endpoints.Logout, {});
+    }
 
+    public refresh(refreshToken: string): Observable<CurrentUser> {
         return this.httpClient
             .post<RefreshResponse>(
                 Endpoints.Refresh,
@@ -49,30 +33,16 @@ export class AuthService {
                 { context: new HttpContext().set(ALLOW_ANONYMOUS, true) },
             )
             .pipe(
-                catchError(error => this.logout().pipe(switchMap(() => throwError(() => error)))),
-                switchMap(response => {
-                    localStorage.setItem(AuthService.accessTokenKey, response.accessToken);
-                    this.updateCurrentUser();
+                map(response => {
+                    let currentUser = this.getUserFromJwt(response.accessToken, refreshToken);
 
-                    return this.currentUser;
+                    return currentUser;
                 }),
             );
     }
 
-    public logout(): Observable<void> {
-        return this.httpClient
-            .post<void>(Endpoints.Logout, {})
-            .pipe(finalize(() => this.removeTokens()));
-    }
-
-    private removeTokens(): void {
-        localStorage.removeItem(AuthService.accessTokenKey);
-        localStorage.removeItem(AuthService.refreshTokenKey);
-        this.updateCurrentUser();
-    }
-
-    private getUserFromJwt(jwt: string): CurrentUser {
-        let parts = jwt.split('.');
+    private getUserFromJwt(accessToken: string, refreshToken: string): CurrentUser {
+        let parts = accessToken.split('.');
         if (parts.length !== 3) {
             throw new Error('Invalid JWT');
         }
@@ -82,31 +52,14 @@ export class AuthService {
         let parsedPayload = JSON.parse(decodedPayload);
 
         return new CurrentUser(
-            jwt,
+            accessToken,
+            refreshToken,
             new Date(parsedPayload.exp * 1000),
             parsedPayload.sub,
             parsedPayload.login,
             parsedPayload.roles,
             parsedPayload.permissions,
         );
-    }
-
-    private updateCurrentUser(): void {
-        let accessToken = this.getAccessToken();
-        if (accessToken) {
-            let currentUser = this.getUserFromJwt(accessToken);
-            this.currentUserSubject.next(currentUser);
-        } else {
-            this.currentUserSubject.next(null);
-        }
-    }
-
-    public getAccessToken(): string | null {
-        return localStorage.getItem(AuthService.accessTokenKey);
-    }
-
-    public get currentUser(): Observable<CurrentUser | null> {
-        return this.currentUserSubject.asObservable();
     }
 }
 

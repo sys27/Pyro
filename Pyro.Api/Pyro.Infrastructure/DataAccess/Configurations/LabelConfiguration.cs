@@ -33,7 +33,7 @@ internal class LabelConfiguration : IEntityTypeConfiguration<Label>
             .IsRequired()
             .HasDefaultValue(false);
 
-        builder.HasIndex(x => x.Name)
+        builder.HasIndex("GitRepositoryId", "Name")
             .IsUnique()
             .HasDatabaseName("IX_Label_Name");
     }
