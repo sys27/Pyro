@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { Observable } from 'rxjs';
 import { MarkdownService } from '@services/markdown.service';
+import { Observable, of } from 'rxjs';
 
 @Pipe({
     name: 'md',
@@ -9,7 +9,11 @@ import { MarkdownService } from '@services/markdown.service';
 export class MarkdownPipe implements PipeTransform {
     public constructor(private readonly markdownService: MarkdownService) {}
 
-    public transform(value: any, ...args: any[]): Observable<string> {
+    public transform(value: string | null): Observable<string> {
+        if (!value) {
+            return of('');
+        }
+
         return this.markdownService.parse(value);
     }
 }

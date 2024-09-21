@@ -1,81 +1,49 @@
+import { disableLabel, enableLabel, loadLabels } from '@actions/repository-labels.actions';
 import { AsyncPipe } from '@angular/common';
-import { Component, DestroyRef, Injector, input, OnDestroy, OnInit } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Component, input, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { DataSourceDirective } from '@directives/data-source.directive';
 import { PyroPermissions } from '@models/pyro-permissions';
+import { Store } from '@ngrx/store';
 import { ColorPipe } from '@pipes/color.pipe';
-import { AuthService } from '@services/auth.service';
-import { Label, LabelService } from '@services/label.service';
-import { createErrorHandler } from '@services/operators';
-import { MessageService } from 'primeng/api';
+import { Label } from '@services/label.service';
+import { AppState } from '@states/app.state';
+import { selectHasPermission } from '@states/auth.state';
+import { DataSourceState } from '@states/data-source.state';
+import { selectLabels } from '@states/repository.state';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
-import { BehaviorSubject, map, Observable, shareReplay, switchMap } from 'rxjs';
+import { Observable } from 'rxjs';
 
 @Component({
     selector: 'label-list',
     standalone: true,
-    imports: [AsyncPipe, ColorPipe, ButtonModule, RouterLink, TableModule],
+    imports: [AsyncPipe, ButtonModule, ColorPipe, DataSourceDirective, RouterLink, TableModule],
     templateUrl: './label-list.component.html',
     styleUrl: './label-list.component.css',
 })
-export class LabelListComponent implements OnInit, OnDestroy {
+export class LabelListComponent implements OnInit {
     public readonly repositoryName = input.required<string>();
-    private readonly refreshLabels$ = new BehaviorSubject<void>(undefined);
-    public labels$: Observable<Label[]> | undefined;
-    public hasManagePermission$: Observable<boolean> | undefined;
+    public labels$: Observable<DataSourceState<Label>> = this.store.select(selectLabels);
+    public hasManagePermission$: Observable<boolean> = this.store.select(
+        selectHasPermission(PyroPermissions.RepositoryManage),
+    );
 
-    public constructor(
-        private readonly injector: Injector,
-        private readonly destroyRef: DestroyRef,
-        private readonly messageService: MessageService,
-        private readonly labelService: LabelService,
-        private readonly authService: AuthService,
-    ) {}
+    public constructor(private readonly store: Store<AppState>) {}
 
     public ngOnInit(): void {
-        this.labels$ = this.refreshLabels$.pipe(
-            switchMap(() => this.labelService.getLabels(this.repositoryName())),
-            createErrorHandler(this.injector),
-            shareReplay(1),
-        );
-        this.hasManagePermission$ = this.authService.currentUser.pipe(
-            takeUntilDestroyed(this.destroyRef),
-            map(user => user?.hasPermission(PyroPermissions.RepositoryManage) ?? false),
-        );
-    }
-
-    public ngOnDestroy(): void {
-        this.refreshLabels$.complete();
+        this.store.dispatch(loadLabels({ repositoryName: this.repositoryName() }));
     }
 
     public enableLabel(label: Label): void {
-        this.labelService
-            .enableLabel(this.repositoryName(), label.id)
-            .pipe(createErrorHandler(this.injector))
-            .subscribe(() => {
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Success',
-                    detail: `Label '${label.name}' enabled`,
-                });
-
-                this.refreshLabels$.next();
-            });
+        this.store.dispatch(
+            enableLabel({ repositoryName: this.repositoryName(), labelId: label.id }),
+        );
     }
 
     public disableLabel(label: Label): void {
-        this.labelService
-            .disableLabel(this.repositoryName(), label.id)
-            .pipe(createErrorHandler(this.injector))
-            .subscribe(() => {
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Success',
-                    detail: `Label '${label.name}' disabled`,
-                });
-
-                this.refreshLabels$.next();
-            });
+        this.store.dispatch(
+            disableLabel({ repositoryName: this.repositoryName(), labelId: label.id }),
+        );
     }
 }

@@ -1,10 +1,14 @@
-import { Component, Injector, OnInit } from '@angular/core';
+import { loadRoles } from '@actions/roles.actions';
+import { createUser } from '@actions/users.actions';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
 import { ValidationSummaryComponent, Validators } from '@controls/validation-summary';
-import { ObservableOptionsDirective } from '@directives/observable-options.directive';
-import { createErrorHandler } from '@services/operators';
-import { CreateUser, Role, User, UserService } from '@services/user.service';
+import { DataSourceDirective } from '@directives/data-source.directive';
+import { Store } from '@ngrx/store';
+import { CreateUser, Role, UserService } from '@services/user.service';
+import { AppState } from '@states/app.state';
+import { DataSourceState } from '@states/data-source.state';
+import { selectRolesFeature } from '@states/roles.state';
 import { AutoFocusModule } from 'primeng/autofocus';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
@@ -20,10 +24,10 @@ import { Observable } from 'rxjs';
         AutoFocusModule,
         ButtonModule,
         CheckboxModule,
+        DataSourceDirective,
         InputTextModule,
         MultiSelectModule,
         ListboxModule,
-        ObservableOptionsDirective,
         ReactiveFormsModule,
         ValidationSummaryComponent,
     ],
@@ -31,8 +35,7 @@ import { Observable } from 'rxjs';
     styleUrl: './user-new.component.css',
 })
 export class UserNewComponent implements OnInit {
-    public user: User | undefined;
-    public roles$: Observable<Role[]> | undefined;
+    public roles$: Observable<DataSourceState<Role>> = this.store.select(selectRolesFeature);
 
     public readonly form = this.formBuilder.nonNullable.group({
         login: [
@@ -50,14 +53,13 @@ export class UserNewComponent implements OnInit {
     });
 
     public constructor(
-        private readonly injector: Injector,
         private readonly formBuilder: FormBuilder,
-        private readonly router: Router,
+        private readonly store: Store<AppState>,
         private readonly userService: UserService,
     ) {}
 
     public ngOnInit(): void {
-        this.roles$ = this.userService.getRoles().pipe(createErrorHandler(this.injector));
+        this.store.dispatch(loadRoles());
     }
 
     public onSubmit(): void {
@@ -65,9 +67,12 @@ export class UserNewComponent implements OnInit {
             return;
         }
 
-        this.userService
-            .createUser(this.form.value as CreateUser)
-            .pipe(createErrorHandler(this.injector))
-            .subscribe(() => this.router.navigate(['/users']));
+        let user: CreateUser = {
+            login: this.form.value.login!,
+            password: this.form.value.password!,
+            roles: this.form.value.roles!,
+        };
+
+        this.store.dispatch(createUser({ user }));
     }
 }

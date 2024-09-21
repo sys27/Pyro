@@ -1,17 +1,24 @@
+import { issuesNextPage, issuesPreviousPage, loadIssues } from '@actions/issues.actions';
 import { AsyncPipe, NgClass } from '@angular/common';
-import { Component, DestroyRef, input, OnInit, signal } from '@angular/core';
+import { Component, input, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { PaginatorComponent, PaginatorState } from '@controls/paginator/paginator.component';
+import { PaginatorComponent } from '@controls/paginator/paginator.component';
 import { TagComponent } from '@controls/tag/tag.component';
+import { DataSourceDirective } from '@directives/data-source.directive';
 import { PyroPermissions } from '@models/pyro-permissions';
+import { Store } from '@ngrx/store';
 import { ColorPipe } from '@pipes/color.pipe';
 import { LuminanceColorPipe } from '@pipes/luminance-color.pipe';
-import { AuthService } from '@services/auth.service';
-import { Issue, IssueService } from '@services/issue.service';
+import { Issue } from '@services/issue.service';
+import { AppState } from '@states/app.state';
+import { selectHasPermission } from '@states/auth.state';
+import { DataSourceState } from '@states/data-source.state';
+import { selectCurrentPage, selectHasNext, selectHasPrevious } from '@states/paged.state';
+import { selectIssues } from '@states/repository.state';
 import { ButtonModule } from 'primeng/button';
 import { DataViewModule } from 'primeng/dataview';
 import { DividerModule } from 'primeng/divider';
-import { map, Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 
 @Component({
     selector: 'repo-issues',
@@ -20,6 +27,7 @@ import { map, Observable, of } from 'rxjs';
         AsyncPipe,
         ButtonModule,
         ColorPipe,
+        DataSourceDirective,
         DataViewModule,
         DividerModule,
         LuminanceColorPipe,
@@ -33,34 +41,30 @@ import { map, Observable, of } from 'rxjs';
 })
 export class RepositoryIssuesComponent implements OnInit {
     public readonly repositoryName = input.required<string>();
-    public readonly issues = signal<Issue[]>([]);
-    public hasEditPermission$: Observable<boolean> | undefined;
+    public readonly issues$: Observable<DataSourceState<Issue>> = this.store.select(
+        selectCurrentPage(selectIssues),
+    );
+    public readonly isPreviousEnabled$: Observable<boolean> = this.store.select(
+        selectHasPrevious(selectIssues),
+    );
+    public readonly isNextEnabled$: Observable<boolean> = this.store.select(
+        selectHasNext(selectIssues),
+    );
+    public hasEditPermission$: Observable<boolean> = this.store.select(
+        selectHasPermission(PyroPermissions.IssueEdit),
+    );
 
-    public constructor(
-        private readonly destroyRef: DestroyRef,
-        private readonly issueService: IssueService,
-        private readonly authService: AuthService,
-    ) {}
+    public constructor(private readonly store: Store<AppState>) {}
 
     public ngOnInit(): void {
-        this.hasEditPermission$ = this.authService.currentUser.pipe(
-            map(user => user?.hasPermission(PyroPermissions.IssueEdit) ?? false),
-        );
+        this.store.dispatch(loadIssues({ repositoryName: this.repositoryName() }));
     }
 
-    public paginatorLoader = (state: PaginatorState): Observable<Issue[]> => {
-        if (!this.repositoryName()) {
-            return of([]);
-        }
-
-        return this.issueService.getIssues(this.repositoryName(), state.before, state.after);
-    };
-
-    public paginatorOffsetSelector(item: Issue): string {
-        return item.id;
+    public onPrevious(): void {
+        this.store.dispatch(issuesPreviousPage());
     }
 
-    public paginatorDataChanged(items: Issue[]): void {
-        this.issues.set(items);
+    public onNext(): void {
+        this.store.dispatch(issuesNextPage());
     }
 }

@@ -31,6 +31,9 @@ updates:
       angular:
         patterns:
           - "@angular/*"
+      ngrx:
+        patterns:
+          - "@ngrx/*"
 
   - package-ecosystem: docker
     directory: "/"

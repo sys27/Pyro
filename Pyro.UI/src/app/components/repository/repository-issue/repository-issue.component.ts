@@ -4,9 +4,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterModule } from '@angular/router';
 import { TagComponent } from '@controls/tag/tag.component';
 import { PyroPermissions } from '@models/pyro-permissions';
+import { Store } from '@ngrx/store';
 import { ColorPipe } from '@pipes/color.pipe';
 import { LuminanceColorPipe } from '@pipes/luminance-color.pipe';
-import { AuthService } from '@services/auth.service';
 import {
     ChangeLogs,
     Comment,
@@ -15,6 +15,8 @@ import {
     IssueService,
 } from '@services/issue.service';
 import { createErrorHandler } from '@services/operators';
+import { AppState } from '@states/app.state';
+import { selectCurrentUser, selectHasPermission } from '@states/auth.state';
 import { ButtonModule } from 'primeng/button';
 import { ButtonGroupModule } from 'primeng/buttongroup';
 import { DividerModule } from 'primeng/divider';
@@ -55,7 +57,9 @@ export class RepositoryIssueComponent implements OnInit, OnDestroy {
     public changeLogs$: Observable<ChangeLogs[]> | undefined;
     public items$: Observable<(Comment | ChangeLogs)[]> | undefined;
     public canEdit$: Observable<boolean> | undefined;
-    public canManage$: Observable<boolean> | undefined;
+    public canManage$: Observable<boolean> = this.store.select(
+        selectHasPermission(PyroPermissions.IssueManage),
+    );
     private readonly commentAddedTrigger$ = new BehaviorSubject<void>(undefined);
     private readonly refreshIssue$ = new BehaviorSubject<void>(undefined);
 
@@ -63,7 +67,7 @@ export class RepositoryIssueComponent implements OnInit, OnDestroy {
         private readonly injector: Injector,
         private readonly destroyRef: DestroyRef,
         private readonly issueService: IssueService,
-        private readonly authService: AuthService,
+        private readonly store: Store<AppState>,
     ) {}
 
     public ngOnInit(): void {
@@ -104,7 +108,7 @@ export class RepositoryIssueComponent implements OnInit, OnDestroy {
                 );
             }),
         );
-        this.canEdit$ = combineLatest([this.authService.currentUser, this.issue$]).pipe(
+        this.canEdit$ = combineLatest([this.store.select(selectCurrentUser), this.issue$]).pipe(
             takeUntilDestroyed(this.destroyRef),
             map(([user, issue]) => {
                 if (!user || !issue) {
@@ -112,16 +116,6 @@ export class RepositoryIssueComponent implements OnInit, OnDestroy {
                 }
 
                 return user.hasPermission(PyroPermissions.IssueEdit) && !issue.isLocked;
-            }),
-        );
-        this.canManage$ = this.authService.currentUser.pipe(
-            takeUntilDestroyed(this.destroyRef),
-            map(user => {
-                if (!user) {
-                    return false;
-                }
-
-                return user.hasPermission(PyroPermissions.IssueManage);
             }),
         );
     }
@@ -150,9 +144,10 @@ export class RepositoryIssueComponent implements OnInit, OnDestroy {
             .subscribe(() => this.refreshIssue$.next());
     }
 
-    public isChangeLog(obj: any): obj is ChangeLogs {
+    public isChangeLog(obj: Comment | ChangeLogs): obj is ChangeLogs {
         return (
             obj &&
+            '$type' in obj &&
             typeof obj.$type === 'number' &&
             Object.values(IssueChangeLogType).includes(obj.$type)
         );

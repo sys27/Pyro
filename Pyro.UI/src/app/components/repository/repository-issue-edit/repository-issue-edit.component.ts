@@ -1,4 +1,6 @@
-import { Component, Injector, input, signal } from '@angular/core';
+import { editIssue, editIssueComponentOpened } from '@actions/issues.actions';
+import { Component, DestroyRef, input, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
     AbstractControl,
     FormBuilder,
@@ -6,23 +8,27 @@ import {
     ReactiveFormsModule,
     ValidationErrors,
 } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
 import { ValidationSummaryComponent, Validators } from '@controls/validation-summary';
-import { ObservableOptionsDirective } from '@directives/observable-options.directive';
+import { DataSourceDirective } from '@directives/data-source.directive';
+import { Store } from '@ngrx/store';
+import { IssueStatus, IssueStatusTransition } from '@services/issue-status.service';
+import { Issue, User } from '@services/issue.service';
+import { Label } from '@services/label.service';
+import { AppState } from '@states/app.state';
+import { DataSourceState } from '@states/data-source.state';
 import {
-    IssueStatus,
-    IssueStatusService,
-    IssueStatusTransition,
-} from '@services/issue-status.service';
-import { Issue, IssueService, User } from '@services/issue.service';
-import { Label, LabelService } from '@services/label.service';
-import { createErrorHandler } from '@services/operators';
+    selectEnabledLabels,
+    selectEnabledStatuses,
+    selectSelectedIssue,
+    selectStatusTransitions,
+    selectUsers,
+} from '@states/repository.state';
 import { AutoFocusModule } from 'primeng/autofocus';
 import { ButtonModule } from 'primeng/button';
 import { DropdownModule } from 'primeng/dropdown';
 import { InputTextModule } from 'primeng/inputtext';
 import { MultiSelectModule } from 'primeng/multiselect';
-import { finalize, map, Observable, of, shareReplay, take } from 'rxjs';
+import { combineLatest, filter, map, Observable } from 'rxjs';
 
 @Component({
     selector: 'repository-issue-edit',
@@ -30,24 +36,26 @@ import { finalize, map, Observable, of, shareReplay, take } from 'rxjs';
     imports: [
         AutoFocusModule,
         ButtonModule,
+        DataSourceDirective,
         DropdownModule,
         InputTextModule,
         MultiSelectModule,
-        ObservableOptionsDirective,
         ReactiveFormsModule,
         ValidationSummaryComponent,
     ],
     templateUrl: './repository-issue-edit.component.html',
     styleUrl: './repository-issue-edit.component.css',
 })
-export class RepositoryIssueEditComponent {
+export class RepositoryIssueEditComponent implements OnInit {
     public readonly repositoryName = input.required<string>();
-    public readonly issueNumber = input<number>();
-    public users$: Observable<User[]> | undefined;
-    public labels$: Observable<Label[]> | undefined;
-    public statuses$: Observable<IssueStatus[]> | undefined;
-    private issue: Issue | undefined;
-    private statusTranstions$: Observable<IssueStatusTransition[]> | undefined;
+    public readonly issueNumber = input.required<number>();
+    public users$: Observable<DataSourceState<User>> = this.store.select(selectUsers);
+    public labels$: Observable<DataSourceState<Label>> = this.store.select(selectEnabledLabels);
+    public statuses$: Observable<DataSourceState<IssueStatus>> =
+        this.store.select(selectEnabledStatuses);
+    private statusTranstions$: Observable<DataSourceState<IssueStatusTransition>> =
+        this.store.select(selectStatusTransitions);
+    private issue$: Observable<Issue | null> = this.store.select(selectSelectedIssue);
     public readonly form = this.formBuilder.group({
         title: ['', [Validators.required('Title'), Validators.maxLength('Title', 200)]],
         assigneeId: new FormControl<string | null>(null),
@@ -56,19 +64,15 @@ export class RepositoryIssueEditComponent {
             '',
             Validators.required('Status'),
             (control: AbstractControl): Observable<ValidationErrors | null> => {
-                if (!this.statusTranstions$ || !this.issue) {
-                    return of(null);
-                }
-
-                return this.statusTranstions$.pipe(
-                    map(transitions => {
-                        let initialValue = this.issue?.status.id;
+                return combineLatest([this.statusTranstions$, this.issue$]).pipe(
+                    map(([transitions, issue]) => {
+                        let initialValue = issue?.status.id;
                         let currentValue = control.value;
                         if (!initialValue || initialValue == currentValue) {
                             return null;
                         }
 
-                        let transition = transitions.find(
+                        let transition = transitions.data.find(
                             t => t.from.id === initialValue && t.to.id === currentValue,
                         );
 
@@ -81,41 +85,31 @@ export class RepositoryIssueEditComponent {
     public readonly isLoading = signal<boolean>(false);
 
     public constructor(
-        private readonly injector: Injector,
+        private readonly destroyRef: DestroyRef,
         private readonly formBuilder: FormBuilder,
-        private readonly router: Router,
-        private readonly route: ActivatedRoute,
-        private readonly issueService: IssueService,
-        private readonly labelService: LabelService,
-        private readonly statusService: IssueStatusService,
+        private readonly store: Store<AppState>,
     ) {}
 
     public ngOnInit(): void {
-        this.users$ = this.issueService
-            .getUsers()
-            .pipe(createErrorHandler(this.injector), shareReplay(1));
-        this.labels$ = this.labelService
-            .getLabels(this.repositoryName())
-            .pipe(createErrorHandler(this.injector), shareReplay(1));
-        this.statuses$ = this.statusService
-            .getStatuses(this.repositoryName())
-            .pipe(createErrorHandler(this.injector), shareReplay(1));
-        this.statusTranstions$ = this.statusService
-            .getStatusTransitions(this.repositoryName())
-            .pipe(createErrorHandler(this.injector), shareReplay(1));
-        this.issueService
-            .getIssue(this.repositoryName(), this.issueNumber()!)
-            .pipe(take(1), createErrorHandler(this.injector))
+        this.store.dispatch(
+            editIssueComponentOpened({
+                repositoryName: this.repositoryName(),
+                issueNumber: this.issueNumber(),
+            }),
+        );
+
+        this.issue$
+            .pipe(
+                takeUntilDestroyed(this.destroyRef),
+                filter(issue => !!issue),
+            )
             .subscribe(issue => {
-                if (issue) {
-                    this.issue = issue;
-                    this.form.setValue({
-                        title: issue.title,
-                        assigneeId: issue.assignee?.id || null,
-                        labelIds: issue.labels.map(label => label.id),
-                        statusId: issue.status.id,
-                    });
-                }
+                this.form.setValue({
+                    title: issue.title,
+                    assigneeId: issue.assignee?.id || null,
+                    labelIds: issue.labels.map(label => label.id),
+                    statusId: issue.status.id,
+                });
             });
     }
 
@@ -132,15 +126,12 @@ export class RepositoryIssueEditComponent {
         };
 
         this.isLoading.set(true);
-
-        this.issueService
-            .updateIssue(this.repositoryName(), this.issueNumber()!, issue)
-            .pipe(
-                createErrorHandler(this.injector),
-                finalize(() => this.isLoading.set(false)),
-            )
-            .subscribe(() => {
-                this.router.navigate(['../'], { relativeTo: this.route });
-            });
+        this.store.dispatch(
+            editIssue({
+                repositoryName: this.repositoryName(),
+                issueNumber: this.issueNumber(),
+                issue,
+            }),
+        );
     }
 }

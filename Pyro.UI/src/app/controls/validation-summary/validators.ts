@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { AbstractControl, AsyncValidatorFn, ValidationErrors, ValidatorFn } from '@angular/forms';
 import {
@@ -123,7 +124,7 @@ export class Validators {
         return value != null && typeof value.length === 'number';
     }
 
-    private static nullValidator(control: AbstractControl): ValidationErrors | null {
+    private static nullValidator(_control: AbstractControl): ValidationErrors | null {
         return null;
     }
 }

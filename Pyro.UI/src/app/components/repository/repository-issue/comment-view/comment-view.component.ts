@@ -1,8 +1,10 @@
 import { AsyncPipe, DatePipe } from '@angular/common';
 import { Component, input, OnInit, output } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
-import { AuthService } from '@services/auth.service';
+import { Store } from '@ngrx/store';
 import { Comment, Issue } from '@services/issue.service';
+import { AppState } from '@states/app.state';
+import { selectCurrentUser } from '@states/auth.state';
 import { PanelModule } from 'primeng/panel';
 import { combineLatest, map, Observable } from 'rxjs';
 import { MarkdownPipe } from '../../../../pipes/markdown.pipe';
@@ -24,10 +26,11 @@ export class CommentViewComponent implements OnInit {
     public canEditIssue$: Observable<boolean> | undefined;
     public readonly commentAdded = output<Comment>();
 
-    public constructor(private readonly authService: AuthService) {}
+    public constructor(private readonly store: Store<AppState>) {}
 
     public ngOnInit(): void {
-        this.canEditIssue$ = combineLatest([this.authService.currentUser, this.issue$]).pipe(
+        let currentUser$ = this.store.select(selectCurrentUser);
+        this.canEditIssue$ = combineLatest([currentUser$, this.issue$]).pipe(
             map(([user, issue]) => {
                 if (!user || !issue) {
                     return false;

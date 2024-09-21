@@ -1,6 +1,6 @@
 <div class="m-4">
   <p-dataView
-    [value]="issues()"
+    [dataSource]="issues$"
     emptyMessage=" ">
     <ng-template pTemplate="header">
       <div class="flex flex-row-reverse">
@@ -8,7 +8,7 @@
           routerLink="new"
           label="New issue"
           severity="success"
-          [disabled]="!(hasEditPermission$ | async)" />
+          [disabled]="(hasEditPermission$ | async) === false" />
       </div>
     </ng-template>
 
@@ -53,8 +53,18 @@
     </ng-template>
   </p-dataView>
 
-  <paginator
-    [loader]="paginatorLoader"
-    [offsetSelector]="paginatorOffsetSelector"
-    (dataChanged)="paginatorDataChanged($event)" />
+  <div class="mt-2 flex flex-row justify-content-center gap-2">
+    <p-button
+      icon="pi pi-angle-left"
+      severity="secondary"
+      [outlined]="true"
+      [disabled]="(isPreviousEnabled$ | async) === false"
+      (onClick)="onPrevious()" />
+    <p-button
+      icon="pi pi-angle-right"
+      severity="secondary"
+      [outlined]="true"
+      [disabled]="(isNextEnabled$ | async) === false"
+      (onClick)="onNext()" />
+  </div>
 </div>

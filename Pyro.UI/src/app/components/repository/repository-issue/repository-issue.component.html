@@ -11,7 +11,7 @@
               routerLink="edit"
               label="Edit"
               icon="pi pi-pencil"
-              [disabled]="!(canEdit$ | async)"
+              [disabled]="(canEdit$ | async) === false"
               [outlined]="true" />
 
             @if (issue.isLocked) {
@@ -20,14 +20,14 @@
                 icon="pi pi-lock-open"
                 [outlined]="true"
                 (click)="unlockIssue()"
-                [disabled]="!(canManage$ | async)" />
+                [disabled]="(canManage$ | async) === false" />
             } @else {
               <p-button
                 label="Lock"
                 icon="pi pi-lock"
                 [outlined]="true"
                 (click)="lockIssue()"
-                [disabled]="!(canManage$ | async)" />
+                [disabled]="(canManage$ | async) === false" />
             }
 
             <p-button
@@ -35,7 +35,7 @@
               icon="pi pi-trash"
               severity="danger"
               [outlined]="true"
-              [disabled]="!(canManage$ | async)" />
+              [disabled]="(canManage$ | async) === false" />
           </p-buttonGroup>
         </div>
       </div>

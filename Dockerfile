@@ -44,6 +44,7 @@ WORKDIR /src
 COPY ["Pyro.UI/package.json", "Pyro.UI/package-lock.json", "./"]
 RUN npm ci
 COPY Pyro.UI .
+RUN npm run lint
 RUN npm run build
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0.10-alpine3.20 AS final
@@ -55,6 +56,7 @@ ENV ASPNETCORE_ConnectionStrings__DefaultConnection="Data Source=/data/pyro.db"
 ENV ASPNETCORE_Git__BasePath="/data"
 ENV ASPNETCORE_URLS="http://+:80"
 
+RUN apk add --no-cache git
 RUN addgroup -S pyro && adduser -S pyro -G pyro
 
 VOLUME /data

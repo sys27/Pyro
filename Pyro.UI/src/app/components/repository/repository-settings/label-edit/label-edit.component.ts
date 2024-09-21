@@ -1,15 +1,18 @@
-import { Component, Injector, input, signal } from '@angular/core';
+import { loadLabels, updateLabel } from '@actions/repository-labels.actions';
+import { Component, DestroyRef, input, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { ValidationSummaryComponent, Validators } from '@controls/validation-summary';
 import { Color } from '@models/color';
-import { LabelService } from '@services/label.service';
-import { createErrorHandler } from '@services/operators';
+import { Store } from '@ngrx/store';
+import { AppState } from '@states/app.state';
+import { selectLabels } from '@states/repository.state';
 import { AutoFocusModule } from 'primeng/autofocus';
 import { ButtonModule } from 'primeng/button';
 import { ColorPickerModule } from 'primeng/colorpicker';
 import { InputTextModule } from 'primeng/inputtext';
-import { finalize } from 'rxjs';
+import { filter, map } from 'rxjs';
 
 @Component({
     selector: 'label-edit',
@@ -26,7 +29,7 @@ import { finalize } from 'rxjs';
     templateUrl: './label-edit.component.html',
     styleUrl: './label-edit.component.css',
 })
-export class LabelEditComponent {
+export class LabelEditComponent implements OnInit {
     public readonly repositoryName = input.required<string>();
     public readonly labelId = input.required<string>();
     public readonly form = this.formBuilder.nonNullable.group({
@@ -36,23 +39,27 @@ export class LabelEditComponent {
     public readonly isLoading = signal<boolean>(false);
 
     public constructor(
-        private readonly injector: Injector,
         private readonly formBuilder: FormBuilder,
-        private readonly router: Router,
-        private readonly route: ActivatedRoute,
-        private readonly labelService: LabelService,
+        private readonly destroyRef: DestroyRef,
+        private readonly store: Store<AppState>,
     ) {}
 
     public ngOnInit(): void {
-        this.labelService
-            .getLabel(this.repositoryName(), this.labelId())
-            .pipe(createErrorHandler(this.injector))
-            .subscribe(label => {
+        this.store.dispatch(loadLabels({ repositoryName: this.repositoryName() }));
+
+        this.store
+            .select(selectLabels)
+            .pipe(
+                takeUntilDestroyed(this.destroyRef),
+                map(labels => labels.data.find(label => label.id === this.labelId())),
+                filter(label => !!label),
+            )
+            .subscribe(label =>
                 this.form.setValue({
                     name: label.name,
                     color: label.color,
-                });
-            });
+                }),
+            );
     }
 
     public onSubmit(): void {
@@ -60,21 +67,18 @@ export class LabelEditComponent {
             return;
         }
 
-        this.isLoading.set(true);
-
         let label = {
             name: this.form.value.name!,
             color: this.form.value.color!,
         };
 
-        this.labelService
-            .updateLabel(this.repositoryName(), this.labelId(), label)
-            .pipe(
-                createErrorHandler(this.injector),
-                finalize(() => this.isLoading.set(false)),
-            )
-            .subscribe(() => {
-                this.router.navigate(['../'], { relativeTo: this.route });
-            });
+        this.isLoading.set(true);
+        this.store.dispatch(
+            updateLabel({
+                repositoryName: this.repositoryName(),
+                labelId: this.labelId(),
+                label,
+            }),
+        );
     }
 }

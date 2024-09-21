@@ -1,15 +1,17 @@
-import { Component, Injector, input, OnInit, signal } from '@angular/core';
+import { loadStatuses, updateStatus } from '@actions/repository-statuses.actions';
+import { Component, DestroyRef, input, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
 import { ValidationSummaryComponent, Validators } from '@controls/validation-summary';
 import { Color } from '@models/color';
-import { IssueStatusService } from '@services/issue-status.service';
-import { createErrorHandler } from '@services/operators';
+import { Store } from '@ngrx/store';
+import { AppState } from '@states/app.state';
+import { selectStatuses } from '@states/repository.state';
 import { AutoFocusModule } from 'primeng/autofocus';
 import { ButtonModule } from 'primeng/button';
 import { ColorPickerModule } from 'primeng/colorpicker';
 import { InputTextModule } from 'primeng/inputtext';
-import { finalize } from 'rxjs';
+import { filter, map } from 'rxjs';
 
 @Component({
     selector: 'status-edit',
@@ -35,23 +37,27 @@ export class StatusEditComponent implements OnInit {
     public readonly isLoading = signal<boolean>(false);
 
     public constructor(
-        private readonly injector: Injector,
         private readonly formBuilder: FormBuilder,
-        private readonly router: Router,
-        private readonly route: ActivatedRoute,
-        private readonly statusService: IssueStatusService,
+        private readonly destroyRef: DestroyRef,
+        private readonly store: Store<AppState>,
     ) {}
 
     public ngOnInit(): void {
-        this.statusService
-            .getStatus(this.repositoryName(), this.statusId())
-            .pipe(createErrorHandler(this.injector))
-            .subscribe(status => {
+        this.store.dispatch(loadStatuses({ repositoryName: this.repositoryName() }));
+
+        this.store
+            .select(selectStatuses)
+            .pipe(
+                takeUntilDestroyed(this.destroyRef),
+                map(statuses => statuses.data.find(label => label.id === this.statusId())),
+                filter(status => !!status),
+            )
+            .subscribe(status =>
                 this.form.setValue({
                     name: status.name,
                     color: status.color,
-                });
-            });
+                }),
+            );
     }
 
     public onSubmit(): void {
@@ -59,21 +65,18 @@ export class StatusEditComponent implements OnInit {
             return;
         }
 
-        this.isLoading.set(true);
-
         let status = {
             name: this.form.value.name!,
             color: this.form.value.color!,
         };
 
-        this.statusService
-            .updateStatus(this.repositoryName(), this.statusId(), status)
-            .pipe(
-                createErrorHandler(this.injector),
-                finalize(() => this.isLoading.set(false)),
-            )
-            .subscribe(() => {
-                this.router.navigate(['../'], { relativeTo: this.route });
-            });
+        this.isLoading.set(true);
+        this.store.dispatch(
+            updateStatus({
+                repositoryName: this.repositoryName(),
+                statusId: this.statusId(),
+                status,
+            }),
+        );
     }
 }

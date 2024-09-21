@@ -30,7 +30,7 @@ public static partial class IssueMapper
 
     public static partial IReadOnlyList<UserResponse> ToResponse(this IReadOnlyList<User> gitRepository);
 
-    public static partial GetIssues ToGetIssues(this GetUsersRequest request);
+    public static partial GetIssues ToGetIssues(this GetIssuesRequest request);
 
     [UserMapping(Default = true)]
     public static ColorResponse ToResponse(this int color)

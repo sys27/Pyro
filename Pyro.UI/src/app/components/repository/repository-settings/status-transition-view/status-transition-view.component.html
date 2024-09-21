@@ -1,44 +1,42 @@
-@if (transitions$ | async; as transitions) {
-  <p-table
-    [value]="transitions"
-    selectionMode="single"
-    styleClass="p-datatable-striped">
-    <ng-template pTemplate="caption">
-      <div class="flex flex-row-reverse">
+<p-table
+  [dataSource]="transitions$"
+  selectionMode="single"
+  styleClass="p-datatable-striped">
+  <ng-template pTemplate="caption">
+    <div class="flex flex-row-reverse">
+      <p-button
+        label="New Transition"
+        icon="pi pi-plus"
+        severity="success"
+        [routerLink]="['new']"
+        [disabled]="(hasManagePermission$ | async) === false" />
+    </div>
+  </ng-template>
+  <ng-template pTemplate="header">
+    <tr>
+      <th style="width: 47%">From</th>
+      <th style="width: 47%">To</th>
+      <th style="width: 6%"></th>
+    </tr>
+  </ng-template>
+  <ng-template
+    pTemplate="body"
+    let-transition>
+    <tr>
+      <td>
+        <tag [value]="transition.from" />
+      </td>
+      <td>
+        <tag [value]="transition.to" />
+      </td>
+      <td>
         <p-button
-          label="New Transition"
-          icon="pi pi-plus"
-          severity="success"
-          [routerLink]="['new']"
-          [disabled]="!(hasManagePermission$ | async)" />
-      </div>
-    </ng-template>
-    <ng-template pTemplate="header">
-      <tr>
-        <th style="width: 47%">From</th>
-        <th style="width: 47%">To</th>
-        <th style="width: 6%"></th>
-      </tr>
-    </ng-template>
-    <ng-template
-      pTemplate="body"
-      let-transition>
-      <tr>
-        <td>
-          <tag [value]="transition.from" />
-        </td>
-        <td>
-          <tag [value]="transition.to" />
-        </td>
-        <td>
-          <p-button
-            icon="pi pi-trash"
-            severity="danger"
-            [outlined]="true"
-            (onClick)="deleteTransition(transition)"
-            [disabled]="!(hasManagePermission$ | async)" />
-        </td>
-      </tr>
-    </ng-template>
-  </p-table>
-}
+          icon="pi pi-trash"
+          severity="danger"
+          [outlined]="true"
+          (onClick)="deleteTransition(transition)"
+          [disabled]="(hasManagePermission$ | async) === false" />
+      </td>
+    </tr>
+  </ng-template>
+</p-table>

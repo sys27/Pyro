@@ -1,10 +1,12 @@
+import { logoutAction } from '@actions/auth.actions';
 import { AsyncPipe } from '@angular/common';
-import { Component, Injector, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { AuthService } from '@services/auth.service';
-import { NotificationService } from '@services/notification.service';
-import { createErrorHandler } from '@services/operators';
+import { Store } from '@ngrx/store';
 import { ThemeService } from '@services/theme.service';
+import { AppState } from '@states/app.state';
+import { selectIsLoggedIn } from '@states/auth.state';
 import { MenuItem, PrimeNGConfig } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { ButtonGroupModule } from 'primeng/buttongroup';
@@ -14,7 +16,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SplitButtonModule } from 'primeng/splitbutton';
 import { ToastModule } from 'primeng/toast';
 import { ToolbarModule } from 'primeng/toolbar';
-import { finalize, noop } from 'rxjs';
+import { distinctUntilChanged, Observable } from 'rxjs';
 
 @Component({
     selector: 'app-root',
@@ -36,7 +38,7 @@ import { finalize, noop } from 'rxjs';
     templateUrl: './app.component.html',
     styleUrl: './app.component.css',
 })
-export class AppComponent implements OnInit, OnDestroy {
+export class AppComponent implements OnInit {
     public title = 'Pyro';
     public themeIcon = signal('pi pi-sun');
     public loginMenuItems: MenuItem[] = [
@@ -45,33 +47,31 @@ export class AppComponent implements OnInit, OnDestroy {
             label: 'Logout',
             icon: 'pi pi-sign-out',
             command: () => {
-                this.authService
-                    .logout()
-                    .pipe(
-                        createErrorHandler(this.injector),
-                        finalize(() => this.router.navigate(['login'])),
-                    )
-                    .subscribe(noop);
+                this.store.dispatch(logoutAction());
             },
         },
     ];
+    public isLoggedIn$: Observable<boolean> = this.store.select(selectIsLoggedIn);
 
     public constructor(
-        private readonly injector: Injector,
         private readonly primeNg: PrimeNGConfig,
         private readonly router: Router,
-        public readonly authService: AuthService,
+        private readonly destroyRef: DestroyRef,
+        private readonly store: Store<AppState>,
         private readonly themeService: ThemeService,
-        private readonly notificationService: NotificationService,
-    ) {}
+    ) {
+        this.isLoggedIn$
+            .pipe(takeUntilDestroyed(this.destroyRef), distinctUntilChanged())
+            .subscribe(isLoggedIn => {
+                if (!isLoggedIn) {
+                    this.router.navigate(['/login']);
+                }
+            });
+    }
 
     public ngOnInit(): void {
         this.themeService.useTheme();
         this.primeNg.ripple = true;
-    }
-
-    public ngOnDestroy(): void {
-        this.notificationService.ngOnDestroy();
     }
 
     public toggleThemeClick(): void {

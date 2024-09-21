@@ -1,19 +1,26 @@
-import { Component, Injector, OnDestroy, OnInit, signal } from '@angular/core';
+import { createRepository } from '@actions/repositories.actions';
+import { AsyncPipe } from '@angular/common';
+import { Component, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ValidationSummaryComponent, Validators } from '@controls/validation-summary';
-import { NotificationEvent, NotificationService } from '@services/notification.service';
-import { createErrorHandler } from '@services/operators';
+import { Store } from '@ngrx/store';
 import { CreateRepository, RepositoryService } from '@services/repository.service';
+import { WebSocketEvents } from '@services/web-socket.service';
+import { AppState } from '@states/app.state';
+import { selectIsNewRepositoryProcessing } from '@states/repositories.state';
+import { selectMessage } from '@states/web-socket.state';
 import { AutoFocusModule } from 'primeng/autofocus';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-import { filter, finalize, Observable, Subject, switchMap, takeUntil } from 'rxjs';
+import { filter, map, Observable } from 'rxjs';
 
 @Component({
     selector: 'repository-new',
     standalone: true,
     imports: [
+        AsyncPipe,
         AutoFocusModule,
         ButtonModule,
         InputTextModule,
@@ -23,7 +30,7 @@ import { filter, finalize, Observable, Subject, switchMap, takeUntil } from 'rxj
     templateUrl: './repository-new.component.html',
     styleUrls: ['./repository-new.component.css'],
 })
-export class RepositoryNewComponent implements OnInit, OnDestroy {
+export class RepositoryNewComponent {
     public readonly form = this.formBuilder.nonNullable.group({
         name: [
             '',
@@ -45,46 +52,39 @@ export class RepositoryNewComponent implements OnInit, OnDestroy {
             [Validators.required('Default Branch'), Validators.maxLength('Default Branch', 50)],
         ],
     });
-    public readonly isLoading = signal<boolean>(false);
-    private readonly destroy$: Subject<void> = new Subject<void>();
-    private repositoryInitialized$: Observable<string> | undefined;
+    public readonly isLoading$: Observable<boolean> = this.store.select(
+        selectIsNewRepositoryProcessing,
+    );
+    private repositoryInitializedMessages$: Observable<string> = this.store.pipe(
+        selectMessage(WebSocketEvents.RepositoryInitialized),
+        map(message => message.payload.repositoryName),
+    );
 
     public constructor(
-        private readonly injector: Injector,
+        private readonly destoryRef: DestroyRef,
         private readonly formBuilder: FormBuilder,
         private readonly router: Router,
+        private readonly store: Store<AppState>,
         private readonly repositoryService: RepositoryService,
-        private readonly notificationService: NotificationService,
     ) {}
-
-    public ngOnInit(): void {
-        this.repositoryInitialized$ = this.notificationService
-            .on<string>(NotificationEvent.RepositoryInitialized)
-            .pipe(takeUntil(this.destroy$));
-    }
-
-    public ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
-    }
 
     public onSubmit(): void {
         if (this.form.invalid) {
             return;
         }
 
-        this.isLoading.set(true);
+        let repository: CreateRepository = {
+            name: this.form.value.name!,
+            description: this.form.value.description!,
+            defaultBranch: this.form.value.defaultBranch!,
+        };
 
-        this.repositoryService
-            .createRepository(this.form.value as CreateRepository)
+        this.repositoryInitializedMessages$
             .pipe(
-                createErrorHandler(this.injector),
-                switchMap(() => this.repositoryInitialized$!),
-                filter(name => name === this.form.value.name),
-                finalize(() => this.isLoading.set(false)),
+                takeUntilDestroyed(this.destoryRef),
+                filter(repositoryName => repositoryName === this.form.value.name),
             )
-            .subscribe(name => {
-                this.router.navigate(['/repositories', name]);
-            });
+            .subscribe(repositoryName => this.router.navigate(['/repositories', repositoryName]));
+        this.store.dispatch(createRepository({ repository }));
     }
 }
