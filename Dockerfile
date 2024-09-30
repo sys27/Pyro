@@ -1,4 +1,4 @@
-﻿FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0.401-alpine3.20 AS build
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0.402-alpine3.20 AS build
 ARG BUILD_CONFIGURATION=Release
 ARG TARGETOS
 ARG TARGETARCH
