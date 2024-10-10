@@ -1,17 +1,19 @@
 import { AsyncPipe, NgClass } from '@angular/common';
-import { Component, DestroyRef, input, OnInit, signal } from '@angular/core';
+import { Component, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { PaginatorComponent, PaginatorState } from '@controls/paginator/paginator.component';
 import { TagComponent } from '@controls/tag/tag.component';
 import { PyroPermissions } from '@models/pyro-permissions';
+import { Store } from '@ngrx/store';
 import { ColorPipe } from '@pipes/color.pipe';
 import { LuminanceColorPipe } from '@pipes/luminance-color.pipe';
-import { AuthService } from '@services/auth.service';
 import { Issue, IssueService } from '@services/issue.service';
+import { AppState } from '@states/app.state';
+import { hasPermissionSelector } from '@states/auth.state';
 import { ButtonModule } from 'primeng/button';
 import { DataViewModule } from 'primeng/dataview';
 import { DividerModule } from 'primeng/divider';
-import { map, Observable, of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 
 @Component({
     selector: 'repo-issues',
@@ -31,22 +33,17 @@ import { map, Observable, of } from 'rxjs';
     templateUrl: './repository-issues.component.html',
     styleUrls: ['./repository-issues.component.css'],
 })
-export class RepositoryIssuesComponent implements OnInit {
+export class RepositoryIssuesComponent {
     public readonly repositoryName = input.required<string>();
     public readonly issues = signal<Issue[]>([]);
-    public hasEditPermission$: Observable<boolean> | undefined;
+    public hasEditPermission$: Observable<boolean> = this.store.select(
+        hasPermissionSelector(PyroPermissions.IssueEdit),
+    );
 
     public constructor(
-        private readonly destroyRef: DestroyRef,
         private readonly issueService: IssueService,
-        private readonly authService: AuthService,
+        private readonly store: Store<AppState>,
     ) {}
-
-    public ngOnInit(): void {
-        this.hasEditPermission$ = this.authService.currentUser.pipe(
-            map(user => user?.hasPermission(PyroPermissions.IssueEdit) ?? false),
-        );
-    }
 
     public paginatorLoader = (state: PaginatorState): Observable<Issue[]> => {
         if (!this.repositoryName()) {

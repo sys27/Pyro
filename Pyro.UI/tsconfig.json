@@ -24,11 +24,17 @@
       "dom"
     ],
     "paths": {
+      "@actions/*": [
+        "./src/app/actions/*"
+      ],
       "@controls/*": [
         "./src/app/controls/*"
       ],
       "@directives/*": [
         "./src/app/directives/*"
+      ],
+      "@effects/*": [
+        "./src/app/effects/*"
       ],
       "@models/*": [
         "./src/app/models/*"
@@ -36,8 +42,14 @@
       "@pipes/*": [
         "./src/app/pipes/*"
       ],
+      "@reducers/*": [
+        "./src/app/reducers/*"
+      ],
       "@services/*": [
         "./src/app/services/*"
+      ],
+      "@states/*": [
+        "./src/app/states/*"
       ],
     }
   },

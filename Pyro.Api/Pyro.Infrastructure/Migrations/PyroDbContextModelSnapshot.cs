@@ -15,7 +15,7 @@ namespace Pyro.Infrastructure.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "8.0.8");
+            modelBuilder.HasAnnotation("ProductVersion", "8.0.10");
 
             modelBuilder.Entity("Microsoft.AspNetCore.DataProtection.EntityFrameworkCore.DataProtectionKey", b =>
                 {
@@ -90,9 +90,7 @@ namespace Pyro.Infrastructure.Migrations
                     b.HasKey("Id")
                         .HasName("PK_Label");
 
-                    b.HasIndex("GitRepositoryId");
-
-                    b.HasIndex("Name")
+                    b.HasIndex("GitRepositoryId", "Name")
                         .IsUnique()
                         .HasDatabaseName("IX_Label_Name");
 
