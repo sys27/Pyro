@@ -37,8 +37,8 @@ public static partial class IdentityMapper
 
     public static partial CreateUser ToCommand(this CreateUserRequest user);
 
-    [MapProperty([nameof(JwtTokenPair.AccessToken), nameof(Token.Value)], [nameof(TokenPairResponse.AccessToken)])]
-    [MapProperty([nameof(JwtTokenPair.RefreshToken), nameof(Token.Value)], [nameof(TokenPairResponse.RefreshToken)])]
+    [MapProperty([nameof(JwtTokenPair.AccessToken), nameof(Token.Value)], nameof(TokenPairResponse.AccessToken))]
+    [MapProperty([nameof(JwtTokenPair.RefreshToken), nameof(Token.Value)], nameof(TokenPairResponse.RefreshToken))]
     public static partial TokenPairResponse ToResponse(this JwtTokenPair jwtTokenPair);
 
     [MapperIgnoreSource(nameof(RefreshTokenResult.IsSuccess))]
