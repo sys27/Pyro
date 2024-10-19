@@ -1,8 +1,12 @@
 import { createAction, props } from '@ngrx/store';
 import { BranchItem, Repository, TreeView } from '@services/repository.service';
 
-export const loadRepositoryAndBranches = createAction(
+export const loadRepository = createAction(
     '[Repository] Load Repository',
+    props<{ repositoryName: string }>(),
+);
+export const reloadRepository = createAction(
+    '[Repository] Reload Repository',
     props<{ repositoryName: string }>(),
 );
 export const loadRepositorySuccess = createAction(
@@ -10,6 +14,11 @@ export const loadRepositorySuccess = createAction(
     props<{ repository: Repository }>(),
 );
 export const loadRepositoryFailure = createAction('[Repository] Load Repository Failure');
+
+export const loadBranches = createAction(
+    '[Repository] Load Repository',
+    props<{ repositoryName: string }>(),
+);
 export const loadBranchesSuccess = createAction(
     '[Repository] Load Branches Success',
     props<{ branches: BranchItem[] }>(),

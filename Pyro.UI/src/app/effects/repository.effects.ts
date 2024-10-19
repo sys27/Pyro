@@ -10,15 +10,17 @@ import {
 import { loadLabels } from '@actions/repository-labels.actions';
 import { loadStatuses } from '@actions/repository-statuses.actions';
 import {
+    loadBranches,
     loadBranchesFailure,
     loadBranchesSuccess,
     loadDirectoryViewFailure,
     loadDirectoryViewSuccess,
     loadFileFailure,
     loadFileSuccess,
-    loadRepositoryAndBranches,
+    loadRepository,
     loadRepositoryFailure,
     loadRepositorySuccess,
+    reloadRepository,
     setBranchOrPath,
     setBranchOrPathSuccess,
 } from '@actions/repository.actions';
@@ -33,6 +35,7 @@ import { AppState } from '@states/app.state';
 import {
     licenseFiles,
     readmeFiles,
+    selectBranches,
     selectBranchOrPath,
     selectRepository,
 } from '@states/repository.state';
@@ -40,9 +43,30 @@ import { selectRouteParam } from '@states/router.state';
 import { catchError, combineLatest, filter, map, of, switchMap, tap } from 'rxjs';
 
 export const loadRepositoryEffect = createEffect(
+    (
+        actions$ = inject(Actions),
+        store = inject(Store<AppState>),
+        service = inject(RepositoryService),
+    ) => {
+        return actions$.pipe(
+            ofType(loadRepository),
+            concatLatestFrom(() => store.select(selectRepository)),
+            filter(
+                ([{ repositoryName }, repository]) =>
+                    !repository || repository.name !== repositoryName,
+            ),
+            switchMap(([{ repositoryName }]) => service.getRepository(repositoryName)),
+            map(repository => loadRepositorySuccess({ repository })),
+            catchError(() => of(loadRepositoryFailure())),
+        );
+    },
+    { functional: true },
+);
+
+export const reloadRepositoryEffect = createEffect(
     (actions$ = inject(Actions), service = inject(RepositoryService)) => {
         return actions$.pipe(
-            ofType(loadRepositoryAndBranches),
+            ofType(reloadRepository),
             switchMap(({ repositoryName }) => service.getRepository(repositoryName)),
             map(repository => loadRepositorySuccess({ repository })),
             catchError(() => of(loadRepositoryFailure())),
@@ -52,10 +76,16 @@ export const loadRepositoryEffect = createEffect(
 );
 
 export const loadBranchesEffect = createEffect(
-    (actions$ = inject(Actions), service = inject(RepositoryService)) => {
+    (
+        actions$ = inject(Actions),
+        store = inject(Store<AppState>),
+        service = inject(RepositoryService),
+    ) => {
         return actions$.pipe(
-            ofType(loadRepositoryAndBranches),
-            switchMap(({ repositoryName }) => service.getBranches(repositoryName)),
+            ofType(loadBranches),
+            concatLatestFrom(() => store.select(selectBranches)),
+            filter(([_, branches]) => branches.loading),
+            switchMap(([{ repositoryName }]) => service.getBranches(repositoryName)),
             map(branches => loadBranchesSuccess({ branches })),
             catchError(() => of(loadBranchesFailure())),
         );

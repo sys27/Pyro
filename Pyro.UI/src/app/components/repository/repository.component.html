@@ -1,6 +1,15 @@
 <div class="flex flex-column h-full">
   <p-tabMenu [model]="menu" />
   <div class="flex-grow-1">
-    <router-outlet></router-outlet>
+    @if (isInitialized$ | async) {
+      <router-outlet></router-outlet>
+    } @else {
+      <div class="h-full flex flex-row justify-content-center align-items-center">
+        <div>
+          <p-progressSpinner ariaLabel="initializing" />
+          <p class="text-center font-bold">Initializing...</p>
+        </div>
+      </div>
+    }
   </div>
 </div>

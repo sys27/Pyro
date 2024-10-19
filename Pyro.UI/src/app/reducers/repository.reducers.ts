@@ -30,10 +30,11 @@ import {
     updateStatusSuccess,
 } from '@actions/repository-statuses.actions';
 import {
+    loadBranches,
     loadBranchesSuccess,
     loadDirectoryViewSuccess,
     loadFileSuccess,
-    loadRepositoryAndBranches,
+    loadRepository,
     loadRepositorySuccess,
     setBranchOrPathSuccess,
 } from '@actions/repository.actions';
@@ -61,16 +62,32 @@ let initialState: RepositoryState = {
 
 export const repositoryReducer = createReducer(
     initialState,
-    on(
-        loadRepositoryAndBranches,
-        (state): RepositoryState => ({
+    on(loadRepository, (state, { repositoryName }): RepositoryState => {
+        if (state.repository?.name === repositoryName) {
+            return state;
+        }
+
+        return {
+            ...state,
+            repository: null,
+        };
+    }),
+    on(loadBranches, (state, { repositoryName }): RepositoryState => {
+        if (
+            (state.repository === null || state.repository.name === repositoryName) &&
+            state.branches.data.length > 0
+        ) {
+            return state;
+        }
+
+        return {
             ...state,
             branches: {
                 ...state.branches,
                 loading: true,
             },
-        }),
-    ),
+        };
+    }),
     on(
         loadRepositorySuccess,
         (state, { repository }): RepositoryState => ({
