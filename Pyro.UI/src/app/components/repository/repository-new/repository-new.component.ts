@@ -61,7 +61,7 @@ export class RepositoryNewComponent {
     );
 
     public constructor(
-        private readonly destoryRef: DestroyRef,
+        private readonly destroyRef: DestroyRef,
         private readonly formBuilder: FormBuilder,
         private readonly router: Router,
         private readonly store: Store<AppState>,
@@ -81,7 +81,7 @@ export class RepositoryNewComponent {
 
         this.repositoryInitializedMessages$
             .pipe(
-                takeUntilDestroyed(this.destoryRef),
+                takeUntilDestroyed(this.destroyRef),
                 filter(repositoryName => repositoryName === this.form.value.name),
             )
             .subscribe(repositoryName => this.router.navigate(['/repositories', repositoryName]));

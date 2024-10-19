@@ -62,6 +62,12 @@ export interface Repository {
     get name(): string;
     get description(): string | undefined;
     get defaultBranch(): string;
+    get status(): RepositoryStatus;
+}
+
+export enum RepositoryStatus {
+    New = 1,
+    Initialized = 2,
 }
 
 export interface RepositoryItem {

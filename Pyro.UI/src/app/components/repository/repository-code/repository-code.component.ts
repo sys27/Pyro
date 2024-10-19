@@ -1,4 +1,4 @@
-import { loadRepositoryAndBranches, setBranchOrPath } from '@actions/repository.actions';
+import { loadBranches, setBranchOrPath } from '@actions/repository.actions';
 import { AsyncPipe, DatePipe, SlicePipe } from '@angular/common';
 import { Component, computed, input, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -103,7 +103,7 @@ export class RepositoryCodeComponent implements OnInit {
 
     public ngOnInit(): void {
         let repositoryName = this.repositoryName();
-        this.store.dispatch(loadRepositoryAndBranches({ repositoryName }));
+        this.store.dispatch(loadBranches({ repositoryName }));
 
         this.route.data.pipe(map(data => data['branchOrPath'])).subscribe(branchOrPath => {
             this.store.dispatch(setBranchOrPath({ branchOrPath }));

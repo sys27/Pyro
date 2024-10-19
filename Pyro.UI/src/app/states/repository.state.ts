@@ -2,7 +2,7 @@ import { createFeatureSelector, createSelector } from '@ngrx/store';
 import { IssueStatus, IssueStatusTransition } from '@services/issue-status.service';
 import { Issue, User } from '@services/issue.service';
 import { Label } from '@services/label.service';
-import { BranchItem, Repository, TreeView } from '@services/repository.service';
+import { BranchItem, Repository, RepositoryStatus, TreeView } from '@services/repository.service';
 import { AppState } from './app.state';
 import { DataSourceState } from './data-source.state';
 import { PagedState } from './paged.state';
@@ -29,6 +29,10 @@ export const selectRepositoryFeature = createFeatureSelector<RepositoryState>('r
 export const selectRepository = createSelector<AppState, RepositoryState, Repository | null>(
     selectRepositoryFeature,
     state => state.repository,
+);
+export const selectIsRepositoryInitialized = createSelector<AppState, RepositoryState, boolean>(
+    selectRepositoryFeature,
+    state => state.repository?.status === RepositoryStatus.Initialized,
 );
 export const selectBranches = createSelector<
     AppState,
