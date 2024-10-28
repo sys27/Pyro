@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Pyro.Domain.Git;
 using Pyro.Domain.GitRepositories;
-using Pyro.Domain.Shared;
+using Pyro.Domain.Shared.Messaging;
 using Pyro.Domain.UserProfiles;
 using Pyro.Infrastructure.DataAccess;
 using Pyro.Infrastructure.Messaging;

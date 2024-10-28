@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Pyro.Domain.Identity;
-using Pyro.Domain.Shared;
+using Pyro.Domain.Shared.CurrentUserProvider;
 using Pyro.Infrastructure.DataAccess;
 using Pyro.Services;
 

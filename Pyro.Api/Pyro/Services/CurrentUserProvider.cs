@@ -2,12 +2,11 @@
 // Licensed under the GPL-3.0 license. See LICENSE file in the project root for full license information.
 
 using System.Security.Claims;
-using Pyro.Domain.Shared;
-using Pyro.Domain.Shared.Models;
+using Pyro.Domain.Shared.CurrentUserProvider;
 
 namespace Pyro.Services;
 
-public class CurrentUserProvider : ICurrentUserProvider
+internal class CurrentUserProvider : ICurrentUserProvider
 {
     private readonly IHttpContextAccessor httpContextAccessor;
 

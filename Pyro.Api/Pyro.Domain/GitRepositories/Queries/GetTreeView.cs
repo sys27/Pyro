@@ -4,7 +4,7 @@
 using FluentValidation;
 using MediatR;
 using Pyro.Domain.Git;
-using Pyro.Domain.Shared.Models;
+using Pyro.Domain.Shared;
 
 namespace Pyro.Domain.GitRepositories.Queries;
 

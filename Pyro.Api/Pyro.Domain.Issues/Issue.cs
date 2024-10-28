@@ -3,8 +3,8 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Pyro.Domain.Issues.DomainEvents;
+using Pyro.Domain.Shared.Entities;
 using Pyro.Domain.Shared.Exceptions;
-using Pyro.Domain.Shared.Models;
 
 namespace Pyro.Domain.Issues;
 

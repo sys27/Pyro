@@ -3,7 +3,7 @@
 
 using MediatR;
 using Pyro.Domain.Identity.Models;
-using Pyro.Domain.Shared;
+using Pyro.Domain.Shared.CurrentUserProvider;
 using Pyro.Domain.Shared.Exceptions;
 
 namespace Pyro.Domain.Identity.Queries;

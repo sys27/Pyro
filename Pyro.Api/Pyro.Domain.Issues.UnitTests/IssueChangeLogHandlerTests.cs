@@ -3,8 +3,7 @@
 
 using NSubstitute;
 using Pyro.Domain.Issues.DomainEvents;
-using Pyro.Domain.Shared;
-using Pyro.Domain.Shared.Models;
+using Pyro.Domain.Shared.CurrentUserProvider;
 
 namespace Pyro.Domain.Issues.UnitTests;
 

@@ -3,7 +3,7 @@
 
 using FluentValidation;
 
-namespace Pyro.Domain.Shared.Queries;
+namespace Pyro.Domain.Shared;
 
 public interface IPageQuery<out TOffset>
 {

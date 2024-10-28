@@ -6,13 +6,12 @@ using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Pyro.Domain.Shared;
-using Pyro.Domain.Shared.Models;
+using Pyro.Domain.Shared.Messaging;
 using Pyro.Infrastructure.DataAccess;
 
 namespace Pyro.Infrastructure.Messaging;
 
-public class Bus : IBus
+internal class Bus : IBus
 {
     private readonly PyroDbContext dbContext;
     private readonly JsonSerializerOptions jsonSerializerOptions;
