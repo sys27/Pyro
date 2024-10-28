@@ -4,7 +4,7 @@
 using FluentValidation;
 using MediatR;
 using Pyro.Domain.Identity.Models;
-using Pyro.Domain.Shared.Queries;
+using Pyro.Domain.Shared;
 
 namespace Pyro.Domain.Identity.Queries;
 

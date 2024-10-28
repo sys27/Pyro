@@ -8,7 +8,7 @@ using System.IO.Pipelines;
 using System.Text;
 using Microsoft.Extensions.Options;
 using Pyro.Domain.GitRepositories;
-using Pyro.Domain.Shared;
+using Pyro.Domain.Shared.CurrentUserProvider;
 using Pyro.Domain.Shared.Exceptions;
 using Pyro.Domain.UserProfiles;
 using Pyro.Infrastructure;

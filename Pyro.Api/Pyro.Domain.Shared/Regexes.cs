@@ -3,7 +3,7 @@
 
 using System.Text.RegularExpressions;
 
-namespace Pyro.Domain.Shared.Models;
+namespace Pyro.Domain.Shared;
 
 public static partial class Regexes
 {

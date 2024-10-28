@@ -2,8 +2,8 @@
 // Licensed under the GPL-3.0 license. See LICENSE file in the project root for full license information.
 
 using System.Diagnostics.CodeAnalysis;
+using Pyro.Domain.Shared.Entities;
 using Pyro.Domain.Shared.Exceptions;
-using Pyro.Domain.Shared.Models;
 
 namespace Pyro.Domain.Identity.Models;
 

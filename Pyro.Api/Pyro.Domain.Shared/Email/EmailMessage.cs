@@ -1,8 +1,10 @@
 // Copyright (c) Dmytro Kyshchenko. All rights reserved.
 // Licensed under the GPL-3.0 license. See LICENSE file in the project root for full license information.
 
-using Pyro.Domain.Shared.Entities;
+namespace Pyro.Domain.Shared.Email;
 
-namespace Pyro.Domain.Issues.DomainEvents;
-
-public record IssueLocked(Issue Issue) : IDomainEvent;
+public record EmailMessage(
+    string From,
+    string To,
+    string Subject,
+    string Body);

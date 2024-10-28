@@ -3,7 +3,7 @@
 
 using MediatR;
 using Microsoft.Extensions.Logging;
-using Pyro.Domain.Shared;
+using Pyro.Domain.Shared.CurrentUserProvider;
 
 namespace Pyro.Domain.Identity.Commands;
 

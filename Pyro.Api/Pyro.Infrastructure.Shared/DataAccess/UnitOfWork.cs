@@ -2,7 +2,7 @@
 // Licensed under the GPL-3.0 license. See LICENSE file in the project root for full license information.
 
 using Microsoft.EntityFrameworkCore;
-using Pyro.Domain.Shared.Models;
+using Pyro.Domain.Shared.Entities;
 
 namespace Pyro.Infrastructure.Shared.DataAccess;
 

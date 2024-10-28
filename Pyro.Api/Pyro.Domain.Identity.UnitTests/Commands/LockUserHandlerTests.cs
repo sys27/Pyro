@@ -4,9 +4,8 @@
 using NSubstitute;
 using Pyro.Domain.Identity.Commands;
 using Pyro.Domain.Identity.Models;
-using Pyro.Domain.Shared;
+using Pyro.Domain.Shared.CurrentUserProvider;
 using Pyro.Domain.Shared.Exceptions;
-using Pyro.Domain.Shared.Models;
 
 namespace Pyro.Domain.Identity.UnitTests.Commands;
 

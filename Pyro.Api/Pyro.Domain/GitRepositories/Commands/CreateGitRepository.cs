@@ -4,7 +4,7 @@
 using FluentValidation;
 using MediatR;
 using Pyro.Domain.Shared;
-using Pyro.Domain.Shared.Models;
+using Pyro.Domain.Shared.Messaging;
 
 namespace Pyro.Domain.GitRepositories.Commands;
 
