@@ -3,6 +3,7 @@
 
 using System.Security.Cryptography;
 using System.Text;
+using Pyro.Domain.Identity.Models;
 
 namespace Pyro.Domain.Identity;
 
@@ -12,6 +13,13 @@ public class PasswordService : IPasswordService
     private const int SaltSize = 16;
     private const int IterationsCount = 200000;
     private const int PasswordLength = 64;
+
+    private readonly TimeProvider timeProvider;
+
+    public PasswordService(TimeProvider timeProvider)
+    {
+        this.timeProvider = timeProvider;
+    }
 
     private static byte[] GetPasswordHash(string password, byte[] salt)
     {
@@ -46,5 +54,26 @@ public class PasswordService : IPasswordService
         var passwordHashToVerify = GetPasswordHash(password, [..salt]);
 
         return passwordHashToVerify.AsSpan().SequenceEqual([..passwordHash]);
+    }
+
+    public OneTimePassword GenerateOneTimePasswordFor(User user)
+    {
+        using var rng = RandomNumberGenerator.Create();
+
+        Span<byte> bytes = stackalloc byte[16];
+        rng.GetBytes(bytes);
+
+        var token = Convert.ToBase64String(bytes);
+        var expiresAt = timeProvider.GetUtcNow().AddDays(1); // TODO: config
+        var otp = new OneTimePassword
+        {
+            Token = token,
+            ExpiresAt = expiresAt,
+            Purpose = OneTimePasswordPurpose.UserRegistration,
+            User = user,
+        };
+        user.AddOneTimePassword(otp);
+
+        return otp;
     }
 }

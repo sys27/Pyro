@@ -192,7 +192,7 @@ internal abstract class BaseClient : IDisposable
     }
 
     public Task Login()
-        => Login("pyro", "pyro");
+        => Login("pyro@localhost.local", "pyro");
 
     public async Task Logout()
     {

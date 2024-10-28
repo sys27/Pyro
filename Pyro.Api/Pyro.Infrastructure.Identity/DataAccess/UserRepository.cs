@@ -66,6 +66,17 @@ internal class UserRepository : IUserRepository
         return user;
     }
 
+    public async Task<User?> GetUserByToken(
+        string token,
+        CancellationToken cancellationToken = default)
+    {
+        var user = await Users.FirstOrDefaultAsync(
+            x => x.OneTimePasswords.Any(y => y.Token == token),
+            cancellationToken);
+
+        return user;
+    }
+
     public async Task<User> AddUser(User user, CancellationToken cancellationToken)
     {
         var entity = await dbContext.Set<User>().AddAsync(user, cancellationToken);
@@ -101,5 +112,6 @@ internal class UserRepository : IUserRepository
             .ThenInclude(x => x.Permissions)
             .Include(x => x.AuthenticationTokens)
             .Include(x => x.AccessTokens)
+            .Include(x => x.OneTimePasswords)
             .AsSplitQuery();
 }

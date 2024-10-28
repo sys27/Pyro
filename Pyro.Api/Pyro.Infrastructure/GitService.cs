@@ -74,7 +74,7 @@ internal class GitService : IGitService
         var clonePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
         clonePath = Repository.Clone(gitPath, clonePath);
 
-        var identity = new Identity(pyroUser.Name, pyroUser.Email);
+        var identity = new Identity(pyroUser.Name, pyroUser.User.Email);
         var signature = new Signature(identity, timeProvider.GetUtcNow());
         using var repo = new Repository(clonePath, new RepositoryOptions { Identity = identity });
 

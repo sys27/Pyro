@@ -97,6 +97,25 @@ namespace Pyro.Infrastructure.Migrations
                     b.ToTable("Labels", (string)null);
                 });
 
+            modelBuilder.Entity("Pyro.Domain.UserProfiles.User", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("Login");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users", null, t =>
+                        {
+                            t.ExcludeFromMigrations();
+                        });
+                });
+
             modelBuilder.Entity("Pyro.Domain.UserProfiles.UserAvatar", b =>
                 {
                     b.Property<Guid>("Id")
@@ -117,10 +136,6 @@ namespace Pyro.Infrastructure.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Email")
-                        .HasMaxLength(200)
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -139,7 +154,6 @@ namespace Pyro.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("f9ba057a-35b0-4d10-8326-702d8f7ec966"),
-                            Email = "pyro@localhost.local",
                             Name = "Pyro"
                         });
                 });
@@ -183,6 +197,15 @@ namespace Pyro.Infrastructure.Migrations
                     b.Navigation("GitRepository");
                 });
 
+            modelBuilder.Entity("Pyro.Domain.UserProfiles.User", b =>
+                {
+                    b.HasOne("Pyro.Domain.UserProfiles.UserProfile", null)
+                        .WithOne("User")
+                        .HasForeignKey("Pyro.Domain.UserProfiles.User", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Pyro.Domain.UserProfiles.UserAvatar", b =>
                 {
                     b.HasOne("Pyro.Domain.UserProfiles.UserProfile", null)
@@ -200,6 +223,9 @@ namespace Pyro.Infrastructure.Migrations
             modelBuilder.Entity("Pyro.Domain.UserProfiles.UserProfile", b =>
                 {
                     b.Navigation("Avatar");
+
+                    b.Navigation("User")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

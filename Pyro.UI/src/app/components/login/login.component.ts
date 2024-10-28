@@ -26,7 +26,7 @@ import { PasswordModule } from 'primeng/password';
 export class LoginComponent {
     public readonly returnUrl = input<string>('/');
     public readonly formGroup = this.formBuilder.nonNullable.group({
-        login: ['', Validators.required('Login')],
+        login: ['', [Validators.required('Login'), Validators.email('Login')]],
         password: ['', Validators.required('Password')],
     });
 

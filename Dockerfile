@@ -52,9 +52,9 @@ EXPOSE 80
 HEALTHCHECK --interval=5s --timeout=5s CMD wget http://localhost/health -q -O - > /dev/null 2>&1
 
 ENV ASPNETCORE_ENVIRONMENT="Production"
-ENV ASPNETCORE_ConnectionStrings__DefaultConnection="Data Source=/data/pyro.db"
-ENV ASPNETCORE_Git__BasePath="/data"
 ENV ASPNETCORE_URLS="http://+:80"
+ENV ConnectionStrings__DefaultConnection="Data Source=/data/pyro.db"
+ENV Git__BasePath="/data"
 
 RUN apk add --no-cache git
 RUN addgroup -S pyro && adduser -S pyro -G pyro

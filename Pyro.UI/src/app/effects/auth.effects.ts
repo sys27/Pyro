@@ -66,6 +66,16 @@ export const logoutEffect = createEffect(
     { functional: true },
 );
 
+export const loggedOutActionEffect = createEffect(
+    (actions$ = inject(Actions), router = inject(Router)) => {
+        return actions$.pipe(
+            ofType(loggedOutAction),
+            tap(() => router.navigate(['/login'])),
+        );
+    },
+    { functional: true, dispatch: false },
+);
+
 export const refreshEffect = createEffect(
     (actions$ = inject(Actions), authService = inject(AuthService)) => {
         return actions$.pipe(

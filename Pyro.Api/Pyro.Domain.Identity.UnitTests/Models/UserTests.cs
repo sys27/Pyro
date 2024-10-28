@@ -3,6 +3,7 @@
 
 using NSubstitute;
 using Pyro.Domain.Identity.Models;
+using Pyro.Domain.Shared.Exceptions;
 
 namespace Pyro.Domain.Identity.UnitTests.Models;
 
@@ -182,5 +183,91 @@ public class UserTests
         user.Unlock();
 
         Assert.That(user.IsLocked, Is.False);
+    }
+
+    [Test]
+    public void ActivateUserIsNull()
+    {
+        var user = new User { Login = "test" };
+        var timeProvider = Substitute.For<TimeProvider>();
+
+        Assert.Throws<ArgumentNullException>(() => user.Activate(timeProvider, null!, [], []));
+    }
+
+    [Test]
+    public void ActivateUserWithExpiredToken()
+    {
+        var currentTime = DateTimeOffset.UtcNow;
+
+        var user = new User { Login = "test" };
+        var oneTimePassword = new OneTimePassword
+        {
+            Token = "token",
+            ExpiresAt = currentTime.AddDays(-1),
+            Purpose = OneTimePasswordPurpose.UserRegistration,
+            User = user,
+        };
+        user.AddOneTimePassword(oneTimePassword);
+
+        var timeProvider = Substitute.For<TimeProvider>();
+        timeProvider
+            .GetUtcNow()
+            .Returns(currentTime);
+
+        Assert.Throws<DomainException>(() => user.Activate(timeProvider, oneTimePassword, [], []));
+    }
+
+    [Test]
+    public void ActivateLockedUser()
+    {
+        var currentTime = DateTimeOffset.UtcNow;
+
+        var user = new User { Login = "test" };
+        var oneTimePassword = new OneTimePassword
+        {
+            Token = "token",
+            ExpiresAt = currentTime.AddDays(1),
+            Purpose = OneTimePasswordPurpose.UserRegistration,
+            User = user,
+        };
+        user.AddOneTimePassword(oneTimePassword);
+
+        var timeProvider = Substitute.For<TimeProvider>();
+        timeProvider
+            .GetUtcNow()
+            .Returns(currentTime);
+
+        Assert.Throws<DomainException>(() => user.Activate(timeProvider, oneTimePassword, [], []));
+    }
+
+    [Test]
+    public void ActivateUser()
+    {
+        var currentTime = DateTimeOffset.UtcNow;
+
+        var user = new User { Login = "test" };
+        user.Lock();
+
+        var oneTimePassword = new OneTimePassword
+        {
+            Token = "token",
+            ExpiresAt = currentTime.AddDays(1),
+            Purpose = OneTimePasswordPurpose.UserRegistration,
+            User = user,
+        };
+        user.AddOneTimePassword(oneTimePassword);
+
+        var timeProvider = Substitute.For<TimeProvider>();
+        timeProvider
+            .GetUtcNow()
+            .Returns(currentTime);
+
+        user.Activate(timeProvider, oneTimePassword, [], []);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(user.IsLocked, Is.False);
+            Assert.That(user.OneTimePasswords, Is.Empty);
+        });
     }
 }

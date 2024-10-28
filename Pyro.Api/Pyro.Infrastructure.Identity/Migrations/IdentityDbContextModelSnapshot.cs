@@ -15,7 +15,7 @@ namespace Pyro.Infrastructure.Identity.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "8.0.6");
+            modelBuilder.HasAnnotation("ProductVersion", "8.0.10");
 
             modelBuilder.Entity("Pyro.Domain.Identity.Models.AccessToken", b =>
                 {
@@ -79,6 +79,36 @@ namespace Pyro.Infrastructure.Identity.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("AuthenticationTokens", (string)null);
+                });
+
+            modelBuilder.Entity("Pyro.Domain.Identity.Models.OneTimePassword", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("ExpiresAt")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Purpose")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Token")
+                        .IsUnique()
+                        .HasDatabaseName("IX_OneTimePasswords_Token");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("OneTimePasswords", (string)null);
                 });
 
             modelBuilder.Entity("Pyro.Domain.Identity.Models.Permission", b =>
@@ -234,7 +264,7 @@ namespace Pyro.Infrastructure.Identity.Migrations
                         {
                             Id = new Guid("f9ba057a-35b0-4d10-8326-702d8f7ec966"),
                             IsLocked = false,
-                            Login = "pyro",
+                            Login = "pyro@localhost.local",
                             password = new byte[] { 239, 163, 54, 78, 41, 129, 181, 60, 27, 181, 100, 116, 243, 128, 253, 209, 87, 147, 27, 73, 138, 190, 50, 65, 18, 253, 153, 127, 194, 97, 240, 29, 179, 58, 68, 117, 170, 97, 172, 236, 70, 27, 167, 168, 87, 3, 66, 53, 11, 34, 206, 209, 211, 150, 81, 227, 19, 161, 249, 24, 45, 138, 206, 197 },
                             salt = new byte[] { 109, 28, 230, 18, 208, 250, 67, 218, 171, 6, 152, 200, 162, 109, 186, 132 }
                         });
@@ -374,6 +404,18 @@ namespace Pyro.Infrastructure.Identity.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Pyro.Domain.Identity.Models.OneTimePassword", b =>
+                {
+                    b.HasOne("Pyro.Domain.Identity.Models.User", "User")
+                        .WithMany("OneTimePasswords")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_OneTimePasswords_Users_UserId");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("RolePermission", b =>
                 {
                     b.HasOne("Pyro.Domain.Identity.Models.Permission", null)
@@ -409,6 +451,8 @@ namespace Pyro.Infrastructure.Identity.Migrations
                     b.Navigation("AccessTokens");
 
                     b.Navigation("AuthenticationTokens");
+
+                    b.Navigation("OneTimePasswords");
                 });
 #pragma warning restore 612, 618
         }

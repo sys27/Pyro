@@ -1,7 +1,6 @@
 // Copyright (c) Dmytro Kyshchenko. All rights reserved.
 // Licensed under the GPL-3.0 license. See LICENSE file in the project root for full license information.
 
-using System.Text.Json;
 using FluentValidation;
 using Hellang.Middleware.ProblemDetails;
 using Microsoft.AspNetCore.Http.Connections;
@@ -9,7 +8,6 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.FileProviders;
 using Pyro;
-using Pyro.BackgroundServices;
 using Pyro.Domain.Identity;
 using Pyro.Domain.Identity.Models;
 using Pyro.Domain.Issues;
@@ -25,15 +23,7 @@ using User = Pyro.Domain.Identity.Models.User;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Configuration.Sources.Clear();
-builder.Configuration
-    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
-    .AddEnvironmentVariables("ASPNETCORE_");
-
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.Configure<JsonSerializerOptions>(options =>
-    options.TypeInfoResolver = PyroJsonContext.Default);
 builder.Services.AddProblemDetails(builder.Environment);
 builder.Services.AddHealthChecks();
 
@@ -46,10 +36,12 @@ builder.Services.AddSingleton<IUserIdProvider, LoginUserIdProvider>();
 builder.Services.AddSingleton<INotificationService, NotificationService>();
 
 builder.Services.AddIdentityDomain();
-builder.Services.AddSharedInfrastructure();
-builder.Services.AddInfrastructure(builder.Configuration);
-builder.Services.AddIdentityInfrastructure(builder.Configuration);
-builder.Services.AddIssuesInfrastructure(builder.Configuration);
+builder
+    .AddSharedInfrastructure()
+    .AddInfrastructure()
+    .AddIdentityInfrastructure()
+    .AddIssuesInfrastructure()
+    .AddPyroInfrastructure();
 
 builder.Services
     .AddValidatorsFromAssemblyContaining<Pyro.Domain.GitRepositories.GitRepository>()
@@ -63,12 +55,7 @@ builder.Services.AddMediatR(c => c
     .AddOpenBehavior(typeof(LoggingPipeline<,>))
     .AddOpenBehavior(typeof(ValidatorPipeline<,>)));
 
-builder.Services.AddHostedService<OutboxMessageProcessing>();
-
 builder.Services.AddAuth();
-
-// TODO:
-builder.Services.AddScoped<GitBackend>();
 
 var app = builder.Build();
 

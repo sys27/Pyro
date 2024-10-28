@@ -13,30 +13,31 @@ namespace Pyro.Infrastructure.Issues;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddIssuesInfrastructure(
-        this IServiceCollection services,
-        IConfiguration configuration)
+    public static IHostApplicationBuilder AddIssuesInfrastructure(this IHostApplicationBuilder builder)
     {
+        var services = builder.Services;
+        var configuration = builder.Configuration;
+
         services.AddDbContext<IssuesDbContext>((provider, options) =>
-        {
-            var env = provider.GetRequiredService<IHostEnvironment>();
+            {
+                var env = provider.GetRequiredService<IHostEnvironment>();
 
-            options
-                .UseSqlite(configuration.GetConnectionString("DefaultConnection"))
-                .EnableDetailedErrors(env.IsDevelopment())
-                .EnableSensitiveDataLogging(env.IsDevelopment())
-                .AddInterceptors(provider.GetRequiredService<DomainEventInterceptor>())
-                .ConfigureWarnings(w =>
-                {
+                options
+                    .UseSqlite(configuration.GetConnectionString("DefaultConnection"))
+                    .EnableDetailedErrors(env.IsDevelopment())
+                    .EnableSensitiveDataLogging(env.IsDevelopment())
+                    .AddInterceptors(provider.GetRequiredService<DomainEventInterceptor>())
+                    .ConfigureWarnings(w =>
+                    {
 #if DEBUG
-                    w.Throw(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.MultipleCollectionIncludeWarning);
+                        w.Throw(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.MultipleCollectionIncludeWarning);
 #endif
-                });
-        });
-        services.AddScoped<DbContext, IssuesDbContext>(sp => sp.GetRequiredService<IssuesDbContext>());
-
-        return services
+                    });
+            })
+            .AddScoped<DbContext, IssuesDbContext>(sp => sp.GetRequiredService<IssuesDbContext>())
             .AddScoped<IIssueRepository, IssueRepository>()
             .AddScoped<IGitRepositoryRepository, GitRepositoryRepository>();
+
+        return builder;
     }
 }

@@ -24,12 +24,23 @@ public class LockUserTests
         identityClient = pyroClient.Share<IdentityClient>();
         await pyroClient.Login();
 
-        login = faker.Random.Hash(32);
-        password = faker.Random.Hash();
+        login = faker.Internet.Email();
 
-        var createUserRequest = new CreateUserRequest(login, password, ["User"]);
+        var createUserRequest = new CreateUserRequest(login, ["User"]);
         var user = await identityClient.CreateUser(createUserRequest);
         Assert.That(user, Is.Not.Null);
+        Assert.That(user.IsLocked, Is.True);
+
+        var message = Api.Smtp.WaitForMessage(x => x.To == login) ??
+                      throw new InvalidOperationException("The message was not found.");
+        var token = message.GetToken();
+        password = faker.Random.Hash();
+        var activateUserRequest = new ActivateUserRequest(token, password);
+        await identityClient.ActivateUser(activateUserRequest);
+
+        user = await identityClient.GetUser(login);
+        Assert.That(user, Is.Not.Null);
+        Assert.That(user.IsLocked, Is.False);
     }
 
     [OneTimeTearDown]

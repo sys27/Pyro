@@ -1,0 +1,38 @@
+<div class="h-full flex flex-row justify-content-center align-items-center">
+  <form
+    class="w-4"
+    [formGroup]="form"
+    (ngSubmit)="onSubmit()">
+    <h1>Please set password for your user</h1>
+    <validation-summary />
+
+    <div class="field">
+      <label for="password">Password:</label>
+      <input
+        id="password"
+        type="password"
+        class="w-full"
+        formControlName="password"
+        pInputText />
+      <validation-summary controlName="password" />
+    </div>
+
+    <div class="field">
+      <label for="confirmPassword">Confirm Password:</label>
+      <input
+        id="confirmPassword"
+        type="password"
+        class="w-full"
+        formControlName="confirmPassword"
+        pInputText />
+      <validation-summary controlName="confirmPassword" />
+    </div>
+
+    <div class="field">
+      <p-button
+        label="Save"
+        type="submit"
+        [disabled]="form.invalid" />
+    </div>
+  </form>
+</div>

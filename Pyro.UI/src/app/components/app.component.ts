@@ -1,7 +1,6 @@
 import { logoutAction } from '@actions/auth.actions';
 import { AsyncPipe } from '@angular/common';
-import { Component, DestroyRef, OnInit, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Component, OnInit, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { ThemeService } from '@services/theme.service';
@@ -16,7 +15,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SplitButtonModule } from 'primeng/splitbutton';
 import { ToastModule } from 'primeng/toast';
 import { ToolbarModule } from 'primeng/toolbar';
-import { distinctUntilChanged, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 
 @Component({
     selector: 'app-root',
@@ -56,18 +55,9 @@ export class AppComponent implements OnInit {
     public constructor(
         private readonly primeNg: PrimeNGConfig,
         private readonly router: Router,
-        private readonly destroyRef: DestroyRef,
         private readonly store: Store<AppState>,
         private readonly themeService: ThemeService,
-    ) {
-        this.isLoggedIn$
-            .pipe(takeUntilDestroyed(this.destroyRef), distinctUntilChanged())
-            .subscribe(isLoggedIn => {
-                if (!isLoggedIn) {
-                    this.router.navigate(['/login']);
-                }
-            });
-    }
+    ) {}
 
     public ngOnInit(): void {
         this.themeService.useTheme();

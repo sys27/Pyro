@@ -1,6 +1,7 @@
 // Copyright (c) Dmytro Kyshchenko. All rights reserved.
 // Licensed under the GPL-3.0 license. See LICENSE file in the project root for full license information.
 
+using Bogus;
 using Pyro.ApiTests.Clients;
 using Pyro.Contracts.Requests.Identity;
 
@@ -8,11 +9,13 @@ namespace Pyro.ApiTests.Tests;
 
 public class UserTests
 {
+    private Faker faker;
     private IdentityClient client;
 
     [OneTimeSetUp]
     public async Task SetUp()
     {
+        faker = new Faker();
         client = new IdentityClient(Api.BaseAddress);
         await client.Login();
     }
@@ -35,7 +38,7 @@ public class UserTests
     [Test]
     public async Task GetUserByLogin()
     {
-        const string login = "pyro";
+        const string login = "pyro@localhost.local";
         var result = await client.GetUser(login);
 
         Assert.That(result, Is.Not.Null);
@@ -54,11 +57,17 @@ public class UserTests
     [Test]
     public async Task CreateGetUpdateUser()
     {
+        var login = faker.Internet.Email();
         var createRequest = new CreateUserRequest(
-            Guid.NewGuid().ToString().Replace("-", string.Empty),
-            "password",
+            login,
             ["Admin"]);
         await client.CreateUser(createRequest);
+
+        var message = Api.Smtp.WaitForMessage(x => x.To == login) ??
+                      throw new InvalidOperationException("The message was not found.");
+        var token = message.GetToken();
+        var activateUserRequest = new ActivateUserRequest(token, faker.Random.Hash());
+        await client.ActivateUser(activateUserRequest);
 
         var user = await client.GetUser(createRequest.Login);
 

@@ -18,6 +18,7 @@ internal class UserProfileRepository : IUserProfileRepository
         var profile = await dbContext
             .Set<UserProfile>()
             .Include(x => x.Avatar)
+            .Include(x => x.User)
             .FirstOrDefaultAsync(x => x.Id == userId, cancellationToken);
 
         return profile;

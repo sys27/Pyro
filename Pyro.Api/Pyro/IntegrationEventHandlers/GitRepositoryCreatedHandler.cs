@@ -7,7 +7,7 @@ using Pyro.Domain.GitRepositories;
 using Pyro.Domain.Shared;
 using Pyro.Infrastructure.DataAccess;
 
-namespace Pyro.DomainEventHandlers;
+namespace Pyro.IntegrationEventHandlers;
 
 public class GitRepositoryCreatedHandler : INotificationHandler<GitRepositoryCreated>
 {

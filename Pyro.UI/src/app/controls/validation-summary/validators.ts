@@ -113,6 +113,26 @@ export class Validators {
         };
     }
 
+    public static sameAs(
+        controlName1: [string, string],
+        controlName2: [string, string],
+    ): ValidatorFn {
+        return form => {
+            let control1 = form.get(controlName1);
+            let control2 = form.get(controlName2);
+
+            if (!control1 || !control2) {
+                return null;
+            }
+
+            if (control1.value === control2.value) {
+                return null;
+            }
+
+            return { sameAs: `The '${controlName1}' and the '${controlName2}' fields must match` };
+        };
+    }
+
     private static isEmptyInputValue(value: any): boolean {
         return (
             value == null ||

@@ -30,12 +30,15 @@ public static partial class IdentityMapper
     [MapperIgnoreSource(nameof(User.Salt))]
     [MapperIgnoreSource(nameof(User.AuthenticationTokens))]
     [MapperIgnoreSource(nameof(User.AccessTokens))]
+    [MapperIgnoreSource(nameof(User.OneTimePasswords))]
     [MapperIgnoreSource(nameof(User.DomainEvents))]
     public static partial UserResponse ToResponse(this User user);
 
     public static partial IReadOnlyList<UserResponse> ToResponse(this IReadOnlyList<User> user);
 
     public static partial CreateUser ToCommand(this CreateUserRequest user);
+
+    public static partial ActivateUser ToCommand(this ActivateUserRequest request);
 
     [MapProperty([nameof(JwtTokenPair.AccessToken), nameof(Token.Value)], nameof(TokenPairResponse.AccessToken))]
     [MapProperty([nameof(JwtTokenPair.RefreshToken), nameof(Token.Value)], nameof(TokenPairResponse.RefreshToken))]

@@ -3,4 +3,4 @@
 
 namespace Pyro.Contracts.Responses;
 
-public record UserProfileResponse(string Name, string? Email, string? Status);
+public record UserProfileResponse(string Name, string? Status);

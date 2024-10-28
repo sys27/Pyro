@@ -36,7 +36,6 @@ export const authReducer = createReducer(
 
 const localStorageKey = 'auth';
 
-// TODO: ???
 export function saveStateReducer(reducer: ActionReducer<AppState>): ActionReducer<AppState> {
     return (state, action) => {
         let result = reducer(state, action);
