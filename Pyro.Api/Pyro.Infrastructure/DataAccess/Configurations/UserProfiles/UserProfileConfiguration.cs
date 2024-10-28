@@ -19,9 +19,6 @@ internal class UserProfileConfiguration : IEntityTypeConfiguration<UserProfile>
         builder.Property(x => x.Id)
             .IsRequired();
 
-        builder.Property(x => x.Email)
-            .HasMaxLength(200);
-
         builder.Property(x => x.Name)
             .IsRequired()
             .HasMaxLength(50);
@@ -32,6 +29,11 @@ internal class UserProfileConfiguration : IEntityTypeConfiguration<UserProfile>
         builder.HasOne(x => x.Avatar)
             .WithOne()
             .HasForeignKey<UserAvatar>(x => x.Id);
+
+        builder.HasOne(x => x.User)
+            .WithOne()
+            .HasForeignKey<User>(x => x.Id)
+            .HasPrincipalKey<UserProfile>(x => x.Id);
 
         builder.HasData(SeedData.UserProfiles);
     }

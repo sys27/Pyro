@@ -5,5 +5,5 @@ namespace Pyro.Domain.Shared.Email;
 
 public interface IEmailService
 {
-    Task SendEmailAsync(EmailMessage emailMessage, CancellationToken cancellationToken = default);
+    Task SendEmail(EmailMessage emailMessage, CancellationToken cancellationToken = default);
 }

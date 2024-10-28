@@ -13,7 +13,7 @@ public class CreateUserHandlerTests
     [Test]
     public async Task CreateValidUser()
     {
-        var command = new CreateUser("test", "password", ["admin"]);
+        var command = new CreateUser("test", ["admin"]);
 
         var repository = Substitute.For<IUserRepository>();
         repository
@@ -22,7 +22,10 @@ public class CreateUserHandlerTests
 
         var passwordService = Substitute.For<IPasswordService>();
         passwordService
-            .GeneratePasswordHash(command.Password)
+            .GeneratePassword()
+            .Returns(string.Empty);
+        passwordService
+            .GeneratePasswordHash(string.Empty)
             .Returns((new byte[64], new byte[16]));
 
         var handler = new CreateUserHandler(repository, passwordService);
@@ -34,13 +37,14 @@ public class CreateUserHandlerTests
             Assert.That(user.Login, Is.EqualTo(command.Login));
             Assert.That(user.Roles, Has.Count.EqualTo(1));
             Assert.That(user.Roles[0].Name, Is.EqualTo("admin"));
+            Assert.That(user.IsLocked, Is.True);
         });
     }
 
     [Test]
     public void CreateUserWithInvalidRole()
     {
-        var command = new CreateUser("test", "password", ["user"]);
+        var command = new CreateUser("test", ["user"]);
 
         var repository = Substitute.For<IUserRepository>();
         repository
@@ -49,7 +53,10 @@ public class CreateUserHandlerTests
 
         var passwordService = Substitute.For<IPasswordService>();
         passwordService
-            .GeneratePasswordHash(command.Password)
+            .GeneratePassword()
+            .Returns(string.Empty);
+        passwordService
+            .GeneratePasswordHash(string.Empty)
             .Returns((new byte[64], new byte[16]));
 
         var handler = new CreateUserHandler(repository, passwordService);

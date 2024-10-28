@@ -2,48 +2,34 @@
 // Licensed under the GPL-3.0 license. See LICENSE file in the project root for full license information.
 
 using MediatR;
+using Microsoft.Extensions.Options;
 using Pyro.Domain.Shared.Messaging;
 
 namespace Pyro.BackgroundServices;
 
-public class OutboxMessageProcessing : BackgroundService
+internal class OutboxMessageProcessing : BackgroundService
 {
     private readonly ILogger<OutboxMessageProcessing> logger;
     private readonly IServiceProvider serviceProvider;
     private readonly IHostApplicationLifetime applicationLifetime;
+    private readonly OutboxMessageProcessingOptions options;
 
     public OutboxMessageProcessing(
         ILogger<OutboxMessageProcessing> logger,
         IServiceProvider serviceProvider,
-        IHostApplicationLifetime applicationLifetime)
+        IHostApplicationLifetime applicationLifetime,
+        IOptions<OutboxMessageProcessingOptions> options)
     {
         this.logger = logger;
         this.serviceProvider = serviceProvider;
         this.applicationLifetime = applicationLifetime;
-    }
-
-    private async Task<bool> WaitForApplicationStarted(CancellationToken stoppingToken)
-    {
-        var taskCompletionSource = new TaskCompletionSource<bool>();
-        await using var r1 = applicationLifetime.ApplicationStarted
-            .Register(() => taskCompletionSource.SetResult(true));
-
-        await using var registration = stoppingToken
-            .Register(() => taskCompletionSource.SetResult(false));
-
-        return await taskCompletionSource.Task;
+        this.options = options.Value;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        if (!await WaitForApplicationStarted(stoppingToken))
-        {
+        if (!await applicationLifetime.WaitForApplicationStarted(stoppingToken))
             return;
-        }
-
-        // TODO: configuration
-        const int batchSize = 10;
-        var delay = TimeSpan.FromSeconds(3);
 
         logger.LogInformation("Outbox message processing started");
 
@@ -53,7 +39,7 @@ public class OutboxMessageProcessing : BackgroundService
 
         while (!stoppingToken.IsCancellationRequested)
         {
-            var messages = bus.GetBatch(batchSize, stoppingToken);
+            var messages = bus.GetBatch(options.BatchSize, stoppingToken);
             await foreach (var message in messages)
             {
                 logger.LogInformation("Processing message {MessageId}", message.MessageId);
@@ -65,7 +51,15 @@ public class OutboxMessageProcessing : BackgroundService
                 logger.LogInformation("Message {MessageId} processed", message.MessageId);
             }
 
-            await Task.Delay(delay, stoppingToken);
+            await Task.Delay(options.Interval, stoppingToken);
         }
     }
+}
+
+internal class OutboxMessageProcessingOptions
+{
+    public const string Name = nameof(OutboxMessageProcessing);
+
+    public TimeSpan Interval { get; set; } = TimeSpan.FromSeconds(3);
+    public int BatchSize { get; set; } = 10;
 }

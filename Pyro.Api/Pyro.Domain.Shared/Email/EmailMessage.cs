@@ -4,7 +4,13 @@
 namespace Pyro.Domain.Shared.Email;
 
 public record EmailMessage(
-    string From,
-    string To,
+    EmailAddress From,
+    EmailAddress To,
     string Subject,
     string Body);
+
+public record EmailAddress(string Name, string Address)
+{
+    public override string ToString()
+        => $"{Name} <{Address}>";
+}

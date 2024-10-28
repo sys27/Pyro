@@ -5,5 +5,4 @@ namespace Pyro.Contracts.Requests.Identity;
 
 public record CreateUserRequest(
     string Login,
-    string Password,
     IEnumerable<string> Roles);

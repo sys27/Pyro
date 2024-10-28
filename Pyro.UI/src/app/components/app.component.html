@@ -10,36 +10,41 @@
           routerLink="/"
           text="true"
           severity="warning" />
-        <p-buttonGroup>
-          <p-button
-            label="Repositories"
-            routerLink="/repositories"
-            outlined="true" />
-          <p-button
-            icon="pi pi-plus"
-            routerLink="/repositories/new"
-            outlined="true" />
-        </p-buttonGroup>
-        <p-buttonGroup>
-          <p-button
-            label="Users"
-            routerLink="/users"
-            outlined="true" />
-          <p-button
-            icon="pi pi-plus"
-            routerLink="/users/new"
-            outlined="true" />
-        </p-buttonGroup>
+
+        @if (isLoggedIn$ | async) {
+          <p-buttonGroup>
+            <p-button
+              label="Repositories"
+              routerLink="/repositories"
+              outlined="true" />
+            <p-button
+              icon="pi pi-plus"
+              routerLink="/repositories/new"
+              outlined="true" />
+          </p-buttonGroup>
+          <p-buttonGroup>
+            <p-button
+              label="Users"
+              routerLink="/users"
+              outlined="true" />
+            <p-button
+              icon="pi pi-plus"
+              routerLink="/users/new"
+              outlined="true" />
+          </p-buttonGroup>
+        }
       </div>
 
       <div class="p-toolbar-group-end gap-2">
-        <p-iconField iconPosition="left">
-          <p-inputIcon styleClass="pi pi-search" />
-          <input
-            type="text"
-            pInputText
-            placeholder="Search" />
-        </p-iconField>
+        @if (isLoggedIn$ | async) {
+          <p-iconField iconPosition="left">
+            <p-inputIcon styleClass="pi pi-search" />
+            <input
+              type="text"
+              pInputText
+              placeholder="Search" />
+          </p-iconField>
+        }
 
         <p-button
           [icon]="themeIcon()"

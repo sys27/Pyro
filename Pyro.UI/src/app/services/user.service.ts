@@ -38,7 +38,6 @@ export class UserService {
     public createUser(user: CreateUser): Observable<void> {
         let request = {
             login: user.login,
-            password: user.password,
             roles: user.roles.map(role => role.name),
         };
 
@@ -59,6 +58,10 @@ export class UserService {
 
     public unlockUser(login: string): Observable<void> {
         return this.httpClient.post<void>(`${Endpoints.Users}/${login}/unlock`, null);
+    }
+
+    public activate(command: ActivateUser): Observable<void> {
+        return this.httpClient.post<void>(`${Endpoints.Users}/activate`, command);
     }
 }
 
@@ -86,12 +89,14 @@ export interface UserItem {
 
 export interface CreateUser {
     login: string;
-
-    password: string;
-
     roles: Role[];
 }
 
 export interface UpdateUser {
     roles: Role[];
+}
+
+export interface ActivateUser {
+    get token(): string;
+    get password(): string;
 }

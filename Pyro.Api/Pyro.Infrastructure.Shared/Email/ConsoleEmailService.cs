@@ -13,7 +13,7 @@ internal class ConsoleEmailService : IEmailService
     public ConsoleEmailService(ILogger<ConsoleEmailService> logger)
         => this.logger = logger;
 
-    public Task SendEmailAsync(EmailMessage emailMessage, CancellationToken cancellationToken = default)
+    public Task SendEmail(EmailMessage emailMessage, CancellationToken cancellationToken = default)
     {
         logger.LogInformation(
             "Sending email message. From: {From}, To: {To}, Subject: {Subject}, Body: {Body}",

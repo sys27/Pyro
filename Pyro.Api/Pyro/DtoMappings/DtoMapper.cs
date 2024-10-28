@@ -13,6 +13,7 @@ public static partial class DtoMapper
 {
     [MapperIgnoreSource(nameof(UserProfile.Id))]
     [MapperIgnoreSource(nameof(UserProfile.Avatar))]
+    [MapperIgnoreSource(nameof(UserProfile.User))]
     public static partial UserProfileResponse ToResponse(this UserProfile request);
 
     public static partial UpdateProfile ToCommand(this UpdateUserProfileRequest request);

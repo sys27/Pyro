@@ -78,7 +78,7 @@ public class GitBackend
                 { "REMOTE_USER", currentUser.Login },
                 { "REMOTE_ADDR", httpContext.Connection.RemoteIpAddress?.ToString() },
                 { "GIT_COMMITTER_NAME", currentUser.Login },
-                { "GIT_COMMITTER_EMAIL", userProfile.Email },
+                { "GIT_COMMITTER_EMAIL", userProfile.User.Email },
             },
         };
 

@@ -7,7 +7,7 @@ using Pyro.Domain.UserProfiles;
 
 namespace Pyro.DomainEventHandlers;
 
-public class UserCreatedHandler : INotificationHandler<UserCreated>
+internal class UserCreatedHandler : INotificationHandler<UserCreated>
 {
     private readonly IMediator mediator;
 
@@ -16,6 +16,7 @@ public class UserCreatedHandler : INotificationHandler<UserCreated>
 
     public async Task Handle(UserCreated notification, CancellationToken cancellationToken)
     {
+        // TODO: move handlers to domain projects and create contracts for commands and events?
         var command = new CreateUserProfile(notification.UserId, notification.Name);
         await mediator.Send(command, cancellationToken);
     }

@@ -10,7 +10,6 @@ namespace Pyro.Domain.Identity.Commands;
 
 public record CreateUser(
     string Login,
-    string Password,
     IEnumerable<string> Roles) : IRequest<User>;
 
 public class CreateUserValidator : AbstractValidator<CreateUser>
@@ -19,11 +18,8 @@ public class CreateUserValidator : AbstractValidator<CreateUser>
     {
         RuleFor(x => x.Login)
             .NotEmpty()
-            .MaximumLength(32);
-
-        RuleFor(x => x.Password)
-            .NotEmpty()
-            .MinimumLength(8);
+            .MaximumLength(32)
+            .EmailAddress();
 
         RuleFor(x => x.Roles)
             .NotEmpty();
@@ -43,8 +39,9 @@ public class CreateUserHandler : IRequestHandler<CreateUser, User>
 
     public async Task<User> Handle(CreateUser request, CancellationToken cancellationToken = default)
     {
-        var (password, salt) = passwordService.GeneratePasswordHash(request.Password);
-        var user = User.Create(request.Login, password, salt);
+        var password = passwordService.GeneratePassword();
+        var (passwordHash, salt) = passwordService.GeneratePasswordHash(password);
+        var user = User.Create(request.Login, passwordHash, salt);
 
         var allRoles = await repository.GetRolesAsync(cancellationToken);
         var invalidRoles = request.Roles.Except(allRoles.Select(x => x.Name)).ToList();
@@ -54,6 +51,8 @@ public class CreateUserHandler : IRequestHandler<CreateUser, User>
         var rolesToAdd = allRoles.Where(x => request.Roles.Contains(x.Name)).ToList();
         foreach (var role in rolesToAdd)
             user.AddRole(role);
+
+        passwordService.GenerateOneTimePasswordFor(user);
 
         await repository.AddUser(user, cancellationToken);
 

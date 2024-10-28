@@ -13,30 +13,31 @@ namespace Pyro.Infrastructure.Identity;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddIdentityInfrastructure(
-        this IServiceCollection services,
-        IConfiguration configuration)
+    public static IHostApplicationBuilder AddIdentityInfrastructure(this IHostApplicationBuilder builder)
     {
+        var services = builder.Services;
+        var configuration = builder.Configuration;
+
         services.AddDbContext<IdentityDbContext>((provider, options) =>
-        {
-            var env = provider.GetRequiredService<IHostEnvironment>();
+            {
+                var env = provider.GetRequiredService<IHostEnvironment>();
 
-            options
-                .UseSqlite(configuration.GetConnectionString("DefaultConnection"))
-                .EnableDetailedErrors(env.IsDevelopment())
-                .EnableSensitiveDataLogging(env.IsDevelopment())
-                .AddInterceptors(provider.GetRequiredService<DomainEventInterceptor>())
-                .ConfigureWarnings(w =>
-                {
+                options
+                    .UseSqlite(configuration.GetConnectionString("DefaultConnection"))
+                    .EnableDetailedErrors(env.IsDevelopment())
+                    .EnableSensitiveDataLogging(env.IsDevelopment())
+                    .AddInterceptors(provider.GetRequiredService<DomainEventInterceptor>())
+                    .ConfigureWarnings(w =>
+                    {
 #if DEBUG
-                    w.Throw(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.MultipleCollectionIncludeWarning);
+                        w.Throw(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.MultipleCollectionIncludeWarning);
 #endif
-                });
-        });
-        services.AddScoped<DbContext, IdentityDbContext>(sp => sp.GetRequiredService<IdentityDbContext>());
-
-        return services
+                    });
+            })
+            .AddScoped<DbContext, IdentityDbContext>(sp => sp.GetRequiredService<IdentityDbContext>())
             .AddScoped<IUserRepository, UserRepository>()
             .AddSingleton<ISigningKeyService, SigningKeyService>();
+
+        return builder;
     }
 }

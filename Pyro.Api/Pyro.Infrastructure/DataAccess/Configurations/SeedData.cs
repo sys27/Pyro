@@ -16,7 +16,6 @@ public static class SeedData
             new UserProfile
             {
                 Id = UserProfile.Pyro,
-                Email = "pyro@localhost.local",
                 Name = "Pyro",
             }
         ];

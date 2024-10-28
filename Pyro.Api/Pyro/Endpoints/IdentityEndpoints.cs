@@ -161,6 +161,27 @@ internal static class IdentityEndpoints
             .WithName("Unlock User")
             .WithOpenApi();
 
+        usersBuilder.MapPost("/activate", async (
+                IMediator mediator,
+                UnitOfWork unitOfWork,
+                ActivateUserRequest request,
+                CancellationToken cancellationToken) =>
+            {
+                var command = request.ToCommand();
+                await mediator.Send(command, cancellationToken);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
+
+                return Results.Ok();
+            })
+            .AllowAnonymous()
+            .Produces(200)
+            .ProducesValidationProblem()
+            .Produces(401)
+            .Produces(403)
+            .ProducesProblem(500)
+            .WithName("Activate User")
+            .WithOpenApi();
+
         var accessTokenBuilder = usersBuilder.MapGroup("/access-tokens")
             .WithTags("Access Tokens");
 

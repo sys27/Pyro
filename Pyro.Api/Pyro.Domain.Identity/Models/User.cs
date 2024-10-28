@@ -14,6 +14,7 @@ public class User : DomainEntity
     private readonly List<Role> roles = [];
     private readonly List<AuthenticationToken> authenticationTokens = [];
     private readonly List<AccessToken> accessTokens = [];
+    private readonly List<OneTimePassword> oneTimePasswords = [];
 
     private byte[] password = [];
     private byte[] salt = [];
@@ -25,6 +26,7 @@ public class User : DomainEntity
             Login = login,
             Password = password,
             Salt = salt,
+            IsLocked = true,
         };
         user.PublishEvent(new UserCreated(user.Id, login));
 
@@ -77,6 +79,9 @@ public class User : DomainEntity
 
     public IReadOnlyList<AccessToken> AccessTokens
         => accessTokens;
+
+    public IReadOnlyList<OneTimePassword> OneTimePasswords
+        => oneTimePasswords;
 
     public void Lock()
     {
@@ -136,5 +141,43 @@ public class User : DomainEntity
                           throw new NotFoundException("Access token not found");
 
         accessTokens.Remove(accessToken);
+    }
+
+    public void AddOneTimePassword(OneTimePassword oneTimePassword)
+    {
+        if (oneTimePasswords.Any(x => x.Token == oneTimePassword.Token))
+            return;
+
+        oneTimePasswords.Add(oneTimePassword);
+    }
+
+    public OneTimePassword? GetOneTimePassword(string token)
+        => oneTimePasswords.FirstOrDefault(x => x.Token == token);
+
+    public OneTimePassword? GetRegistrationOneTimePassword()
+        => oneTimePasswords.FirstOrDefault(x => x.IsUserRegistration);
+
+    private void DeleteOneTimePassword(OneTimePassword oneTimePassword)
+        => oneTimePasswords.Remove(oneTimePassword);
+
+    public void Activate(
+        TimeProvider timeProvider,
+        OneTimePassword oneTimePassword,
+        byte[] newPassword,
+        byte[] newSalt)
+    {
+        if (oneTimePassword is null)
+            throw new ArgumentNullException(nameof(oneTimePassword));
+
+        if (oneTimePassword.ExpiresAt < timeProvider.GetUtcNow())
+            throw new DomainException($"The token '{oneTimePassword.Token}' is expired");
+
+        if (!IsLocked)
+            throw new DomainException($"The user '{Login}' is already activated.");
+
+        password = newPassword;
+        salt = newSalt;
+        Unlock();
+        DeleteOneTimePassword(oneTimePassword);
     }
 }

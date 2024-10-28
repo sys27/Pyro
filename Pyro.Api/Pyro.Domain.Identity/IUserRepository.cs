@@ -20,6 +20,10 @@ public interface IUserRepository
         string login,
         CancellationToken cancellationToken = default);
 
+    Task<User?> GetUserByToken(
+        string token,
+        CancellationToken cancellationToken = default);
+
     Task<User> AddUser(User user, CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<Role>> GetRolesAsync(CancellationToken cancellationToken = default);

@@ -11,9 +11,9 @@ public class UserProfile : Entity
 
     public required string Name { get; set; }
 
-    public string? Email { get; init; }
-
     public string? Status { get; set; }
 
     public UserAvatar? Avatar { get; init; }
+
+    public User User { get; init; } = null!;
 }
