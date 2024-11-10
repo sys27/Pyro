@@ -6,7 +6,6 @@ using Hellang.Middleware.ProblemDetails;
 using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.StaticFiles;
-using Microsoft.Extensions.FileProviders;
 using Pyro;
 using Pyro.Domain.Identity;
 using Pyro.Domain.Identity.Models;
@@ -56,6 +55,7 @@ builder.Services.AddMediatR(c => c
     .AddOpenBehavior(typeof(ValidatorPipeline<,>)));
 
 builder.Services.AddAuth();
+builder.Services.AddSpa();
 
 var app = builder.Build();
 
@@ -64,17 +64,7 @@ app.UseProblemDetails();
 if (!app.Environment.IsDevelopment())
 {
     app.UseHsts();
-
-    app.UseFileServer(new FileServerOptions
-    {
-        EnableDefaultFiles = true,
-        EnableDirectoryBrowsing = false,
-        FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")),
-        DefaultFilesOptions =
-        {
-            DefaultFileNames = ["index.html"],
-        },
-    });
+    app.UseSpa();
 }
 
 app.UseAuthentication();
