@@ -38,6 +38,9 @@ internal class IdentityClient : BaseClient
     public async Task ActivateUser(ActivateUserRequest request)
         => await Post($"/api/users/activate", request);
 
+    public async Task ChangePassword(ChangePasswordRequest request)
+        => await Post("/api/users/change-password", request);
+
     public async Task<IReadOnlyList<AccessTokenResponse>?> GetAccessTokens()
         => await Get<IReadOnlyList<AccessTokenResponse>>("/api/users/access-tokens");
 

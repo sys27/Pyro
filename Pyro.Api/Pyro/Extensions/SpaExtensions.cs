@@ -7,23 +7,26 @@ namespace Pyro.Extensions;
 
 internal static class SpaExtensions
 {
-    public static IServiceCollection AddSpa(this IServiceCollection services)
+    public static IHostApplicationBuilder AddSpa(this IHostApplicationBuilder builder)
     {
-        var fileServerOptions = new FileServerOptions
+        if (!builder.Environment.IsDevelopment())
         {
-            EnableDefaultFiles = true,
-            EnableDirectoryBrowsing = false,
-            FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")),
-            DefaultFilesOptions =
+            var fileServerOptions = new FileServerOptions
             {
-                DefaultFileNames = ["index.html"],
-            },
-        };
-        services.AddSingleton(fileServerOptions);
-        services.AddSingleton(fileServerOptions.DefaultFilesOptions);
-        services.AddSingleton(fileServerOptions.StaticFileOptions);
+                EnableDefaultFiles = true,
+                EnableDirectoryBrowsing = false,
+                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")),
+                DefaultFilesOptions =
+                {
+                    DefaultFileNames = ["index.html"],
+                },
+            };
+            builder.Services.AddSingleton(fileServerOptions);
+            builder.Services.AddSingleton(fileServerOptions.DefaultFilesOptions);
+            builder.Services.AddSingleton(fileServerOptions.StaticFileOptions);
+        }
 
-        return services;
+        return builder;
     }
 
     public static IApplicationBuilder UseSpa(this IApplicationBuilder app)

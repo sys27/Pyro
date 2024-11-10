@@ -1,4 +1,9 @@
-import { loggedInAction, loggedOutAction, refreshedAction } from '@actions/auth.actions';
+import {
+    loggedInAction,
+    loggedOutAction,
+    logoutFailedAction,
+    refreshedAction,
+} from '@actions/auth.actions';
 import { CurrentUser } from '@models/current-user';
 import { ActionReducer, createReducer, INIT, on } from '@ngrx/store';
 import { AppState } from '@states/app.state';
@@ -19,6 +24,7 @@ export const authReducer = createReducer(
     ),
     on(
         loggedOutAction,
+        logoutFailedAction,
         (state): AuthState => ({
             ...state,
 
@@ -68,7 +74,10 @@ export function saveStateReducer(reducer: ActionReducer<AppState>): ActionReduce
             }
         } else if (action.type === loggedInAction.type || action.type === refreshedAction.type) {
             localStorage.setItem(localStorageKey, JSON.stringify(result.auth));
-        } else if (action.type === loggedOutAction.type) {
+        } else if (
+            action.type === loggedOutAction.type ||
+            action.type === logoutFailedAction.type
+        ) {
             localStorage.removeItem(localStorageKey);
         }
 

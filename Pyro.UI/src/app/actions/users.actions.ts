@@ -51,3 +51,10 @@ export const updateUserFailure = createAction('[Users] Update User Failure');
 export const loadUser = createAction('[Users] Load User', props<{ login: string }>());
 export const loadUserSuccess = createAction('[Users] Load User Success', props<{ user: User }>());
 export const loadUserFailure = createAction('[Users] Load User Failure');
+
+export const changePassword = createAction(
+    '[Users] Change Password',
+    props<{ oldPassword: string; newPassword: string }>(),
+);
+export const changePasswordSuccess = createAction('[Users] Change Password Success');
+export const changePasswordFailure = createAction('[Users] Change Password Failure');
