@@ -40,7 +40,7 @@ public class User : DomainEntity
         get => password;
 
         [MemberNotNull(nameof(password))]
-        init
+        set
         {
             if (value is null)
                 throw new DomainValidationException("Password cannot be null.");
@@ -57,7 +57,7 @@ public class User : DomainEntity
         get => salt;
 
         [MemberNotNull(nameof(salt))]
-        init
+        set
         {
             if (value is null)
                 throw new DomainValidationException("Salt cannot be null.");
@@ -141,6 +141,16 @@ public class User : DomainEntity
                           throw new NotFoundException("Access token not found");
 
         accessTokens.Remove(accessToken);
+    }
+
+    public void ChangePassword(IPasswordService passwordService, string oldPassword, string newPassword)
+    {
+        if (!passwordService.VerifyPassword(oldPassword, password, salt))
+            throw new DomainException("The old password is incorrect.");
+
+        var (newPasswordHash, newSalt) = passwordService.GeneratePasswordHash(newPassword);
+        Password = newPasswordHash;
+        Salt = newSalt;
     }
 
     public void AddOneTimePassword(OneTimePassword oneTimePassword)

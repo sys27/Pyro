@@ -63,6 +63,10 @@ export class UserService {
     public activate(command: ActivateUser): Observable<void> {
         return this.httpClient.post<void>(`${Endpoints.Users}/activate`, command);
     }
+
+    public changePassword(command: ChangePassword): Observable<void> {
+        return this.httpClient.post<void>(`${Endpoints.Users}/change-password`, command);
+    }
 }
 
 export interface Permission {
@@ -99,4 +103,9 @@ export interface UpdateUser {
 export interface ActivateUser {
     get token(): string;
     get password(): string;
+}
+
+export interface ChangePassword {
+    get oldPassword(): string;
+    get newPassword(): string;
 }

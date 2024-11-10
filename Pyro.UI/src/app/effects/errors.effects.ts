@@ -37,6 +37,7 @@ import {
 } from '@actions/repository.actions';
 import { loadRolesFailure } from '@actions/roles.actions';
 import {
+    changePasswordFailure,
     createUserFailure,
     loadUserFailure,
     loadUsersFailure,
@@ -91,6 +92,7 @@ export const errorsEffect = createEffect(
                 createIssueFailure,
                 editIssueFailure,
                 loadIssueFailure,
+                changePasswordFailure,
             ),
             tap(() =>
                 messageService.add({

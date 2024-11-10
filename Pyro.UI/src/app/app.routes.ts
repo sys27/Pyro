@@ -29,6 +29,7 @@ import {
 import {
     AccessTokenListComponent,
     AccessTokenNewComponent,
+    ChangePasswordComponent,
     ProfileEditComponent,
     SettingsComponent,
 } from './components/settings';
@@ -161,7 +162,11 @@ export const routes: Routes = [
                 path: 'access-tokens',
                 component: AccessTokenListComponent,
                 canActivate: [authGuard()],
-                children: [],
+            },
+            {
+                path: 'change-password',
+                component: ChangePasswordComponent,
+                canActivate: [authGuard()],
             },
             { path: '', redirectTo: 'profile', pathMatch: 'full' },
         ],

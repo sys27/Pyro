@@ -1,18 +1,16 @@
-import { refreshAction, refreshedAction } from '@actions/auth.actions';
+import { refreshAction, refreshedAction, refreshFailedAction } from '@actions/auth.actions';
 import { HttpContextToken, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { Router } from '@angular/router';
 import { Actions, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { AppState } from '@states/app.state';
 import { selectCurrentUser } from '@states/auth.state';
-import { catchError, map, of, switchMap, take, throwError } from 'rxjs';
+import { map, of, race, switchMap, take } from 'rxjs';
 import { Endpoints } from '../endpoints';
 
 export const ALLOW_ANONYMOUS = new HttpContextToken<boolean>(() => false);
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-    let router = inject(Router);
     let store: Store<AppState> = inject(Store<AppState>);
     let actions$ = inject(Actions);
 
@@ -30,15 +28,15 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
                 // TODO: catch errors
                 // TODO: handle multiple requests
-                return actions$.pipe(
-                    ofType(refreshedAction),
-                    take(1),
-                    map(({ currentUser }) => currentUser),
-                    catchError(error => {
-                        router.navigate(['/login']);
-
-                        return throwError(() => error);
-                    }),
+                return race(
+                    actions$.pipe(
+                        ofType(refreshedAction),
+                        map(({ currentUser }) => currentUser),
+                    ),
+                    actions$.pipe(
+                        ofType(refreshFailedAction),
+                        map(() => null),
+                    ),
                 );
             }
 

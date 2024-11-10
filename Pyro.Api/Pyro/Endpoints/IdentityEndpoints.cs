@@ -182,6 +182,26 @@ internal static class IdentityEndpoints
             .WithName("Activate User")
             .WithOpenApi();
 
+        usersBuilder.MapPost("/change-password", async (
+                IMediator mediator,
+                UnitOfWork unitOfWork,
+                ChangePasswordRequest request,
+                CancellationToken cancellationToken) =>
+            {
+                var command = request.ToCommand();
+                await mediator.Send(command, cancellationToken);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
+
+                return Results.Ok();
+            })
+            .Produces(200)
+            .ProducesValidationProblem()
+            .Produces(401)
+            .Produces(403)
+            .ProducesProblem(500)
+            .WithName("Change Password")
+            .WithOpenApi();
+
         var accessTokenBuilder = usersBuilder.MapGroup("/access-tokens")
             .WithTags("Access Tokens");
 

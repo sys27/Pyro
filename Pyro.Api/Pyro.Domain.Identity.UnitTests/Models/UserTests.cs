@@ -270,4 +270,44 @@ public class UserTests
             Assert.That(user.OneTimePasswords, Is.Empty);
         });
     }
+
+    [Test]
+    public void ChangeIncorrectPassword()
+    {
+        const string oldPassword = "password";
+
+        var passwordService = new PasswordService(TimeProvider.System);
+        var (passwordHash, salt) = passwordService.GeneratePasswordHash(oldPassword);
+        var user = new User
+        {
+            Login = "test@localhost.local",
+            Password = passwordHash,
+            Salt = salt,
+        };
+
+        Assert.Throws<DomainException>(() => user.ChangePassword(passwordService, "incorrect", "newPassword"));
+    }
+
+    [Test]
+    public void ChangePassword()
+    {
+        const string oldPassword = "password";
+
+        var passwordService = new PasswordService(TimeProvider.System);
+        var (passwordHash, salt) = passwordService.GeneratePasswordHash(oldPassword);
+        var user = new User
+        {
+            Login = "test@localhost.local",
+            Password = passwordHash,
+            Salt = salt,
+        };
+
+        user.ChangePassword(passwordService, oldPassword, "newPassword");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(user.Password, Is.Not.EqualTo(passwordHash));
+            Assert.That(user.Salt, Is.Not.EqualTo(salt));
+        });
+    }
 }

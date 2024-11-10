@@ -1,6 +1,9 @@
 import { notifyAction } from '@actions/notification.actions';
 import { loadRoles } from '@actions/roles.actions';
 import {
+    changePassword,
+    changePasswordFailure,
+    changePasswordSuccess,
     createUser,
     createUserFailure,
     createUserSuccess,
@@ -29,7 +32,7 @@ import { Router } from '@angular/router';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { concatLatestFrom } from '@ngrx/operators';
 import { Store } from '@ngrx/store';
-import { UserService } from '@services/user.service';
+import { ChangePassword, UserService } from '@services/user.service';
 import { AppState } from '@states/app.state';
 import { selectCurrentPage } from '@states/paged.state';
 import { selectUsers } from '@states/users.state';
@@ -202,6 +205,38 @@ export const loadUserEffect = createEffect(
             switchMap(({ login }) => service.getUser(login)),
             map(user => loadUserSuccess({ user })),
             catchError(() => of(loadUserFailure())),
+        );
+    },
+    { functional: true },
+);
+
+export const changePasswordEffect = createEffect(
+    (actions$ = inject(Actions), userService = inject(UserService)) => {
+        return actions$.pipe(
+            ofType(changePassword),
+            switchMap(({ oldPassword, newPassword }) => {
+                let command: ChangePassword = { oldPassword, newPassword };
+
+                return userService.changePassword(command);
+            }),
+            map(() => changePasswordSuccess()),
+            catchError(() => of(changePasswordFailure())),
+        );
+    },
+    { functional: true },
+);
+
+export const changePasswordSuccessEffect = createEffect(
+    (actions$ = inject(Actions)) => {
+        return actions$.pipe(
+            ofType(changePasswordSuccess),
+            map(() =>
+                notifyAction({
+                    title: 'Password changed',
+                    message: 'Password has been changed',
+                    severity: 'success',
+                }),
+            ),
         );
     },
     { functional: true },

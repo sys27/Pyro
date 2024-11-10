@@ -55,7 +55,7 @@ builder.Services.AddMediatR(c => c
     .AddOpenBehavior(typeof(ValidatorPipeline<,>)));
 
 builder.Services.AddAuth();
-builder.Services.AddSpa();
+builder.AddSpa();
 
 var app = builder.Build();
 

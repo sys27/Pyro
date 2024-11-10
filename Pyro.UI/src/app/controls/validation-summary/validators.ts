@@ -118,8 +118,8 @@ export class Validators {
         controlName2: [string, string],
     ): ValidatorFn {
         return form => {
-            let control1 = form.get(controlName1);
-            let control2 = form.get(controlName2);
+            let control1 = form.get(controlName1[0]);
+            let control2 = form.get(controlName2[0]);
 
             if (!control1 || !control2) {
                 return null;
@@ -129,7 +129,7 @@ export class Validators {
                 return null;
             }
 
-            return { sameAs: `The '${controlName1}' and the '${controlName2}' fields must match` };
+            return { sameAs: `The '${controlName1[1]}' and the '${controlName2[1]}' fields must match` };
         };
     }
 

@@ -92,6 +92,36 @@ public class UserTests
     }
 
     [Test]
+    public async Task ChangePassword()
+    {
+        var login = faker.Internet.Email();
+        var createRequest = new CreateUserRequest(
+            login,
+            ["Admin"]);
+        await client.CreateUser(createRequest);
+
+        var message = Api.Smtp.WaitForMessage(x => x.To == login) ??
+                      throw new InvalidOperationException("The message was not found.");
+        var token = message.GetToken();
+        var password = faker.Random.Hash();
+        var activateUserRequest = new ActivateUserRequest(token, password);
+        await client.ActivateUser(activateUserRequest);
+
+        using var identityClient = new IdentityClient(Api.BaseAddress);
+        await identityClient.Login(login, password);
+
+        var newPassword = faker.Random.Hash();
+        var changePasswordRequest = new ChangePasswordRequest(password, newPassword);
+        await identityClient.ChangePassword(changePasswordRequest);
+        await identityClient.Logout();
+
+        await identityClient.Login(login, newPassword);
+        var user = identityClient.GetUser(login);
+
+        Assert.That(user, Is.Not.Null);
+    }
+
+    [Test]
     public async Task CreateGetDeleteAccessToken()
     {
         var createRequest = new CreateAccessTokenRequest(
