@@ -27,3 +27,4 @@ README.md
 **/*.db-shm
 **/*.db-wal
 **/dist
+**/.angular
