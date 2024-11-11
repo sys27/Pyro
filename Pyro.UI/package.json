@@ -25,7 +25,7 @@
     "@ngrx/router-store": "18.1.1",
     "@ngrx/store": "18.1.1",
     "@ngrx/store-devtools": "18.1.1",
-    "dompurify": "3.1.7",
+    "dompurify": "3.2.0",
     "highlight.js": "11.10.0",
     "marked": "14.1.4",
     "marked-alert": "2.1.2",
