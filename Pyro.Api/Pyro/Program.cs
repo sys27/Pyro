@@ -55,6 +55,7 @@ builder.Services.AddMediatR(c => c
     .AddOpenBehavior(typeof(ValidatorPipeline<,>)));
 
 builder.Services.AddAuth();
+builder.Services.AddOpenApi();
 builder.AddSpa();
 
 var app = builder.Build();
@@ -85,6 +86,7 @@ app.MapHub<PyroHub>(
     .RequireAuthorization();
 
 app.MapGitBackendEndpoints();
+app.MapOpenApi();
 
 app.ApplyMigrations();
 app.Run();
