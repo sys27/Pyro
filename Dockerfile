@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0.403-alpine3.20 AS build
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:9.0.100-alpine3.20 AS build
 ARG BUILD_CONFIGURATION=Release
 ARG TARGETOS
 ARG TARGETARCH
@@ -47,7 +47,7 @@ COPY Pyro.UI .
 RUN npm run lint
 RUN npm run build
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0.10-alpine3.20 AS final
+FROM mcr.microsoft.com/dotnet/aspnet:9.0.0-alpine3.20 AS final
 EXPOSE 80
 HEALTHCHECK --interval=5s --timeout=5s CMD wget http://localhost/health -q -O - > /dev/null 2>&1
 
