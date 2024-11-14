@@ -18,12 +18,13 @@ using Pyro.Infrastructure.Identity;
 using Pyro.Infrastructure.Issues;
 using Pyro.Infrastructure.Shared;
 using Pyro.Services;
+using Scalar.AspNetCore;
 using User = Pyro.Domain.Identity.Models.User;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddProblemDetails(builder.Environment);
+builder.Services.AddPyroProblemDetails(builder.Environment);
 builder.Services.AddHealthChecks();
 
 builder.Services.AddHttpContextAccessor();
@@ -55,7 +56,7 @@ builder.Services.AddMediatR(c => c
     .AddOpenBehavior(typeof(ValidatorPipeline<,>)));
 
 builder.Services.AddAuth();
-builder.Services.AddOpenApi();
+builder.Services.AddPyroOpenApi();
 builder.AddSpa();
 
 var app = builder.Build();
@@ -87,6 +88,7 @@ app.MapHub<PyroHub>(
 
 app.MapGitBackendEndpoints();
 app.MapOpenApi();
+app.MapScalarApiReference();
 
 app.ApplyMigrations();
 app.Run();

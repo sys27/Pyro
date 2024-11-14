@@ -9,7 +9,7 @@ namespace Pyro.Extensions;
 
 internal static class ProblemDetailsExtensions
 {
-    public static IServiceCollection AddProblemDetails(
+    public static IServiceCollection AddPyroProblemDetails(
         this IServiceCollection services,
         IWebHostEnvironment environment)
     {
