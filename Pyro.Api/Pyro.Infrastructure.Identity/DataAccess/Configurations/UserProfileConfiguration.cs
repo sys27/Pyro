@@ -3,9 +3,9 @@
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Pyro.Domain.UserProfiles;
+using Pyro.Domain.Identity.Models;
 
-namespace Pyro.Infrastructure.DataAccess.Configurations.UserProfiles;
+namespace Pyro.Infrastructure.Identity.DataAccess.Configurations;
 
 internal class UserProfileConfiguration : IEntityTypeConfiguration<UserProfile>
 {
@@ -25,15 +25,6 @@ internal class UserProfileConfiguration : IEntityTypeConfiguration<UserProfile>
 
         builder.Property(x => x.Status)
             .HasMaxLength(200);
-
-        builder.HasOne(x => x.Avatar)
-            .WithOne()
-            .HasForeignKey<UserAvatar>(x => x.Id);
-
-        builder.HasOne(x => x.User)
-            .WithOne()
-            .HasForeignKey<User>(x => x.Id)
-            .HasPrincipalKey<UserProfile>(x => x.Id);
 
         builder.HasData(SeedData.UserProfiles);
     }

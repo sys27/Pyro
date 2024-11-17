@@ -51,8 +51,7 @@ public class ActivateUserHandler : IRequestHandler<ActivateUser>
             return;
         }
 
-        var (passwordHash, salt) = passwordService.GeneratePasswordHash(request.Password);
-        user.Activate(timeProvider, token, passwordHash, salt);
+        user.Activate(timeProvider, passwordService, token, request.Password);
 
         logger.LogInformation("User '{Login}' activated", user.Login);
     }

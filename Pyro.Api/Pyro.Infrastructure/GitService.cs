@@ -8,7 +8,6 @@ using Microsoft.Extensions.Options;
 using Pyro.Domain.Git;
 using Pyro.Domain.GitRepositories;
 using Pyro.Domain.Shared.Exceptions;
-using Pyro.Domain.UserProfiles;
 
 namespace Pyro.Infrastructure;
 
@@ -19,18 +18,15 @@ internal class GitService : IGitService
     private readonly GitOptions options;
     private readonly ILogger<GitService> logger;
     private readonly TimeProvider timeProvider;
-    private readonly IUserProfileRepository profileRepository;
 
     public GitService(
         IOptions<GitOptions> options,
         ILogger<GitService> logger,
-        TimeProvider timeProvider,
-        IUserProfileRepository profileRepository)
+        TimeProvider timeProvider)
     {
         this.options = options.Value;
         this.logger = logger;
         this.timeProvider = timeProvider;
-        this.profileRepository = profileRepository;
     }
 
     private string GetGitPath(GitRepository repository)
@@ -54,9 +50,6 @@ internal class GitService : IGitService
         GitRepository gitRepo,
         CancellationToken cancellationToken = default)
     {
-        var pyroUser = await profileRepository.GetUserProfile(UserProfile.Pyro, cancellationToken) ??
-                       throw new DomainException("Pyro user not found");
-
         var gitPath = GetGitPath(gitRepo);
         gitPath = Repository.Init(gitPath, true);
 
@@ -74,7 +67,10 @@ internal class GitService : IGitService
         var clonePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
         clonePath = Repository.Clone(gitPath, clonePath);
 
-        var identity = new Identity(pyroUser.Name, pyroUser.User.Email);
+        // TODO: use user identity
+        const string pyroName = "Pyro";
+        const string pyroEmail = "pyro@localhost.local";
+        var identity = new Identity(pyroName, pyroEmail);
         var signature = new Signature(identity, timeProvider.GetUtcNow());
         using var repo = new Repository(clonePath, new RepositoryOptions { Identity = identity });
 

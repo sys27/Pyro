@@ -3,17 +3,11 @@
 
 using Pyro.Domain.Shared.Entities;
 
-namespace Pyro.Domain.UserProfiles;
+namespace Pyro.Domain.Identity.Models;
 
 public class UserProfile : Entity
 {
-    public static readonly Guid Pyro = Guid.Parse("F9BA057A-35B0-4D10-8326-702D8F7EC966");
-
     public required string Name { get; set; }
 
     public string? Status { get; set; }
-
-    public UserAvatar? Avatar { get; init; }
-
-    public User User { get; init; } = null!;
 }

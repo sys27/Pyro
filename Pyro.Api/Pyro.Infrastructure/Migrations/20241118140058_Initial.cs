@@ -57,46 +57,36 @@ namespace Pyro.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserProfiles",
+                name: "Labels",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
                     Name = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
-                    Email = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
-                    Status = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true)
+                    Color = table.Column<int>(type: "INTEGER", nullable: false),
+                    GitRepositoryId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    IsDisabled = table.Column<bool>(type: "INTEGER", nullable: false, defaultValue: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserProfile", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "UserAvatars",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Image = table.Column<byte[]>(type: "BLOB", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserAvatar", x => x.Id);
+                    table.PrimaryKey("PK_Label", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_UserAvatars_UserProfiles_Id",
-                        column: x => x.Id,
-                        principalTable: "UserProfiles",
+                        name: "FK_Labels_GitRepositories_GitRepositoryId",
+                        column: x => x.GitRepositoryId,
+                        principalTable: "GitRepositories",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
-
-            migrationBuilder.InsertData(
-                table: "UserProfiles",
-                columns: new[] { "Id", "Email", "Name", "Status" },
-                values: new object[] { new Guid("f9ba057a-35b0-4d10-8326-702d8f7ec966"), "pyro@localhost.local", "Pyro", null });
 
             migrationBuilder.CreateIndex(
                 name: "IX_GitRepository_Name",
                 table: "GitRepositories",
                 column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Label_Name",
+                table: "Labels",
+                columns: new[] { "GitRepositoryId", "Name" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -112,16 +102,13 @@ namespace Pyro.Infrastructure.Migrations
                 name: "DataProtectionKeys");
 
             migrationBuilder.DropTable(
-                name: "GitRepositories");
+                name: "Labels");
 
             migrationBuilder.DropTable(
                 name: "OutboxMessages");
 
             migrationBuilder.DropTable(
-                name: "UserAvatars");
-
-            migrationBuilder.DropTable(
-                name: "UserProfiles");
+                name: "GitRepositories");
         }
     }
 }

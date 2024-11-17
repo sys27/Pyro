@@ -3,7 +3,7 @@
 
 using Microsoft.Extensions.Options;
 
-namespace Pyro.Infrastructure.Shared.Email;
+namespace Pyro.Domain.Shared.Email;
 
 public class EmailServiceOptions : IValidateOptions<EmailServiceOptions>
 {

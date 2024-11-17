@@ -8,9 +8,9 @@ using System.IO.Pipelines;
 using System.Text;
 using Microsoft.Extensions.Options;
 using Pyro.Domain.GitRepositories;
+using Pyro.Domain.Identity;
 using Pyro.Domain.Shared.CurrentUserProvider;
 using Pyro.Domain.Shared.Exceptions;
-using Pyro.Domain.UserProfiles;
 using Pyro.Infrastructure;
 
 namespace Pyro.Services;
@@ -21,7 +21,7 @@ public class GitBackend
     private readonly IOptions<GitOptions> gitOptions;
     private readonly IGitRepositoryRepository repository;
     private readonly ICurrentUserProvider currentUserProvider;
-    private readonly IUserProfileRepository userProfileRepository;
+    private readonly IUserRepository userRepository;
 
     // TODO: move to infrastructure?
     // TODO: remove HttpContent dependency
@@ -30,7 +30,7 @@ public class GitBackend
         IOptions<GitOptions> gitOptions,
         IGitRepositoryRepository repository,
         ICurrentUserProvider currentUserProvider,
-        IUserProfileRepository userProfileRepository)
+        IUserRepository userRepository)
     {
         this.httpContext = httpContextAccessor.HttpContext ??
                            throw new ArgumentNullException(null, "HttpContext is not available");
@@ -38,7 +38,7 @@ public class GitBackend
         this.gitOptions = gitOptions;
         this.repository = repository;
         this.currentUserProvider = currentUserProvider;
-        this.userProfileRepository = userProfileRepository;
+        this.userRepository = userRepository;
     }
 
     public async Task Handle(string repositoryName, CancellationToken cancellationToken = default)
@@ -47,8 +47,8 @@ public class GitBackend
                             throw new NotFoundException("Repository not found");
 
         var currentUser = currentUserProvider.GetCurrentUser();
-        var userProfile = await userProfileRepository.GetUserProfile(currentUser.Id, cancellationToken) ??
-                          throw new NotFoundException("User profile not found");
+        var user = await userRepository.GetUserById(currentUser.Id, cancellationToken) ??
+                   throw new NotFoundException($"User '{currentUser.Id}' not found");
 
         var basePath = gitOptions.Value.BasePath;
         var gitPath = Path.Combine(basePath, $"{gitRepository.Name}.git");
@@ -77,8 +77,8 @@ public class GitBackend
                 { "HTTP_CONTENT_ENCODING", httpContext.Request.Headers.ContentEncoding },
                 { "REMOTE_USER", currentUser.Login },
                 { "REMOTE_ADDR", httpContext.Connection.RemoteIpAddress?.ToString() },
-                { "GIT_COMMITTER_NAME", currentUser.Login },
-                { "GIT_COMMITTER_EMAIL", userProfile.User.Email },
+                { "GIT_COMMITTER_NAME", user.Profile.Name },
+                { "GIT_COMMITTER_EMAIL", user.Login },
             },
         };
 

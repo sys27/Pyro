@@ -8,7 +8,6 @@ using Microsoft.Extensions.Hosting;
 using Pyro.Domain.Git;
 using Pyro.Domain.GitRepositories;
 using Pyro.Domain.Shared.Messaging;
-using Pyro.Domain.UserProfiles;
 using Pyro.Infrastructure.DataAccess;
 using Pyro.Infrastructure.Messaging;
 using Pyro.Infrastructure.Shared.DataAccess;
@@ -43,8 +42,7 @@ public static class ServiceCollectionExtensions
             .AddScoped<DbContext, PyroDbContext>(sp => sp.GetRequiredService<PyroDbContext>())
             .AddScoped<IBus, Bus>()
             .AddScoped<IGitService, GitService>()
-            .AddScoped<IGitRepositoryRepository, GitRepositoryRepository>()
-            .AddScoped<IUserProfileRepository, UserProfileRepository>();
+            .AddScoped<IGitRepositoryRepository, GitRepositoryRepository>();
 
         return builder;
     }

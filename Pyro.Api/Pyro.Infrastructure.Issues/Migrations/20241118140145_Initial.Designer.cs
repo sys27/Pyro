@@ -11,14 +11,14 @@ using Pyro.Infrastructure.Issues.DataAccess;
 namespace Pyro.Infrastructure.Issues.Migrations
 {
     [DbContext(typeof(IssuesDbContext))]
-    [Migration("20240917153755_AddIssueChangeLogs")]
-    partial class AddIssueChangeLogs
+    [Migration("20241118140145_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "8.0.8");
+            modelBuilder.HasAnnotation("ProductVersion", "9.0.0");
 
             modelBuilder.Entity("Pyro.Domain.Issues.GitRepository", b =>
                 {
@@ -172,11 +172,9 @@ namespace Pyro.Infrastructure.Issues.Migrations
                     b.HasKey("Id")
                         .HasName("PK_IssueStatuses");
 
-                    b.HasIndex("Name")
+                    b.HasIndex("RepositoryId", "Name")
                         .IsUnique()
                         .HasDatabaseName("IX_IssueStatuses_Name");
-
-                    b.HasIndex("RepositoryId");
 
                     b.ToTable("IssueStatuses", (string)null);
                 });
@@ -226,9 +224,7 @@ namespace Pyro.Infrastructure.Issues.Migrations
                     b.HasKey("Id")
                         .HasName("PK_Label");
 
-                    b.HasIndex("GitRepositoryId");
-
-                    b.HasIndex("Name")
+                    b.HasIndex("GitRepositoryId", "Name")
                         .IsUnique()
                         .HasDatabaseName("IX_Label_Name");
 

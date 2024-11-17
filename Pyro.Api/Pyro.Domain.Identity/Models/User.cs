@@ -18,6 +18,7 @@ public class User : DomainEntity
 
     private byte[] password = [];
     private byte[] salt = [];
+    private DateTimeOffset passwordExpiresAt;
 
     public static User Create(string login, byte[] password, byte[] salt)
     {
@@ -26,7 +27,9 @@ public class User : DomainEntity
             Login = login,
             Password = password,
             Salt = salt,
+            PasswordExpiresAt = DateTimeOffset.MinValue,
             IsLocked = true,
+            Profile = new UserProfile { Name = login },
         };
         user.PublishEvent(new UserCreated(user.Id, login));
 
@@ -69,6 +72,12 @@ public class User : DomainEntity
         }
     }
 
+    public DateTimeOffset PasswordExpiresAt
+    {
+        get => passwordExpiresAt;
+        init => passwordExpiresAt = value;
+    }
+
     public bool IsLocked { get; private set; }
 
     public IReadOnlyList<Role> Roles
@@ -82,6 +91,8 @@ public class User : DomainEntity
 
     public IReadOnlyList<OneTimePassword> OneTimePasswords
         => oneTimePasswords;
+
+    public required UserProfile Profile { get; init; }
 
     public void Lock()
     {
@@ -143,14 +154,24 @@ public class User : DomainEntity
         accessTokens.Remove(accessToken);
     }
 
-    public void ChangePassword(IPasswordService passwordService, string oldPassword, string newPassword)
+    private void ChangePassword(TimeProvider timeProvider, IPasswordService passwordService, string newPassword)
+    {
+        var (newPasswordHash, newSalt) = passwordService.GeneratePasswordHash(newPassword);
+        Password = newPasswordHash;
+        Salt = newSalt;
+        passwordExpiresAt = timeProvider.GetUtcNow().AddDays(90); // TODO: config
+    }
+
+    public void ChangePassword(
+        TimeProvider timeProvider,
+        IPasswordService passwordService,
+        string oldPassword,
+        string newPassword)
     {
         if (!passwordService.VerifyPassword(oldPassword, password, salt))
             throw new DomainException("The old password is incorrect.");
 
-        var (newPasswordHash, newSalt) = passwordService.GeneratePasswordHash(newPassword);
-        Password = newPasswordHash;
-        Salt = newSalt;
+        ChangePassword(timeProvider, passwordService, newPassword);
     }
 
     public void AddOneTimePassword(OneTimePassword oneTimePassword)
@@ -172,9 +193,9 @@ public class User : DomainEntity
 
     public void Activate(
         TimeProvider timeProvider,
+        IPasswordService passwordService,
         OneTimePassword oneTimePassword,
-        byte[] newPassword,
-        byte[] newSalt)
+        string newPassword)
     {
         if (oneTimePassword is null)
             throw new ArgumentNullException(nameof(oneTimePassword));
@@ -185,8 +206,7 @@ public class User : DomainEntity
         if (!IsLocked)
             throw new DomainException($"The user '{Login}' is already activated.");
 
-        password = newPassword;
-        salt = newSalt;
+        ChangePassword(timeProvider, passwordService, newPassword);
         Unlock();
         DeleteOneTimePassword(oneTimePassword);
     }

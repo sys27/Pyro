@@ -3,6 +3,7 @@
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Pyro.Domain.Identity.Models;
 
 namespace Pyro.Infrastructure.Identity.DataAccess.Configurations;
@@ -38,6 +39,11 @@ internal class UserConfiguration : IEntityTypeConfiguration<User>
             .HasColumnName("Salt")
             .UsePropertyAccessMode(PropertyAccessMode.Field);
         builder.Ignore(x => x.Salt);
+
+        builder.Property(x => x.PasswordExpiresAt)
+            .IsRequired()
+            .UsePropertyAccessMode(PropertyAccessMode.Field)
+            .HasConversion<DateTimeOffsetToBinaryConverter>();
 
         builder.Property(x => x.IsLocked)
             .HasDefaultValue(false);
@@ -80,6 +86,11 @@ internal class UserConfiguration : IEntityTypeConfiguration<User>
         builder.HasMany(x => x.AccessTokens)
             .WithOne()
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(x => x.Profile)
+            .WithOne()
+            .HasForeignKey<UserProfile>(x => x.Id)
+            .HasPrincipalKey<User>(x => x.Id);
 
         builder.HasIndex(x => x.Login)
             .IsUnique()

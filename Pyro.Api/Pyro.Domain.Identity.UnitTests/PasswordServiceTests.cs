@@ -10,7 +10,11 @@ public class PasswordServiceTests
     [Test]
     public void GenerateOneTimePasswordForTest()
     {
-        var user = new User { Login = "test" };
+        var user = new User
+        {
+            Login = "test",
+            Profile = new UserProfile { Name = "test" },
+        };
 
         var passwordService = new PasswordService(TimeProvider.System);
         var otp = passwordService.GenerateOneTimePasswordFor(user);

@@ -6,7 +6,7 @@ using MediatR;
 using Pyro.Domain.Shared.CurrentUserProvider;
 using Pyro.Domain.Shared.Exceptions;
 
-namespace Pyro.Domain.UserProfiles;
+namespace Pyro.Domain.Identity.Commands;
 
 public record UpdateProfile(string Name, string? Status) : IRequest;
 
@@ -26,11 +26,11 @@ public class UpdateProfileValidator : AbstractValidator<UpdateProfile>
 public class UpdateProfileHandler : IRequestHandler<UpdateProfile>
 {
     private readonly ICurrentUserProvider currentUserProvider;
-    private readonly IUserProfileRepository repository;
+    private readonly IUserRepository repository;
 
     public UpdateProfileHandler(
         ICurrentUserProvider currentUserProvider,
-        IUserProfileRepository repository)
+        IUserRepository repository)
     {
         this.currentUserProvider = currentUserProvider;
         this.repository = repository;
@@ -39,10 +39,10 @@ public class UpdateProfileHandler : IRequestHandler<UpdateProfile>
     public async Task Handle(UpdateProfile request, CancellationToken cancellationToken)
     {
         var currentUser = currentUserProvider.GetCurrentUser();
-        var profile = await repository.GetUserProfile(currentUser.Id, cancellationToken) ??
-                      throw new NotFoundException("User profile not found");
+        var user = await repository.GetUserById(currentUser.Id, cancellationToken) ??
+                   throw new NotFoundException($"User with id {currentUser.Id} is not found");
 
-        profile.Name = request.Name;
-        profile.Status = request.Status;
+        user.Profile.Name = request.Name;
+        user.Profile.Status = request.Status;
     }
 }

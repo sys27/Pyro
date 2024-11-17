@@ -27,7 +27,12 @@ public static class ServiceCollectionExtensions
             .Configure<RemoveExpiredOneTimePasswordsOptions>(
                 configuration
                     .GetRequiredSection("Workers")
-                    .GetRequiredSection(RemoveExpiredOneTimePasswordsOptions.Name));
+                    .GetRequiredSection(RemoveExpiredOneTimePasswordsOptions.Name))
+            .AddHostedService<NotifyExpiringPasswordsBackgroundService>()
+            .Configure<NotifyExpiringPasswordsBackgroundService>(
+                configuration
+                    .GetRequiredSection("Workers")
+                    .GetRequiredSection(NotifyExpiringPasswordsOptions.Name));
 
         return builder;
     }

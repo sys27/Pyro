@@ -9,6 +9,7 @@
     <PackageReference Include="FluentValidation" />
     <PackageReference Include="MediatR" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Options" />
     <PackageReference Include="NewId" />
   </ItemGroup>
 

@@ -13,7 +13,11 @@ public class UpdateUserHandlerTests
     [Test]
     public void UpdateUserWithInvalidRole()
     {
-        var user = new User { Login = "test" };
+        var user = new User
+        {
+            Login = "test",
+            Profile = new UserProfile { Name = "test" },
+        };
         var updateUser = new UpdateUser(user, ["admin"]);
 
         var repository = Substitute.For<IUserRepository>();
@@ -33,7 +37,11 @@ public class UpdateUserHandlerTests
             new Role { Name = "admin" },
             new Role { Name = "user" },
         };
-        var user = new User { Login = "test" };
+        var user = new User
+        {
+            Login = "test",
+            Profile = new UserProfile { Name = "test" },
+        };
         user.AddRole(roles[1]);
 
         var updateUser = new UpdateUser(user, [roles[0].Name]);

@@ -27,7 +27,12 @@ public class LockUserHandlerTests
     public void LockCurrentUser()
     {
         var currentUser = new CurrentUser(Guid.NewGuid(), "user", [], []);
-        var user = new User { Id = currentUser.Id, Login = currentUser.Login };
+        var user = new User
+        {
+            Id = currentUser.Id,
+            Login = currentUser.Login,
+            Profile = new UserProfile { Name = currentUser.Login },
+        };
         var command = new LockUser(currentUser.Login);
 
         var userRepository = Substitute.For<IUserRepository>();
@@ -48,7 +53,11 @@ public class LockUserHandlerTests
     public async Task LockUser()
     {
         var currentUser = new CurrentUser(Guid.NewGuid(), "user", [], []);
-        var user = new User { Login = "test" };
+        var user = new User
+        {
+            Login = "test",
+            Profile = new UserProfile { Name = "test" },
+        };
         var command = new LockUser(user.Login);
 
         var userRepository = Substitute.For<IUserRepository>();

@@ -11,9 +11,13 @@ namespace Pyro.Infrastructure.Identity.DataAccess;
 internal class UserRepository : IUserRepository
 {
     private readonly IdentityDbContext dbContext;
+    private readonly TimeProvider timeProvider;
 
-    public UserRepository(IdentityDbContext dbContext)
-        => this.dbContext = dbContext;
+    public UserRepository(IdentityDbContext dbContext, TimeProvider timeProvider)
+    {
+        this.dbContext = dbContext;
+        this.timeProvider = timeProvider;
+    }
 
     public async Task<IReadOnlyList<User>> GetUsers(
         GetUsers query,
@@ -105,6 +109,16 @@ internal class UserRepository : IUserRepository
         return permissions;
     }
 
+    public IAsyncEnumerable<User> GetUsersWithExpiringPasswords()
+    {
+        var now = timeProvider.GetUtcNow();
+        var expiration = now.AddDays(7); // TODO: config
+
+        return Users
+            .Where(x => !x.IsLocked && x.PasswordExpiresAt < expiration)
+            .AsAsyncEnumerable();
+    }
+
     private IQueryable<User> Users
         => dbContext
             .Set<User>()
@@ -113,5 +127,6 @@ internal class UserRepository : IUserRepository
             .Include(x => x.AuthenticationTokens)
             .Include(x => x.AccessTokens)
             .Include(x => x.OneTimePasswords)
+            .Include(x => x.Profile)
             .AsSplitQuery();
 }

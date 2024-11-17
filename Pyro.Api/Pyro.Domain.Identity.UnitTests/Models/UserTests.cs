@@ -15,7 +15,11 @@ public class UserTests
     [Test]
     public void AddRoleToUser()
     {
-        var user = new User { Login = "test" };
+        var user = new User
+        {
+            Login = "test",
+            Profile = new UserProfile { Name = "test" },
+        };
         var role = new Role
         {
             Name = "Test Role",
@@ -28,7 +32,11 @@ public class UserTests
     [Test]
     public void AddExistingRoleToUser()
     {
-        var user = new User { Login = "test" };
+        var user = new User
+        {
+            Login = "test",
+            Profile = new UserProfile { Name = "test" },
+        };
         var role = new Role
         {
             Name = "Test Role",
@@ -43,7 +51,11 @@ public class UserTests
     [Test]
     public void RemoveAllRolesFromUser()
     {
-        var user = new User { Login = "test" };
+        var user = new User
+        {
+            Login = "test",
+            Profile = new UserProfile { Name = "test" },
+        };
         var role = new Role
         {
             Name = "Test Role",
@@ -57,7 +69,11 @@ public class UserTests
     [Test]
     public void AddAuthTokenToUser()
     {
-        var user = new User { Login = "test" };
+        var user = new User
+        {
+            Login = "test",
+            Profile = new UserProfile { Name = "test" },
+        };
         var token = AuthenticationToken.Create(Guid.NewGuid(), user, DateTimeOffset.UtcNow);
         user.AddAuthenticationToken(token);
 
@@ -67,7 +83,11 @@ public class UserTests
     [Test]
     public void GetAuthTokenFromUser()
     {
-        var user = new User { Login = "test" };
+        var user = new User
+        {
+            Login = "test",
+            Profile = new UserProfile { Name = "test" },
+        };
         var token = AuthenticationToken.Create(Guid.NewGuid(), user, DateTimeOffset.UtcNow);
         user.AddAuthenticationToken(token);
         var result = user.GetAuthenticationToken(token.TokenId);
@@ -78,7 +98,11 @@ public class UserTests
     [Test]
     public void AddAccessTokenToUser()
     {
-        var user = new User { Login = "test" };
+        var user = new User
+        {
+            Login = "test",
+            Profile = new UserProfile { Name = "test" },
+        };
         var token = new AccessToken
         {
             Name = "Test Token",
@@ -96,7 +120,11 @@ public class UserTests
     [Test]
     public void DeleteAccessTokenFromUser()
     {
-        var user = new User { Login = "test" };
+        var user = new User
+        {
+            Login = "test",
+            Profile = new UserProfile { Name = "test" },
+        };
         var token = new AccessToken
         {
             Name = "Test Token",
@@ -114,7 +142,11 @@ public class UserTests
     public void ValidateAccessToken()
     {
         var currentDate = new DateTimeOffset(new DateTime(2024, 01, 01));
-        var user = new User { Login = "test" };
+        var user = new User
+        {
+            Login = "test",
+            Profile = new UserProfile { Name = "test" },
+        };
         var token = new AccessToken
         {
             Name = "Test Token",
@@ -139,7 +171,11 @@ public class UserTests
     public void ValidateExpiredAccessToken()
     {
         var currentDate = new DateTimeOffset(new DateTime(2024, 01, 01));
-        var user = new User { Login = "test" };
+        var user = new User
+        {
+            Login = "test",
+            Profile = new UserProfile { Name = "test" },
+        };
         var token = new AccessToken
         {
             Name = "Test Token",
@@ -163,7 +199,11 @@ public class UserTests
     [Test]
     public void LockUser()
     {
-        var user = new User { Login = "test" };
+        var user = new User
+        {
+            Login = "test",
+            Profile = new UserProfile { Name = "test" },
+        };
         user.AddAuthenticationToken(new AuthenticationToken());
 
         user.Lock();
@@ -178,7 +218,11 @@ public class UserTests
     [Test]
     public void UnlockUser()
     {
-        var user = new User { Login = "test" };
+        var user = new User
+        {
+            Login = "test",
+            Profile = new UserProfile { Name = "test" },
+        };
 
         user.Unlock();
 
@@ -188,10 +232,16 @@ public class UserTests
     [Test]
     public void ActivateUserIsNull()
     {
-        var user = new User { Login = "test" };
-        var timeProvider = Substitute.For<TimeProvider>();
+        var user = new User
+        {
+            Login = "test",
+            Profile = new UserProfile { Name = "test" },
+        };
 
-        Assert.Throws<ArgumentNullException>(() => user.Activate(timeProvider, null!, [], []));
+        var timeProvider = Substitute.For<TimeProvider>();
+        var passwordService = Substitute.For<IPasswordService>();
+
+        Assert.Throws<ArgumentNullException>(() => user.Activate(timeProvider, passwordService, null!, string.Empty));
     }
 
     [Test]
@@ -199,7 +249,11 @@ public class UserTests
     {
         var currentTime = DateTimeOffset.UtcNow;
 
-        var user = new User { Login = "test" };
+        var user = new User
+        {
+            Login = "test",
+            Profile = new UserProfile { Name = "test" },
+        };
         var oneTimePassword = new OneTimePassword
         {
             Token = "token",
@@ -214,7 +268,9 @@ public class UserTests
             .GetUtcNow()
             .Returns(currentTime);
 
-        Assert.Throws<DomainException>(() => user.Activate(timeProvider, oneTimePassword, [], []));
+        var passwordService = Substitute.For<IPasswordService>();
+
+        Assert.Throws<DomainException>(() => user.Activate(timeProvider, passwordService, oneTimePassword, string.Empty));
     }
 
     [Test]
@@ -222,7 +278,11 @@ public class UserTests
     {
         var currentTime = DateTimeOffset.UtcNow;
 
-        var user = new User { Login = "test" };
+        var user = new User
+        {
+            Login = "test",
+            Profile = new UserProfile { Name = "test" },
+        };
         var oneTimePassword = new OneTimePassword
         {
             Token = "token",
@@ -237,7 +297,9 @@ public class UserTests
             .GetUtcNow()
             .Returns(currentTime);
 
-        Assert.Throws<DomainException>(() => user.Activate(timeProvider, oneTimePassword, [], []));
+        var passwordService = Substitute.For<IPasswordService>();
+
+        Assert.Throws<DomainException>(() => user.Activate(timeProvider, passwordService, oneTimePassword, string.Empty));
     }
 
     [Test]
@@ -245,7 +307,11 @@ public class UserTests
     {
         var currentTime = DateTimeOffset.UtcNow;
 
-        var user = new User { Login = "test" };
+        var user = new User
+        {
+            Login = "test",
+            Profile = new UserProfile { Name = "test" },
+        };
         user.Lock();
 
         var oneTimePassword = new OneTimePassword
@@ -262,7 +328,12 @@ public class UserTests
             .GetUtcNow()
             .Returns(currentTime);
 
-        user.Activate(timeProvider, oneTimePassword, [], []);
+        var passwordService = Substitute.For<IPasswordService>();
+        passwordService
+            .GeneratePasswordHash(Arg.Any<string>())
+            .Returns((new byte[64], new byte[16]));
+
+        user.Activate(timeProvider, passwordService, oneTimePassword, "password");
 
         Assert.Multiple(() =>
         {
@@ -283,15 +354,20 @@ public class UserTests
             Login = "test@localhost.local",
             Password = passwordHash,
             Salt = salt,
+            Profile = new UserProfile { Name = "test" },
         };
 
-        Assert.Throws<DomainException>(() => user.ChangePassword(passwordService, "incorrect", "newPassword"));
+        Assert.Throws<DomainException>(() => user.ChangePassword(TimeProvider.System, passwordService, "incorrect", "newPassword"));
     }
 
     [Test]
     public void ChangePassword()
     {
         const string oldPassword = "password";
+
+        var currentDateTime = DateTimeOffset.UtcNow;
+        var currentTimeProvider = Substitute.For<TimeProvider>();
+        currentTimeProvider.GetUtcNow().Returns(currentDateTime);
 
         var passwordService = new PasswordService(TimeProvider.System);
         var (passwordHash, salt) = passwordService.GeneratePasswordHash(oldPassword);
@@ -300,14 +376,16 @@ public class UserTests
             Login = "test@localhost.local",
             Password = passwordHash,
             Salt = salt,
+            Profile = new UserProfile { Name = "test" },
         };
 
-        user.ChangePassword(passwordService, oldPassword, "newPassword");
+        user.ChangePassword(currentTimeProvider, passwordService, oldPassword, "newPassword");
 
         Assert.Multiple(() =>
         {
             Assert.That(user.Password, Is.Not.EqualTo(passwordHash));
             Assert.That(user.Salt, Is.Not.EqualTo(salt));
+            Assert.That(user.PasswordExpiresAt, Is.EqualTo(currentDateTime.AddDays(90)));
         });
     }
 }
