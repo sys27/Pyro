@@ -15,7 +15,7 @@ namespace Pyro.Infrastructure.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "8.0.10");
+            modelBuilder.HasAnnotation("ProductVersion", "9.0.0");
 
             modelBuilder.Entity("Microsoft.AspNetCore.DataProtection.EntityFrameworkCore.DataProtectionKey", b =>
                 {
@@ -97,67 +97,6 @@ namespace Pyro.Infrastructure.Migrations
                     b.ToTable("Labels", (string)null);
                 });
 
-            modelBuilder.Entity("Pyro.Domain.UserProfiles.User", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("TEXT")
-                        .HasColumnName("Login");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Users", null, t =>
-                        {
-                            t.ExcludeFromMigrations();
-                        });
-                });
-
-            modelBuilder.Entity("Pyro.Domain.UserProfiles.UserAvatar", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("TEXT");
-
-                    b.Property<byte[]>("Image")
-                        .IsRequired()
-                        .HasColumnType("BLOB");
-
-                    b.HasKey("Id")
-                        .HasName("PK_UserAvatar");
-
-                    b.ToTable("UserAvatars", (string)null);
-                });
-
-            modelBuilder.Entity("Pyro.Domain.UserProfiles.UserProfile", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Status")
-                        .HasMaxLength(200)
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id")
-                        .HasName("PK_UserProfile");
-
-                    b.ToTable("UserProfiles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("f9ba057a-35b0-4d10-8326-702d8f7ec966"),
-                            Name = "Pyro"
-                        });
-                });
-
             modelBuilder.Entity("Pyro.Infrastructure.Messaging.OutboxMessage", b =>
                 {
                     b.Property<Guid>("Id")
@@ -197,35 +136,9 @@ namespace Pyro.Infrastructure.Migrations
                     b.Navigation("GitRepository");
                 });
 
-            modelBuilder.Entity("Pyro.Domain.UserProfiles.User", b =>
-                {
-                    b.HasOne("Pyro.Domain.UserProfiles.UserProfile", null)
-                        .WithOne("User")
-                        .HasForeignKey("Pyro.Domain.UserProfiles.User", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Pyro.Domain.UserProfiles.UserAvatar", b =>
-                {
-                    b.HasOne("Pyro.Domain.UserProfiles.UserProfile", null)
-                        .WithOne("Avatar")
-                        .HasForeignKey("Pyro.Domain.UserProfiles.UserAvatar", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Pyro.Domain.GitRepositories.GitRepository", b =>
                 {
                     b.Navigation("Labels");
-                });
-
-            modelBuilder.Entity("Pyro.Domain.UserProfiles.UserProfile", b =>
-                {
-                    b.Navigation("Avatar");
-
-                    b.Navigation("User")
-                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

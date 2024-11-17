@@ -23,6 +23,8 @@ using User = Pyro.Domain.Identity.Models.User;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.AddLogging();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddPyroProblemDetails(builder.Environment);
 builder.Services.AddHealthChecks();
@@ -77,7 +79,6 @@ app.MapHealthChecks("/health");
 app.MapGroup("/api")
     .RequireAuthorization()
     .MapIdentityEndpoints()
-    .MapProfileEndpoints()
     .MapGitRepositoryEndpoints()
     .MapIssueEndpoints();
 

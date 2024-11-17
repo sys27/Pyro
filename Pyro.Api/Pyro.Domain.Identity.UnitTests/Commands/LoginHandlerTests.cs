@@ -16,10 +16,11 @@ public class LoginHandlerTests
         var command = new LoginCommand("test", "password");
 
         var logger = Substitute.For<ILogger<LoginHandler>>();
+        var timeProvider = Substitute.For<TimeProvider>();
         var repository = Substitute.For<IUserRepository>();
         var passwordService = Substitute.For<IPasswordService>();
         var tokenService = Substitute.For<ITokenService>();
-        var handler = new LoginHandler(logger, repository, passwordService, tokenService);
+        var handler = new LoginHandler(logger, timeProvider, repository, passwordService, tokenService);
 
         var result = await handler.Handle(command);
 
@@ -30,17 +31,50 @@ public class LoginHandlerTests
     public async Task LoginWithLockedUser()
     {
         var command = new LoginCommand("test", "password");
-        var user = new User { Login = "test" };
+        var user = new User
+        {
+            Login = "test",
+            Profile = new UserProfile { Name = "test" },
+        };
         user.Lock();
 
         var logger = Substitute.For<ILogger<LoginHandler>>();
+        var timeProvider = Substitute.For<TimeProvider>();
         var repository = Substitute.For<IUserRepository>();
         repository
             .GetUserByLogin(command.Login)
             .Returns(user);
         var passwordService = Substitute.For<IPasswordService>();
         var tokenService = Substitute.For<ITokenService>();
-        var handler = new LoginHandler(logger, repository, passwordService, tokenService);
+        var handler = new LoginHandler(logger, timeProvider, repository, passwordService, tokenService);
+
+        var result = await handler.Handle(command);
+
+        Assert.That(result, Is.EqualTo(LoginResult.Fail()));
+    }
+
+    [Test]
+    public async Task LoginWithExpiredPassword()
+    {
+        var currentDate = DateTimeOffset.UtcNow;
+        var command = new LoginCommand("test", "password");
+        var user = new User
+        {
+            Login = "test",
+            Profile = new UserProfile { Name = "test" },
+            PasswordExpiresAt = currentDate.AddDays(-1),
+        };
+
+        var logger = Substitute.For<ILogger<LoginHandler>>();
+        var timeProvider = Substitute.For<TimeProvider>();
+        timeProvider.GetUtcNow().Returns(currentDate);
+        var repository = Substitute.For<IUserRepository>();
+        repository
+            .GetUserByLogin(command.Login)
+            .Returns(user);
+        var passwordService = Substitute.For<IPasswordService>();
+        var tokenService = Substitute.For<ITokenService>();
+        var handler = new LoginHandler(logger, timeProvider, repository, passwordService, tokenService);
 
         var result = await handler.Handle(command);
 
@@ -51,9 +85,14 @@ public class LoginHandlerTests
     public async Task LoginWithInvalidCredentials()
     {
         var command = new LoginCommand("test", "password");
-        var user = new User { Login = "test" };
+        var user = new User
+        {
+            Login = "test",
+            Profile = new UserProfile { Name = "test" },
+        };
 
         var logger = Substitute.For<ILogger<LoginHandler>>();
+        var timeProvider = Substitute.For<TimeProvider>();
         var repository = Substitute.For<IUserRepository>();
         repository
             .GetUserByLogin(command.Login)
@@ -63,7 +102,7 @@ public class LoginHandlerTests
             .VerifyPassword(command.Password, user.Password, user.Salt)
             .Returns(false);
         var tokenService = Substitute.For<ITokenService>();
-        var handler = new LoginHandler(logger, repository, passwordService, tokenService);
+        var handler = new LoginHandler(logger, timeProvider, repository, passwordService, tokenService);
 
         var result = await handler.Handle(command);
 
@@ -74,12 +113,17 @@ public class LoginHandlerTests
     public async Task LoginWithValidCredentials()
     {
         var command = new LoginCommand("test", "password");
-        var user = new User { Login = "test" };
+        var user = new User
+        {
+            Login = "test",
+            Profile = new UserProfile { Name = "test" },
+        };
         var jwtTokenPair = new JwtTokenPair(
             new Token(Guid.NewGuid(), "access", DateTimeOffset.UtcNow),
             new Token(Guid.NewGuid(), "refresh", DateTimeOffset.UtcNow));
 
         var logger = Substitute.For<ILogger<LoginHandler>>();
+        var timeProvider = Substitute.For<TimeProvider>();
         var repository = Substitute.For<IUserRepository>();
         repository
             .GetUserByLogin(command.Login)
@@ -92,7 +136,7 @@ public class LoginHandlerTests
         tokenService
             .GenerateTokenPair(user)
             .Returns(jwtTokenPair);
-        var handler = new LoginHandler(logger, repository, passwordService, tokenService);
+        var handler = new LoginHandler(logger, timeProvider, repository, passwordService, tokenService);
 
         var result = await handler.Handle(command);
 

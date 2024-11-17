@@ -53,6 +53,7 @@ internal class Bus : IBus
             .OrderBy(x => x.CreatedAt)
             .Take(batchSize)
             .AsNoTracking()
+            .TagWith("NO_LOGGING")
             .AsAsyncEnumerable();
 
         await foreach (var outboxMessage in outboxMessages)

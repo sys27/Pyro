@@ -25,15 +25,18 @@ public class ChangePasswordValidator : AbstractValidator<ChangePassword>
 
 public class ChangePasswordHandler : IRequestHandler<ChangePassword>
 {
+    private readonly TimeProvider timeProvider;
     private readonly ICurrentUserProvider currentUserProvider;
     private readonly IUserRepository userRepository;
     private readonly IPasswordService passwordService;
 
     public ChangePasswordHandler(
+        TimeProvider timeProvider,
         ICurrentUserProvider currentUserProvider,
         IUserRepository userRepository,
         IPasswordService passwordService)
     {
+        this.timeProvider = timeProvider;
         this.currentUserProvider = currentUserProvider;
         this.userRepository = userRepository;
         this.passwordService = passwordService;
@@ -45,6 +48,6 @@ public class ChangePasswordHandler : IRequestHandler<ChangePassword>
         var user = await userRepository.GetUserById(currentUser.Id, cancellationToken) ??
                    throw new NotFoundException($"The user (Id: {currentUser.Id}) not found");
 
-        user.ChangePassword(passwordService, request.OldPassword, request.NewPassword);
+        user.ChangePassword(timeProvider, passwordService, request.OldPassword, request.NewPassword);
     }
 }

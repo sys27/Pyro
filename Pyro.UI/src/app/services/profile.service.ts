@@ -24,7 +24,6 @@ export class ProfileService {
 }
 
 export interface Profile {
-    get email(): string;
     get name(): string | null;
     get status(): string | null;
 }

@@ -7,17 +7,111 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Pyro.Infrastructure.Issues.Migrations
 {
     /// <inheritdoc />
-    public partial class AddIssueChangeLogs : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<bool>(
-                name: "IsDisabled",
-                table: "IssueStatuses",
-                type: "INTEGER",
-                nullable: false,
-                defaultValue: false);
+            migrationBuilder.CreateTable(
+                name: "IssueNumberTracker",
+                columns: table => new
+                {
+                    RepositoryId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Number = table.Column<int>(type: "INTEGER", nullable: false, defaultValue: 0)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_IssueNumberTracker", x => x.RepositoryId);
+                    table.ForeignKey(
+                        name: "FK_IssueNumberTracker_Repository",
+                        column: x => x.RepositoryId,
+                        principalTable: "GitRepositories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "IssueStatuses",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
+                    Color = table.Column<int>(type: "INTEGER", nullable: false),
+                    RepositoryId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    IsDisabled = table.Column<bool>(type: "INTEGER", nullable: false, defaultValue: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_IssueStatuses", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_IssueStatuses_GitRepositories_RepositoryId",
+                        column: x => x.RepositoryId,
+                        principalTable: "GitRepositories",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Issues",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    IssueNumber = table.Column<int>(type: "INTEGER", nullable: false),
+                    Title = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
+                    StatusId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    RepositoryId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    AuthorId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedAt = table.Column<long>(type: "INTEGER", nullable: false),
+                    AssigneeId = table.Column<Guid>(type: "TEXT", nullable: true),
+                    IsLocked = table.Column<bool>(type: "INTEGER", nullable: false, defaultValue: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Issue", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Issue_Status",
+                        column: x => x.StatusId,
+                        principalTable: "IssueStatuses",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Issues_GitRepositories_RepositoryId",
+                        column: x => x.RepositoryId,
+                        principalTable: "GitRepositories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Issues_UserProfiles_AssigneeId",
+                        column: x => x.AssigneeId,
+                        principalTable: "UserProfiles",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Issues_UserProfiles_AuthorId",
+                        column: x => x.AuthorId,
+                        principalTable: "UserProfiles",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "IssueStatusTransitions",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    FromId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ToId = table.Column<Guid>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_IssueStatusTranslations", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_IssueStatusTransitions_IssueStatuses_FromId",
+                        column: x => x.FromId,
+                        principalTable: "IssueStatuses",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_IssueStatusTransitions_IssueStatuses_ToId",
+                        column: x => x.ToId,
+                        principalTable: "IssueStatuses",
+                        principalColumn: "Id");
+                });
 
             migrationBuilder.CreateTable(
                 name: "IssueAssigneeChangeLogs",
@@ -56,6 +150,32 @@ namespace Pyro.Infrastructure.Issues.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "IssueComments",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Content = table.Column<string>(type: "TEXT", maxLength: 2000, nullable: false),
+                    IssueId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    AuthorId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedAt = table.Column<long>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_IssueComment", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_IssueComments_Issues_IssueId",
+                        column: x => x.IssueId,
+                        principalTable: "Issues",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_IssueComments_UserProfiles_AuthorId",
+                        column: x => x.AuthorId,
+                        principalTable: "UserProfiles",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "IssueLabelChangeLogs",
                 columns: table => new
                 {
@@ -88,6 +208,28 @@ namespace Pyro.Infrastructure.Issues.Migrations
                         name: "FK_IssueLabelChangeLogs_UserProfiles_AuthorId",
                         column: x => x.AuthorId,
                         principalTable: "UserProfiles",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "IssueLabels",
+                columns: table => new
+                {
+                    IssueId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    LabelId = table.Column<Guid>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_IssueLabel", x => new { x.IssueId, x.LabelId });
+                    table.ForeignKey(
+                        name: "FK_IssueLabels_Issues_IssueId",
+                        column: x => x.IssueId,
+                        principalTable: "Issues",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_IssueLabels_Labels_LabelId",
+                        column: x => x.LabelId,
+                        principalTable: "Labels",
                         principalColumn: "Id");
                 });
 
@@ -200,6 +342,16 @@ namespace Pyro.Infrastructure.Issues.Migrations
                 column: "OldAssigneeId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_IssueComments_AuthorId",
+                table: "IssueComments",
+                column: "AuthorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_IssueComments_IssueId",
+                table: "IssueComments",
+                column: "IssueId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_IssueLabelChangeLogs_AuthorId",
                 table: "IssueLabelChangeLogs",
                 column: "AuthorId");
@@ -220,6 +372,11 @@ namespace Pyro.Infrastructure.Issues.Migrations
                 column: "OldLabelId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_IssueLabels_LabelId",
+                table: "IssueLabels",
+                column: "LabelId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_IssueLockChangeLogs_AuthorId",
                 table: "IssueLockChangeLogs",
                 column: "AuthorId");
@@ -228,6 +385,27 @@ namespace Pyro.Infrastructure.Issues.Migrations
                 name: "IX_IssueLockChangeLogs_IssueId",
                 table: "IssueLockChangeLogs",
                 column: "IssueId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Issue_RepositoryId_Number",
+                table: "Issues",
+                columns: new[] { "RepositoryId", "IssueNumber" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Issues_AssigneeId",
+                table: "Issues",
+                column: "AssigneeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Issues_AuthorId",
+                table: "Issues",
+                column: "AuthorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Issues_StatusId",
+                table: "Issues",
+                column: "StatusId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_IssueStatusChangeLogs_AuthorId",
@@ -250,6 +428,23 @@ namespace Pyro.Infrastructure.Issues.Migrations
                 column: "OldStatusId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_IssueStatuses_Name",
+                table: "IssueStatuses",
+                columns: new[] { "RepositoryId", "Name" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_IssueStatusTransitions_ToId",
+                table: "IssueStatusTransitions",
+                column: "ToId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_IssueStatusTranslations_FromId_ToId",
+                table: "IssueStatusTransitions",
+                columns: new[] { "FromId", "ToId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_IssueTitleChangeLog_AuthorId",
                 table: "IssueTitleChangeLog",
                 column: "AuthorId");
@@ -267,20 +462,34 @@ namespace Pyro.Infrastructure.Issues.Migrations
                 name: "IssueAssigneeChangeLogs");
 
             migrationBuilder.DropTable(
+                name: "IssueComments");
+
+            migrationBuilder.DropTable(
                 name: "IssueLabelChangeLogs");
+
+            migrationBuilder.DropTable(
+                name: "IssueLabels");
 
             migrationBuilder.DropTable(
                 name: "IssueLockChangeLogs");
 
             migrationBuilder.DropTable(
+                name: "IssueNumberTracker");
+
+            migrationBuilder.DropTable(
                 name: "IssueStatusChangeLogs");
+
+            migrationBuilder.DropTable(
+                name: "IssueStatusTransitions");
 
             migrationBuilder.DropTable(
                 name: "IssueTitleChangeLog");
 
-            migrationBuilder.DropColumn(
-                name: "IsDisabled",
-                table: "IssueStatuses");
+            migrationBuilder.DropTable(
+                name: "Issues");
+
+            migrationBuilder.DropTable(
+                name: "IssueStatuses");
         }
     }
 }

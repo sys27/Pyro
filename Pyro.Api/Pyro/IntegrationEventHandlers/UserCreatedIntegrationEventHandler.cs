@@ -8,8 +8,6 @@ using Pyro.Domain.Identity;
 using Pyro.Domain.Identity.Models;
 using Pyro.Domain.Shared.Email;
 using Pyro.Domain.Shared.Exceptions;
-using Pyro.Domain.UserProfiles;
-using Pyro.Infrastructure.Shared.Email;
 
 namespace Pyro.IntegrationEventHandlers;
 
@@ -21,7 +19,6 @@ public class UserCreatedIntegrationEventHandler : INotificationHandler<UserCreat
     private readonly IEmailService emailService;
     private readonly EmailServiceOptions emailServiceOptions;
     private readonly IUserRepository userRepository;
-    private readonly IUserProfileRepository userProfileRepository;
 
     public UserCreatedIntegrationEventHandler(
         ILogger<UserCreatedIntegrationEventHandler> logger,
@@ -29,8 +26,7 @@ public class UserCreatedIntegrationEventHandler : INotificationHandler<UserCreat
         UrlEncoder urlEncoder,
         IEmailService emailService,
         IOptions<EmailServiceOptions> emailServiceOptions,
-        IUserRepository userRepository,
-        IUserProfileRepository userProfileRepository)
+        IUserRepository userRepository)
     {
         this.logger = logger;
         this.urlEncoder = urlEncoder;
@@ -38,15 +34,12 @@ public class UserCreatedIntegrationEventHandler : INotificationHandler<UserCreat
         this.emailService = emailService;
         this.emailServiceOptions = emailServiceOptions.Value;
         this.userRepository = userRepository;
-        this.userProfileRepository = userProfileRepository;
     }
 
     public async Task Handle(UserCreatedIntegrationEvent notification, CancellationToken cancellationToken)
     {
         var user = await userRepository.GetUserById(notification.UserId, cancellationToken) ??
                    throw new NotFoundException($"The user (Id: {notification.UserId}) was not found.");
-        var profile = await userProfileRepository.GetUserProfile(notification.UserId, cancellationToken) ??
-                      throw new NotFoundException($"The user profile (UserId: {notification.UserId}) was not found.");
         var otp = user.GetRegistrationOneTimePassword() ??
                   throw new DomainException($"The user (Id: {notification.UserId}) has no registration one-time password.");
 
@@ -64,7 +57,7 @@ public class UserCreatedIntegrationEventHandler : INotificationHandler<UserCreat
                     """;
         var message = new EmailMessage(
             new EmailAddress("No Reply", $"no-reply@{emailServiceOptions.Domain}"),
-            new EmailAddress(profile.Name, user.Login),
+            new EmailAddress(user.Profile.Name, user.Login),
             "Welcome to Pyro",
             body);
         await emailService.SendEmail(message, cancellationToken);

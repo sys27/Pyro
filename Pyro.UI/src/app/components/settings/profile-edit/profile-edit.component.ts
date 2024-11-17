@@ -20,14 +20,6 @@ import { filter } from 'rxjs';
 })
 export class ProfileEditComponent implements OnInit {
     public readonly form = this.formBuilder.group({
-        email: [
-            '',
-            [
-                Validators.required('Email'),
-                Validators.email('Email'),
-                Validators.maxLength('Email', 150),
-            ],
-        ],
         name: ['', [Validators.required('Name'), Validators.maxLength('Name', 50)]],
         status: ['', [Validators.maxLength('Status', 150)]],
     });
@@ -41,8 +33,6 @@ export class ProfileEditComponent implements OnInit {
     public ngOnInit(): void {
         this.store.dispatch(loadProfile());
 
-        this.form.get('email')!.disable();
-
         this.store
             .select(selectCurrentProfile)
             .pipe(
@@ -51,7 +41,6 @@ export class ProfileEditComponent implements OnInit {
             )
             .subscribe(profile => {
                 this.form.patchValue({
-                    email: profile?.email,
                     name: profile?.name,
                     status: profile?.status,
                 });

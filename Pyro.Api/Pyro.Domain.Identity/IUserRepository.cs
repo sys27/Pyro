@@ -29,4 +29,6 @@ public interface IUserRepository
     Task<IReadOnlyList<Role>> GetRolesAsync(CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<Permission>> GetPermissionsAsync(CancellationToken cancellationToken = default);
+
+    IAsyncEnumerable<User> GetUsersWithExpiringPasswords();
 }

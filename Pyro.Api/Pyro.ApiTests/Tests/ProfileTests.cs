@@ -3,7 +3,6 @@
 
 using Bogus;
 using Pyro.ApiTests.Clients;
-using Pyro.Contracts.Requests;
 using Pyro.Contracts.Requests.Identity;
 
 namespace Pyro.ApiTests.Tests;

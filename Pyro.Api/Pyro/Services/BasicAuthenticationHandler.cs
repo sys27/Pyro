@@ -72,6 +72,13 @@ public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSc
             return AuthenticateResult.Fail("User is locked");
         }
 
+        if (user.PasswordExpiresAt < timeProvider.GetUtcNow())
+        {
+            Logger.LogWarning("The password of '{User}' user is expired", user.Login);
+
+            return AuthenticateResult.Fail("Password is expired");
+        }
+
         // TODO: implement shared logic with TokenService?
         var roles = user.Roles.Select(x => x.Name);
         var permissions = user.Roles.SelectMany(x => x.Permissions).Select(x => x.Name).Distinct();

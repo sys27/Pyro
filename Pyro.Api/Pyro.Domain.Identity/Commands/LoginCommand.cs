@@ -64,17 +64,20 @@ public class LoginValidator : AbstractValidator<LoginCommand>
 public class LoginHandler : IRequestHandler<LoginCommand, LoginResult>
 {
     private readonly ILogger<LoginHandler> logger;
+    private readonly TimeProvider timeProvider;
     private readonly IUserRepository repository;
     private readonly IPasswordService passwordService;
     private readonly ITokenService tokenService;
 
     public LoginHandler(
         ILogger<LoginHandler> logger,
+        TimeProvider timeProvider,
         IUserRepository repository,
         IPasswordService passwordService,
         ITokenService tokenService)
     {
         this.logger = logger;
+        this.timeProvider = timeProvider;
         this.repository = repository;
         this.passwordService = passwordService;
         this.tokenService = tokenService;
@@ -93,6 +96,13 @@ public class LoginHandler : IRequestHandler<LoginCommand, LoginResult>
         if (user.IsLocked)
         {
             logger.LogWarning("Login attempt. User with login '{Login}' is locked", request.Login);
+
+            return LoginResult.Fail();
+        }
+
+        if (user.PasswordExpiresAt < timeProvider.GetUtcNow())
+        {
+            logger.LogWarning("The password of '{User}' user is expired", user.Login);
 
             return LoginResult.Fail();
         }

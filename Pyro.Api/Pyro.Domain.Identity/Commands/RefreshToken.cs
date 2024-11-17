@@ -64,6 +64,13 @@ public class RefreshTokenHandler : IRequestHandler<RefreshToken, RefreshTokenRes
             return RefreshTokenResult.Fail();
         }
 
+        if (user.PasswordExpiresAt < timeProvider.GetUtcNow())
+        {
+            logger.LogWarning("The password of '{User}' user is expired", user.Login);
+
+            return RefreshTokenResult.Fail();
+        }
+
         var token = user.GetAuthenticationToken(jwtToken.TokenId);
         if (token is null)
         {
