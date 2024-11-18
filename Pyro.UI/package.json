@@ -27,7 +27,7 @@
     "@ngrx/store-devtools": "18.1.1",
     "dompurify": "3.2.0",
     "highlight.js": "11.10.0",
-    "marked": "15.0.0",
+    "marked": "15.0.1",
     "marked-alert": "2.1.2",
     "marked-highlight": "2.2.1",
     "primeflex": "3.3.1",
