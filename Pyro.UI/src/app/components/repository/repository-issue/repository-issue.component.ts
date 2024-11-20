@@ -5,8 +5,6 @@ import { RouterModule } from '@angular/router';
 import { TagComponent } from '@controls/tag/tag.component';
 import { PyroPermissions } from '@models/pyro-permissions';
 import { Store } from '@ngrx/store';
-import { ColorPipe } from '@pipes/color.pipe';
-import { LuminanceColorPipe } from '@pipes/luminance-color.pipe';
 import {
     ChangeLogs,
     Comment,
@@ -22,7 +20,6 @@ import { ButtonGroupModule } from 'primeng/buttongroup';
 import { DividerModule } from 'primeng/divider';
 import { TooltipModule } from 'primeng/tooltip';
 import { BehaviorSubject, combineLatest, map, Observable, shareReplay, switchMap } from 'rxjs';
-import { MarkdownPipe } from '../../../pipes/markdown.pipe';
 import { ChangeLogViewComponent } from './change-log-view/change-log-view.component';
 import { CommentNewComponent } from './comment-new/comment-new.component';
 import { CommentViewComponent } from './comment-view/comment-view.component';
@@ -35,13 +32,10 @@ import { CommentViewComponent } from './comment-view/comment-view.component';
         ButtonModule,
         ButtonGroupModule,
         ChangeLogViewComponent,
-        ColorPipe,
         CommentNewComponent,
         CommentViewComponent,
         DatePipe,
         DividerModule,
-        LuminanceColorPipe,
-        MarkdownPipe,
         RouterModule,
         TagComponent,
         TooltipModule,

@@ -10,6 +10,7 @@ namespace Pyro.Domain.Identity.Commands;
 
 public record CreateUser(
     string Login,
+    string Email,
     IEnumerable<string> Roles) : IRequest<User>;
 
 public class CreateUserValidator : AbstractValidator<CreateUser>
@@ -19,6 +20,11 @@ public class CreateUserValidator : AbstractValidator<CreateUser>
         RuleFor(x => x.Login)
             .NotEmpty()
             .MaximumLength(32)
+            .Matches(@"^[a-zA-Z0-9_\-]*$");
+
+        RuleFor(x => x.Email)
+            .NotEmpty()
+            .MaximumLength(50)
             .EmailAddress();
 
         RuleFor(x => x.Roles)
@@ -41,7 +47,7 @@ public class CreateUserHandler : IRequestHandler<CreateUser, User>
     {
         var password = passwordService.GeneratePassword();
         var (passwordHash, salt) = passwordService.GeneratePasswordHash(password);
-        var user = User.Create(request.Login, passwordHash, salt);
+        var user = User.Create(request.Login, request.Email, passwordHash, salt);
 
         var allRoles = await repository.GetRolesAsync(cancellationToken);
         var invalidRoles = request.Roles.Except(allRoles.Select(x => x.Name)).ToList();

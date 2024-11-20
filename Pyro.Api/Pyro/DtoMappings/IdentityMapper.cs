@@ -32,8 +32,9 @@ public static partial class IdentityMapper
     [MapperIgnoreSource(nameof(User.AuthenticationTokens))]
     [MapperIgnoreSource(nameof(User.AccessTokens))]
     [MapperIgnoreSource(nameof(User.OneTimePasswords))]
+    [MapperIgnoreSource(nameof(User.DisplayName))]
+    [MapperIgnoreSource(nameof(User.Email))]
     [MapperIgnoreSource(nameof(User.DomainEvents))]
-    [MapperIgnoreSource(nameof(User.Profile))]
     public static partial UserResponse ToResponse(this User user);
 
     public static partial IReadOnlyList<UserResponse> ToResponse(this IReadOnlyList<User> user);
@@ -65,7 +66,6 @@ public static partial class IdentityMapper
 
     public static partial GetUsers ToGetUsers(this PageRequest<string> request);
 
-    [MapperIgnoreSource(nameof(UserProfile.Id))]
     public static partial UserProfileResponse ToResponse(this UserProfile request);
 
     public static partial UpdateProfile ToCommand(this UpdateUserProfileRequest request);

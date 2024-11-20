@@ -237,15 +237,15 @@ namespace Pyro.Infrastructure.Issues.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("DisplayName")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id")
-                        .HasName("PK_UserProfile");
+                        .HasName("PK_User");
 
-                    b.ToTable("UserProfiles", null, t =>
+                    b.ToTable("Users", null, t =>
                         {
                             t.ExcludeFromMigrations();
                         });

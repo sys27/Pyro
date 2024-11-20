@@ -3,4 +3,4 @@
 
 namespace Pyro.Contracts.Responses.Issues;
 
-public record UserResponse(Guid Id, string Name);
+public record UserResponse(Guid Id, string DisplayName);

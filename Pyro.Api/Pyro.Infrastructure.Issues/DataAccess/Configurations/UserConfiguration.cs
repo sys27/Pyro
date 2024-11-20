@@ -11,15 +11,15 @@ internal class UserConfiguration : IEntityTypeConfiguration<User>
 {
     public void Configure(EntityTypeBuilder<User> builder)
     {
-        builder.ToTable("UserProfiles", b => b.ExcludeFromMigrations());
+        builder.ToTable("Users", b => b.ExcludeFromMigrations());
 
         builder.HasKey(x => x.Id)
-            .HasName("PK_UserProfile");
+            .HasName("PK_User");
 
         builder.Property(x => x.Id)
             .IsRequired();
 
-        builder.Property(x => x.Name)
+        builder.Property(x => x.DisplayName)
             .IsRequired()
             .HasMaxLength(50);
     }

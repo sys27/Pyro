@@ -11,7 +11,7 @@ using Pyro.Infrastructure.Issues.DataAccess;
 namespace Pyro.Infrastructure.Issues.Migrations
 {
     [DbContext(typeof(IssuesDbContext))]
-    [Migration("20241118140145_Initial")]
+    [Migration("20241120081303_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -240,15 +240,15 @@ namespace Pyro.Infrastructure.Issues.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("DisplayName")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id")
-                        .HasName("PK_UserProfile");
+                        .HasName("PK_User");
 
-                    b.ToTable("UserProfiles", null, t =>
+                    b.ToTable("Users", null, t =>
                         {
                             t.ExcludeFromMigrations();
                         });

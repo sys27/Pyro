@@ -13,7 +13,8 @@ public class PasswordServiceTests
         var user = new User
         {
             Login = "test",
-            Profile = new UserProfile { Name = "test" },
+            DisplayName = "test",
+            Email = "test@localhost.local",
         };
 
         var passwordService = new PasswordService(TimeProvider.System);

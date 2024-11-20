@@ -38,7 +38,7 @@ public class UserTests
     [Test]
     public async Task GetUserByLogin()
     {
-        const string login = "pyro@localhost.local";
+        const string login = "pyro";
         var result = await client.GetUser(login);
 
         Assert.That(result, Is.Not.Null);
@@ -57,13 +57,15 @@ public class UserTests
     [Test]
     public async Task CreateGetUpdateUser()
     {
-        var login = faker.Internet.Email();
+        var login = faker.Random.Hash(32);
+        var email = faker.Internet.Email();
         var createRequest = new CreateUserRequest(
             login,
+            email,
             ["Admin"]);
         await client.CreateUser(createRequest);
 
-        var message = Api.Smtp.WaitForMessage(x => x.To == login) ??
+        var message = Api.Smtp.WaitForMessage(x => x.To == email) ??
                       throw new InvalidOperationException("The message was not found.");
         var token = message.GetToken();
         var activateUserRequest = new ActivateUserRequest(token, faker.Random.Hash());
@@ -94,13 +96,15 @@ public class UserTests
     [Test]
     public async Task ChangePassword()
     {
-        var login = faker.Internet.Email();
+        var login = faker.Random.Hash(32);
+        var email = faker.Internet.Email();
         var createRequest = new CreateUserRequest(
             login,
+            email,
             ["Admin"]);
         await client.CreateUser(createRequest);
 
-        var message = Api.Smtp.WaitForMessage(x => x.To == login) ??
+        var message = Api.Smtp.WaitForMessage(x => x.To == email) ??
                       throw new InvalidOperationException("The message was not found.");
         var token = message.GetToken();
         var password = faker.Random.Hash();

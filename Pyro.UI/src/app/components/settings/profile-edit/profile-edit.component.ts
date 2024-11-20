@@ -20,8 +20,8 @@ import { filter } from 'rxjs';
 })
 export class ProfileEditComponent implements OnInit {
     public readonly form = this.formBuilder.group({
-        name: ['', [Validators.required('Name'), Validators.maxLength('Name', 50)]],
-        status: ['', [Validators.maxLength('Status', 150)]],
+        displayName: ['', [Validators.required('Name'), Validators.maxLength('Name', 50)]],
+        email: ['', [Validators.required('Email'), Validators.email('Email')]],
     });
 
     public constructor(
@@ -41,8 +41,8 @@ export class ProfileEditComponent implements OnInit {
             )
             .subscribe(profile => {
                 this.form.patchValue({
-                    name: profile?.name,
-                    status: profile?.status,
+                    displayName: profile.displayName,
+                    email: profile.email,
                 });
             });
     }
@@ -53,8 +53,8 @@ export class ProfileEditComponent implements OnInit {
         }
 
         let profile: UpdateProfile = {
-            name: this.form.get('name')!.value,
-            status: this.form.get('status')!.value,
+            displayName: this.form.value.displayName!,
+            email: this.form.value.email!,
         };
 
         this.store.dispatch(updateProfile({ profile }));

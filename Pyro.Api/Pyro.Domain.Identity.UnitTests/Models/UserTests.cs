@@ -18,7 +18,8 @@ public class UserTests
         var user = new User
         {
             Login = "test",
-            Profile = new UserProfile { Name = "test" },
+            DisplayName = "test",
+            Email = "test@localhost.local",
         };
         var role = new Role
         {
@@ -35,7 +36,8 @@ public class UserTests
         var user = new User
         {
             Login = "test",
-            Profile = new UserProfile { Name = "test" },
+            DisplayName = "test",
+            Email = "test@localhost.local",
         };
         var role = new Role
         {
@@ -54,7 +56,8 @@ public class UserTests
         var user = new User
         {
             Login = "test",
-            Profile = new UserProfile { Name = "test" },
+            DisplayName = "test",
+            Email = "test@localhost.local",
         };
         var role = new Role
         {
@@ -72,7 +75,8 @@ public class UserTests
         var user = new User
         {
             Login = "test",
-            Profile = new UserProfile { Name = "test" },
+            DisplayName = "test",
+            Email = "test@localhost.local",
         };
         var token = AuthenticationToken.Create(Guid.NewGuid(), user, DateTimeOffset.UtcNow);
         user.AddAuthenticationToken(token);
@@ -86,7 +90,8 @@ public class UserTests
         var user = new User
         {
             Login = "test",
-            Profile = new UserProfile { Name = "test" },
+            DisplayName = "test",
+            Email = "test@localhost.local",
         };
         var token = AuthenticationToken.Create(Guid.NewGuid(), user, DateTimeOffset.UtcNow);
         user.AddAuthenticationToken(token);
@@ -101,7 +106,8 @@ public class UserTests
         var user = new User
         {
             Login = "test",
-            Profile = new UserProfile { Name = "test" },
+            DisplayName = "test",
+            Email = "test@localhost.local",
         };
         var token = new AccessToken
         {
@@ -123,7 +129,8 @@ public class UserTests
         var user = new User
         {
             Login = "test",
-            Profile = new UserProfile { Name = "test" },
+            DisplayName = "test",
+            Email = "test@localhost.local",
         };
         var token = new AccessToken
         {
@@ -145,7 +152,8 @@ public class UserTests
         var user = new User
         {
             Login = "test",
-            Profile = new UserProfile { Name = "test" },
+            DisplayName = "test",
+            Email = "test@localhost.local",
         };
         var token = new AccessToken
         {
@@ -174,7 +182,8 @@ public class UserTests
         var user = new User
         {
             Login = "test",
-            Profile = new UserProfile { Name = "test" },
+            DisplayName = "test",
+            Email = "test@localhost.local",
         };
         var token = new AccessToken
         {
@@ -202,7 +211,8 @@ public class UserTests
         var user = new User
         {
             Login = "test",
-            Profile = new UserProfile { Name = "test" },
+            DisplayName = "test",
+            Email = "test@localhost.local",
         };
         user.AddAuthenticationToken(new AuthenticationToken());
 
@@ -221,7 +231,8 @@ public class UserTests
         var user = new User
         {
             Login = "test",
-            Profile = new UserProfile { Name = "test" },
+            DisplayName = "test",
+            Email = "test@localhost.local",
         };
 
         user.Unlock();
@@ -235,7 +246,8 @@ public class UserTests
         var user = new User
         {
             Login = "test",
-            Profile = new UserProfile { Name = "test" },
+            DisplayName = "test",
+            Email = "test@localhost.local",
         };
 
         var timeProvider = Substitute.For<TimeProvider>();
@@ -252,7 +264,8 @@ public class UserTests
         var user = new User
         {
             Login = "test",
-            Profile = new UserProfile { Name = "test" },
+            DisplayName = "test",
+            Email = "test@localhost.local",
         };
         var oneTimePassword = new OneTimePassword
         {
@@ -281,7 +294,8 @@ public class UserTests
         var user = new User
         {
             Login = "test",
-            Profile = new UserProfile { Name = "test" },
+            DisplayName = "test",
+            Email = "test@localhost.local",
         };
         var oneTimePassword = new OneTimePassword
         {
@@ -310,7 +324,8 @@ public class UserTests
         var user = new User
         {
             Login = "test",
-            Profile = new UserProfile { Name = "test" },
+            DisplayName = "test",
+            Email = "test@localhost.local",
         };
         user.Lock();
 
@@ -354,7 +369,8 @@ public class UserTests
             Login = "test@localhost.local",
             Password = passwordHash,
             Salt = salt,
-            Profile = new UserProfile { Name = "test" },
+            DisplayName = "test",
+            Email = "test@localhost.local",
         };
 
         Assert.Throws<DomainException>(() => user.ChangePassword(TimeProvider.System, passwordService, "incorrect", "newPassword"));
@@ -376,7 +392,8 @@ public class UserTests
             Login = "test@localhost.local",
             Password = passwordHash,
             Salt = salt,
-            Profile = new UserProfile { Name = "test" },
+            DisplayName = "test",
+            Email = "test@localhost.local",
         };
 
         user.ChangePassword(currentTimeProvider, passwordService, oldPassword, "newPassword");

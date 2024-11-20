@@ -11,7 +11,7 @@ using Pyro.Infrastructure.DataAccess;
 namespace Pyro.Infrastructure.Migrations
 {
     [DbContext(typeof(PyroDbContext))]
-    [Migration("20241118140058_Initial")]
+    [Migration("20241120081335_Initial")]
     partial class Initial
     {
         /// <inheritdoc />

@@ -16,7 +16,8 @@ public class UpdateUserHandlerTests
         var user = new User
         {
             Login = "test",
-            Profile = new UserProfile { Name = "test" },
+            DisplayName = "test",
+            Email = "test@localhost.local",
         };
         var updateUser = new UpdateUser(user, ["admin"]);
 
@@ -40,7 +41,8 @@ public class UpdateUserHandlerTests
         var user = new User
         {
             Login = "test",
-            Profile = new UserProfile { Name = "test" },
+            DisplayName = "test",
+            Email = "test@localhost.local",
         };
         user.AddRole(roles[1]);
 

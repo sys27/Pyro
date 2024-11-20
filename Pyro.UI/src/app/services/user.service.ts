@@ -38,6 +38,7 @@ export class UserService {
     public createUser(user: CreateUser): Observable<void> {
         let request = {
             login: user.login,
+            email: user.email,
             roles: user.roles.map(role => role.name),
         };
 
@@ -93,6 +94,7 @@ export interface UserItem {
 
 export interface CreateUser {
     login: string;
+    email: string;
     roles: Role[];
 }
 

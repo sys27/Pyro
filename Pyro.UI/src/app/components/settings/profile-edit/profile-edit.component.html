@@ -4,25 +4,25 @@
     [formGroup]="form"
     (ngSubmit)="onSubmit()">
     <div class="field">
-      <label for="name">Name:</label>
+      <label for="displayName">Display Name:</label>
       <input
-        id="name"
+        id="displayName"
         type="text"
         class="w-full"
         pInputText
-        formControlName="name" />
-      <validation-summary controlName="name" />
+        formControlName="displayName" />
+      <validation-summary controlName="displayName" />
     </div>
 
     <div class="field">
-      <label for="status">Status:</label>
+      <label for="email">Email:</label>
       <input
-        id="status"
+        id="email"
         type="text"
         class="w-full"
         pInputText
-        formControlName="status" />
-      <validation-summary controlName="status" />
+        formControlName="email" />
+      <validation-summary controlName="email" />
     </div>
 
     <div class="field">
