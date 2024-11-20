@@ -20,7 +20,7 @@ public class User : DomainEntity
     private byte[] salt = [];
     private DateTimeOffset passwordExpiresAt;
 
-    public static User Create(string login, byte[] password, byte[] salt)
+    public static User Create(string login, string email, byte[] password, byte[] salt)
     {
         var user = new User
         {
@@ -29,7 +29,8 @@ public class User : DomainEntity
             Salt = salt,
             PasswordExpiresAt = DateTimeOffset.MinValue,
             IsLocked = true,
-            Profile = new UserProfile { Name = login },
+            DisplayName = login,
+            Email = email,
         };
         user.PublishEvent(new UserCreated(user.Id, login));
 
@@ -92,7 +93,9 @@ public class User : DomainEntity
     public IReadOnlyList<OneTimePassword> OneTimePasswords
         => oneTimePasswords;
 
-    public required UserProfile Profile { get; init; }
+    public required string DisplayName { get; set; }
+
+    public required string Email { get; set; }
 
     public void Lock()
     {

@@ -84,7 +84,7 @@
           <div>Assignee:</div>
           <div class="flex flex-row gap-2">
             <span class="pi pi-user"></span>
-            <span>{{ issue.assignee?.name ?? 'Unassigned' }}</span>
+            <span>{{ issue.assignee?.displayName ?? 'Unassigned' }}</span>
           </div>
         </div>
 
@@ -94,7 +94,7 @@
           <div>Author:</div>
           <div class="flex flex-row gap-2">
             <span class="pi pi-user"></span>
-            <span>{{ issue.author.name }}</span>
+            <span>{{ issue.author.displayName }}</span>
           </div>
         </div>
 

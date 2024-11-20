@@ -87,10 +87,13 @@ internal class UserConfiguration : IEntityTypeConfiguration<User>
             .WithOne()
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasOne(x => x.Profile)
-            .WithOne()
-            .HasForeignKey<UserProfile>(x => x.Id)
-            .HasPrincipalKey<User>(x => x.Id);
+        builder.Property(x => x.DisplayName)
+            .IsRequired()
+            .HasMaxLength(50);
+
+        builder.Property(x => x.Email)
+            .IsRequired()
+            .HasMaxLength(50);
 
         builder.HasIndex(x => x.Login)
             .IsUnique()

@@ -36,7 +36,7 @@ public class NotifyExpiringPasswordsHandler : IRequestHandler<NotifyExpiringPass
         await foreach (var user in expiringUsers)
         {
             var body = $"""
-                        Hello {user.Profile.Name},
+                        Hello {user.DisplayName},
 
                         Your password is about to expire. The expiration date is {user.PasswordExpiresAt:yyyy-MM-dd}.
                         Please change your password to avoid any issues.
@@ -44,7 +44,7 @@ public class NotifyExpiringPasswordsHandler : IRequestHandler<NotifyExpiringPass
                         Thank you, Pyro.
                         """;
             var email = new EmailMessage(
-                new EmailAddress(user.Profile.Name, user.Login),
+                new EmailAddress(user.DisplayName, user.Email),
                 new EmailAddress("No Reply", $"no-reply@{emailServiceOptions.Domain}"),
                 "Password expiration",
                 body);

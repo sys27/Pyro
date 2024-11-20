@@ -77,8 +77,8 @@ public class GitBackend
                 { "HTTP_CONTENT_ENCODING", httpContext.Request.Headers.ContentEncoding },
                 { "REMOTE_USER", currentUser.Login },
                 { "REMOTE_ADDR", httpContext.Connection.RemoteIpAddress?.ToString() },
-                { "GIT_COMMITTER_NAME", user.Profile.Name },
-                { "GIT_COMMITTER_EMAIL", user.Login },
+                { "GIT_COMMITTER_NAME", user.DisplayName },
+                { "GIT_COMMITTER_EMAIL", user.Email },
             },
         };
 

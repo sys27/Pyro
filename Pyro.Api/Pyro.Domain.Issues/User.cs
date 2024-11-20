@@ -3,4 +3,4 @@
 
 namespace Pyro.Domain.Issues;
 
-public record User(Guid Id, string Name);
+public record User(Guid Id, string DisplayName);

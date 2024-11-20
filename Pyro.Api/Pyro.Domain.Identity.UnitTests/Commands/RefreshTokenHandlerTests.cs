@@ -44,7 +44,8 @@ public class RefreshTokenHandlerTests
         var user = new User
         {
             Login = "test",
-            Profile = new UserProfile { Name = "test" },
+            DisplayName = "test",
+            Email = "test@localhost.local",
         };
         user.Lock();
 
@@ -82,7 +83,8 @@ public class RefreshTokenHandlerTests
         var user = new User
         {
             Login = "test",
-            Profile = new UserProfile { Name = "test" },
+            DisplayName = "test",
+            Email = "test@localhost.local",
             PasswordExpiresAt = currentDate.AddDays(-1),
         };
         var jwtToken = new JwtToken
@@ -119,7 +121,8 @@ public class RefreshTokenHandlerTests
         var user = new User
         {
             Login = "test",
-            Profile = new UserProfile { Name = "test" },
+            DisplayName = "test",
+            Email = "test@localhost.local",
         };
         var jwtToken = new JwtToken
         {
@@ -155,7 +158,8 @@ public class RefreshTokenHandlerTests
         var user = new User
         {
             Login = "test",
-            Profile = new UserProfile { Name = "test" },
+            DisplayName = "test",
+            Email = "test@localhost.local",
         };
         var authToken = AuthenticationToken.Create(Guid.NewGuid(), user, currentDate.AddMonths(-1));
         user.AddAuthenticationToken(authToken);
@@ -196,7 +200,8 @@ public class RefreshTokenHandlerTests
         var user = new User
         {
             Login = "test",
-            Profile = new UserProfile { Name = "test" },
+            DisplayName = "test",
+            Email = "test@localhost.local",
             PasswordExpiresAt = currentDate.AddDays(90),
         };
         var authToken = AuthenticationToken.Create(Guid.NewGuid(), user, currentDate.AddMonths(1));

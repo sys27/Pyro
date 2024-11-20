@@ -195,7 +195,7 @@ export interface IssueTitleChangeLog extends IssueChangeLog {
 
 export interface User {
     get id(): string;
-    get name(): string;
+    get displayName(): string;
 }
 
 export interface CreateIssue {

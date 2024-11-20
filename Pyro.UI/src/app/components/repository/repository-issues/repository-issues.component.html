@@ -35,7 +35,7 @@
 
               <div class="flex flex-row gap-2 text-sm text-400">
                 <div class="flex-grow-1">
-                  <span>#{{ issue.issueNumber }} created by {{ issue.author.name }}</span>
+                  <span>#{{ issue.issueNumber }} created by {{ issue.author.displayName }}</span>
                 </div>
 
                 <div>
@@ -43,7 +43,7 @@
                 </div>
 
                 <div>
-                  <span>{{ issue.assignee?.name ?? 'Unassigned' }}</span>
+                  <span>{{ issue.assignee?.displayName ?? 'Unassigned' }}</span>
                 </div>
               </div>
             </div>

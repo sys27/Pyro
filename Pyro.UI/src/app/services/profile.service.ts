@@ -15,8 +15,8 @@ export class ProfileService {
 
     public updateProfile(profile: UpdateProfile): Observable<void> {
         let request = {
-            name: profile.name,
-            status: profile.status,
+            displayName: profile.displayName,
+            email: profile.email,
         };
 
         return this.http.put<void>(Endpoints.Profile, request);
@@ -24,11 +24,11 @@ export class ProfileService {
 }
 
 export interface Profile {
-    get name(): string | null;
-    get status(): string | null;
+    get displayName(): string;
+    get email(): string;
 }
 
 export interface UpdateProfile {
-    name: string | null;
-    status: string | null;
+    displayName: string;
+    email: string;
 }

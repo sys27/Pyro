@@ -21,11 +21,11 @@ export class ChangeLogViewComponent {
     public constructor(private readonly datePipe: DatePipe) {}
 
     public getTooltipMessage(changeLog: ChangeLogs): string {
-        return `Changed by ${changeLog.author.name} on ${this.datePipe.transform(changeLog.createdAt, 'short')}`;
+        return `Changed by ${changeLog.author.displayName} on ${this.datePipe.transform(changeLog.createdAt, 'short')}`;
     }
 
     public getAssigneeName(user: User | null): string {
-        return user?.name ?? 'Unassigned';
+        return user?.displayName ?? 'Unassigned';
     }
 
     public get issueChangeLogType(): typeof IssueChangeLogType {

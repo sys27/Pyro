@@ -79,14 +79,14 @@ namespace Pyro.Infrastructure.Issues.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Issues_UserProfiles_AssigneeId",
+                        name: "FK_Issues_Users_AssigneeId",
                         column: x => x.AssigneeId,
-                        principalTable: "UserProfiles",
+                        principalTable: "Users",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Issues_UserProfiles_AuthorId",
+                        name: "FK_Issues_Users_AuthorId",
                         column: x => x.AuthorId,
-                        principalTable: "UserProfiles",
+                        principalTable: "Users",
                         principalColumn: "Id");
                 });
 
@@ -133,19 +133,19 @@ namespace Pyro.Infrastructure.Issues.Migrations
                         principalTable: "Issues",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_IssueAssigneeChangeLogs_UserProfiles_AuthorId",
+                        name: "FK_IssueAssigneeChangeLogs_Users_AuthorId",
                         column: x => x.AuthorId,
-                        principalTable: "UserProfiles",
+                        principalTable: "Users",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_IssueAssigneeChangeLogs_UserProfiles_NewAssigneeId",
+                        name: "FK_IssueAssigneeChangeLogs_Users_NewAssigneeId",
                         column: x => x.NewAssigneeId,
-                        principalTable: "UserProfiles",
+                        principalTable: "Users",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_IssueAssigneeChangeLogs_UserProfiles_OldAssigneeId",
+                        name: "FK_IssueAssigneeChangeLogs_Users_OldAssigneeId",
                         column: x => x.OldAssigneeId,
-                        principalTable: "UserProfiles",
+                        principalTable: "Users",
                         principalColumn: "Id");
                 });
 
@@ -169,9 +169,9 @@ namespace Pyro.Infrastructure.Issues.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_IssueComments_UserProfiles_AuthorId",
+                        name: "FK_IssueComments_Users_AuthorId",
                         column: x => x.AuthorId,
-                        principalTable: "UserProfiles",
+                        principalTable: "Users",
                         principalColumn: "Id");
                 });
 
@@ -205,9 +205,9 @@ namespace Pyro.Infrastructure.Issues.Migrations
                         principalTable: "Labels",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_IssueLabelChangeLogs_UserProfiles_AuthorId",
+                        name: "FK_IssueLabelChangeLogs_Users_AuthorId",
                         column: x => x.AuthorId,
-                        principalTable: "UserProfiles",
+                        principalTable: "Users",
                         principalColumn: "Id");
                 });
 
@@ -253,9 +253,9 @@ namespace Pyro.Infrastructure.Issues.Migrations
                         principalTable: "Issues",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_IssueLockChangeLogs_UserProfiles_AuthorId",
+                        name: "FK_IssueLockChangeLogs_Users_AuthorId",
                         column: x => x.AuthorId,
-                        principalTable: "UserProfiles",
+                        principalTable: "Users",
                         principalColumn: "Id");
                 });
 
@@ -289,9 +289,9 @@ namespace Pyro.Infrastructure.Issues.Migrations
                         principalTable: "Issues",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_IssueStatusChangeLogs_UserProfiles_AuthorId",
+                        name: "FK_IssueStatusChangeLogs_Users_AuthorId",
                         column: x => x.AuthorId,
-                        principalTable: "UserProfiles",
+                        principalTable: "Users",
                         principalColumn: "Id");
                 });
 
@@ -315,9 +315,9 @@ namespace Pyro.Infrastructure.Issues.Migrations
                         principalTable: "Issues",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_IssueTitleChangeLog_UserProfiles_AuthorId",
+                        name: "FK_IssueTitleChangeLog_Users_AuthorId",
                         column: x => x.AuthorId,
-                        principalTable: "UserProfiles",
+                        principalTable: "Users",
                         principalColumn: "Id");
                 });
 

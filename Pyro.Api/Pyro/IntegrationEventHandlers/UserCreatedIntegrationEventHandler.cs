@@ -57,7 +57,7 @@ public class UserCreatedIntegrationEventHandler : INotificationHandler<UserCreat
                     """;
         var message = new EmailMessage(
             new EmailAddress("No Reply", $"no-reply@{emailServiceOptions.Domain}"),
-            new EmailAddress(user.Profile.Name, user.Login),
+            new EmailAddress(user.DisplayName, user.Email),
             "Welcome to Pyro",
             body);
         await emailService.SendEmail(message, cancellationToken);

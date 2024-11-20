@@ -2,13 +2,14 @@
 // Licensed under the GPL-3.0 license. See LICENSE file in the project root for full license information.
 
 using MediatR;
-using Pyro.Domain.Identity.Models;
 using Pyro.Domain.Shared.CurrentUserProvider;
 using Pyro.Domain.Shared.Exceptions;
 
 namespace Pyro.Domain.Identity.Queries;
 
 public record GetUserProfile : IRequest<UserProfile>;
+
+public record UserProfile(string DisplayName, string Email);
 
 public class GetUserProfileHandler : IRequestHandler<GetUserProfile, UserProfile>
 {
@@ -29,6 +30,6 @@ public class GetUserProfileHandler : IRequestHandler<GetUserProfile, UserProfile
         var user = await repository.GetUserById(currentUser.Id, cancellationToken) ??
                    throw new NotFoundException($"User with id {currentUser.Id} not found");
 
-        return user.Profile;
+        return new UserProfile(user.DisplayName, user.Email);
     }
 }

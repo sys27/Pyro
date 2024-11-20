@@ -8,18 +8,20 @@ using Pyro.Domain.Shared.Exceptions;
 
 namespace Pyro.Domain.Identity.Commands;
 
-public record UpdateProfile(string Name, string? Status) : IRequest;
+public record UpdateProfile(string DisplayName, string Email) : IRequest;
 
 public class UpdateProfileValidator : AbstractValidator<UpdateProfile>
 {
     public UpdateProfileValidator()
     {
-        RuleFor(x => x.Name)
+        RuleFor(x => x.DisplayName)
             .NotEmpty()
             .MaximumLength(50);
 
-        RuleFor(x => x.Status)
-            .MaximumLength(200);
+        RuleFor(x => x.Email)
+            .NotEmpty()
+            .EmailAddress()
+            .MaximumLength(50);
     }
 }
 
@@ -42,7 +44,7 @@ public class UpdateProfileHandler : IRequestHandler<UpdateProfile>
         var user = await repository.GetUserById(currentUser.Id, cancellationToken) ??
                    throw new NotFoundException($"User with id {currentUser.Id} is not found");
 
-        user.Profile.Name = request.Name;
-        user.Profile.Status = request.Status;
+        user.DisplayName = request.DisplayName;
+        user.Email = request.Email;
     }
 }

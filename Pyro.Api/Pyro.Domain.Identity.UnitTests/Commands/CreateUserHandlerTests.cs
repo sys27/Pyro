@@ -13,7 +13,7 @@ public class CreateUserHandlerTests
     [Test]
     public async Task CreateValidUser()
     {
-        var command = new CreateUser("test", ["admin"]);
+        var command = new CreateUser("test", "test@localhost.local", ["admin"]);
 
         var repository = Substitute.For<IUserRepository>();
         repository
@@ -35,6 +35,8 @@ public class CreateUserHandlerTests
         Assert.Multiple(() =>
         {
             Assert.That(user.Login, Is.EqualTo(command.Login));
+            Assert.That(user.DisplayName, Is.EqualTo(command.Login));
+            Assert.That(user.Email, Is.EqualTo(command.Email));
             Assert.That(user.Roles, Has.Count.EqualTo(1));
             Assert.That(user.Roles[0].Name, Is.EqualTo("admin"));
             Assert.That(user.IsLocked, Is.True);
@@ -44,7 +46,7 @@ public class CreateUserHandlerTests
     [Test]
     public void CreateUserWithInvalidRole()
     {
-        var command = new CreateUser("test", ["user"]);
+        var command = new CreateUser("test", "test@localhost.local", ["user"]);
 
         var repository = Substitute.For<IUserRepository>();
         repository

@@ -40,11 +40,7 @@ export class UserNewComponent implements OnInit {
     public readonly form = this.formBuilder.nonNullable.group({
         login: [
             '',
-            [
-                Validators.required('Login'),
-                Validators.maxLength('Login', 32),
-                Validators.email('Login'),
-            ],
+            [Validators.required('Login'), Validators.maxLength('Login', 32)],
             [
                 Validators.exists(
                     value => `The user with login '${value}' already exists`,
@@ -52,6 +48,7 @@ export class UserNewComponent implements OnInit {
                 ),
             ],
         ],
+        email: ['', [Validators.required('Email'), Validators.email('Email')]],
         roles: new FormControl<Role[]>([], Validators.required('Roles')),
     });
 
@@ -72,6 +69,7 @@ export class UserNewComponent implements OnInit {
 
         let user: CreateUser = {
             login: this.form.value.login!,
+            email: this.form.value.email!,
             roles: this.form.value.roles!,
         };
 

@@ -3,4 +3,8 @@
 
 namespace Pyro.Contracts.Responses.Identity;
 
-public record UserResponse(Guid Id, string Login, bool IsLocked, IEnumerable<RoleResponse> Roles);
+public record UserResponse(
+    Guid Id,
+    string Login,
+    bool IsLocked,
+    IEnumerable<RoleResponse> Roles);

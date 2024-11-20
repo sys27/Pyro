@@ -34,7 +34,8 @@ public class LoginHandlerTests
         var user = new User
         {
             Login = "test",
-            Profile = new UserProfile { Name = "test" },
+            DisplayName = "test",
+            Email = "test@localhost.local",
         };
         user.Lock();
 
@@ -61,7 +62,8 @@ public class LoginHandlerTests
         var user = new User
         {
             Login = "test",
-            Profile = new UserProfile { Name = "test" },
+            DisplayName = "test",
+            Email = "test@localhost.local",
             PasswordExpiresAt = currentDate.AddDays(-1),
         };
 
@@ -88,7 +90,8 @@ public class LoginHandlerTests
         var user = new User
         {
             Login = "test",
-            Profile = new UserProfile { Name = "test" },
+            DisplayName = "test",
+            Email = "test@localhost.local",
         };
 
         var logger = Substitute.For<ILogger<LoginHandler>>();
@@ -116,7 +119,8 @@ public class LoginHandlerTests
         var user = new User
         {
             Login = "test",
-            Profile = new UserProfile { Name = "test" },
+            DisplayName = "test",
+            Email = "test@localhost.local",
         };
         var jwtTokenPair = new JwtTokenPair(
             new Token(Guid.NewGuid(), "access", DateTimeOffset.UtcNow),

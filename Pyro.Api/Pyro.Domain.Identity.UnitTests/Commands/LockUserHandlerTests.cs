@@ -31,7 +31,8 @@ public class LockUserHandlerTests
         {
             Id = currentUser.Id,
             Login = currentUser.Login,
-            Profile = new UserProfile { Name = currentUser.Login },
+            DisplayName = currentUser.Login,
+            Email = "test@localhost.local",
         };
         var command = new LockUser(currentUser.Login);
 
@@ -56,7 +57,8 @@ public class LockUserHandlerTests
         var user = new User
         {
             Login = "test",
-            Profile = new UserProfile { Name = "test" },
+            DisplayName = "test",
+            Email = "test@localhost.local",
         };
         var command = new LockUser(user.Login);
 

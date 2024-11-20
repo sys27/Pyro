@@ -115,7 +115,7 @@ internal class UserRepository : IUserRepository
         var expiration = now.AddDays(7); // TODO: config
 
         return Users
-            .Where(x => !x.IsLocked && x.PasswordExpiresAt < expiration)
+            .Where(x => !x.IsLocked && x.PasswordExpiresAt > now && x.PasswordExpiresAt < expiration)
             .AsAsyncEnumerable();
     }
 
@@ -127,6 +127,5 @@ internal class UserRepository : IUserRepository
             .Include(x => x.AuthenticationTokens)
             .Include(x => x.AccessTokens)
             .Include(x => x.OneTimePasswords)
-            .Include(x => x.Profile)
             .AsSplitQuery();
 }
