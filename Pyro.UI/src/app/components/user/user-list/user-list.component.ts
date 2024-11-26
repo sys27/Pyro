@@ -1,4 +1,5 @@
 import {
+    forgotPassword,
     loadUsers,
     lockUser,
     unlockUser,
@@ -9,7 +10,6 @@ import { AsyncPipe } from '@angular/common';
 import { Component, DestroyRef, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterModule } from '@angular/router';
-import { PaginatorComponent } from '@controls/paginator/paginator.component';
 import { DataSourceDirective } from '@directives/data-source.directive';
 import { PyroPermissions } from '@models/pyro-permissions';
 import { Store } from '@ngrx/store';
@@ -20,7 +20,9 @@ import { DataSourceState } from '@states/data-source.state';
 import { selectCurrentPage, selectHasNext, selectHasPrevious } from '@states/paged.state';
 import { selectUsers } from '@states/users.state';
 import { ButtonModule } from 'primeng/button';
+import { ButtonGroupModule } from 'primeng/buttongroup';
 import { TableModule } from 'primeng/table';
+import { TooltipModule } from 'primeng/tooltip';
 import { map, Observable } from 'rxjs';
 
 @Component({
@@ -29,10 +31,11 @@ import { map, Observable } from 'rxjs';
     imports: [
         AsyncPipe,
         ButtonModule,
+        ButtonGroupModule,
         DataSourceDirective,
-        PaginatorComponent,
         RouterModule,
         TableModule,
+        TooltipModule,
     ],
     templateUrl: './user-list.component.html',
     styleUrl: './user-list.component.css',
@@ -66,6 +69,10 @@ export class UserListComponent implements OnInit {
 
     public unlockUserHandler(user: User): void {
         this.store.dispatch(unlockUser({ login: user.login }));
+    }
+
+    public resetPasswordHandler(user: User): void {
+        this.store.dispatch(forgotPassword({ login: user.login }));
     }
 
     public isCurrentUser(user: User): Observable<boolean> {

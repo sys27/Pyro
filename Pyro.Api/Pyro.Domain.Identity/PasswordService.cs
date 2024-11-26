@@ -56,20 +56,41 @@ public class PasswordService : IPasswordService
         return passwordHashToVerify.AsSpan().SequenceEqual([..passwordHash]);
     }
 
-    public OneTimePassword GenerateOneTimePasswordFor(User user)
+    private static string GetToken()
     {
         using var rng = RandomNumberGenerator.Create();
 
         Span<byte> bytes = stackalloc byte[16];
         rng.GetBytes(bytes);
 
-        var token = Convert.ToBase64String(bytes);
+        return Convert.ToBase64String(bytes);
+    }
+
+    public OneTimePassword GenerateOneTimePasswordFor(User user)
+    {
+        var token = GetToken();
         var expiresAt = timeProvider.GetUtcNow().AddDays(1); // TODO: config
         var otp = new OneTimePassword
         {
             Token = token,
             ExpiresAt = expiresAt,
             Purpose = OneTimePasswordPurpose.UserRegistration,
+            User = user,
+        };
+        user.AddOneTimePassword(otp);
+
+        return otp;
+    }
+
+    public OneTimePassword GeneratePasswordResetTokenFor(User user)
+    {
+        var token = GetToken();
+        var expiresAt = timeProvider.GetUtcNow().AddMinutes(5); // TODO: config
+        var otp = new OneTimePassword
+        {
+            Token = token,
+            ExpiresAt = expiresAt,
+            Purpose = OneTimePasswordPurpose.PasswordReset,
             User = user,
         };
         user.AddOneTimePassword(otp);

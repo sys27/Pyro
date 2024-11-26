@@ -22,23 +22,31 @@
               </div>
 
               <div class="flex-shrink-1 flex gap-2">
-                <p-button
-                  icon="pi pi-pencil"
-                  [routerLink]="['/users', user.login]"
-                  [outlined]="true" />
+                <p-buttonGroup>
+                  <p-button
+                    icon="pi pi-pencil"
+                    [routerLink]="['/users', user.login]"
+                    [outlined]="true" />
 
-                @if (user.isLocked) {
+                  @if (user.isLocked) {
+                    <p-button
+                      icon="pi pi-lock-open"
+                      [outlined]="true"
+                      (onClick)="unlockUserHandler(user)" />
+                  } @else {
+                    <p-button
+                      icon="pi pi-lock"
+                      [outlined]="true"
+                      [disabled]="isCurrentUser(user) | async"
+                      (onClick)="lockUserHandler(user)" />
+                  }
+
                   <p-button
-                    icon="pi pi-lock-open"
+                    icon="pi pi-key"
                     [outlined]="true"
-                    (onClick)="unlockUserHandler(user)" />
-                } @else {
-                  <p-button
-                    icon="pi pi-lock"
-                    [outlined]="true"
-                    [disabled]="isCurrentUser(user) | async"
-                    (onClick)="lockUserHandler(user)" />
-                }
+                    (onClick)="resetPasswordHandler(user)"
+                    pTooltip="Reset Password" />
+                </p-buttonGroup>
               </div>
             </div>
           </td>

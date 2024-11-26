@@ -3,7 +3,7 @@ import {
     deleteAccessTokenFailure,
     loadAccessTokensFailure,
 } from '@actions/access-tokens.actions';
-import { loginFailedAction, logoutFailedAction, refreshFailedAction } from '@actions/auth.actions';
+import { loginFailedAction, refreshFailedAction } from '@actions/auth.actions';
 import {
     createIssueFailure,
     editIssueFailure,
@@ -39,9 +39,11 @@ import { loadRolesFailure } from '@actions/roles.actions';
 import {
     changePasswordFailure,
     createUserFailure,
+    forgotPasswordFailure,
     loadUserFailure,
     loadUsersFailure,
     lockUserFailure,
+    resetPasswordFailure,
     unlockUserFailure,
     updateUserFailure,
 } from '@actions/users.actions';
@@ -55,7 +57,6 @@ export const errorsEffect = createEffect(
         return actions$.pipe(
             ofType(
                 loginFailedAction,
-                logoutFailedAction,
                 refreshFailedAction,
                 loadRolesFailure,
                 loadUsersFailure,
@@ -93,6 +94,8 @@ export const errorsEffect = createEffect(
                 editIssueFailure,
                 loadIssueFailure,
                 changePasswordFailure,
+                forgotPasswordFailure,
+                resetPasswordFailure,
             ),
             tap(() =>
                 messageService.add({

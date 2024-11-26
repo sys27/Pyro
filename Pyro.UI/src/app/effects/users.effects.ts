@@ -1,3 +1,4 @@
+import { logoutAction } from '@actions/auth.actions';
 import { notifyAction } from '@actions/notification.actions';
 import { loadRoles } from '@actions/roles.actions';
 import {
@@ -7,6 +8,9 @@ import {
     createUser,
     createUserFailure,
     createUserSuccess,
+    forgotPassword,
+    forgotPasswordFailure,
+    forgotPasswordSuccess,
     loadCurrentUsersPageSuccess,
     loadNextUsersPageSuccess,
     loadPreviousUsersPageSuccess,
@@ -18,6 +22,9 @@ import {
     lockUser,
     lockUserFailure,
     lockUserSuccess,
+    resetPassword,
+    resetPasswordFailure,
+    resetPasswordSuccess,
     unlockUser,
     unlockUserFailure,
     unlockUserSuccess,
@@ -237,6 +244,56 @@ export const changePasswordSuccessEffect = createEffect(
                     severity: 'success',
                 }),
             ),
+        );
+    },
+    { functional: true },
+);
+
+export const forgotPasswordEffect = createEffect(
+    (actions$ = inject(Actions), userService = inject(UserService)) => {
+        return actions$.pipe(
+            ofType(forgotPassword),
+            switchMap(({ login }) => userService.forgotPassword(login)),
+            map(() => forgotPasswordSuccess()),
+            catchError(() => of(forgotPasswordFailure())),
+        );
+    },
+    { functional: true },
+);
+
+export const forgotPasswordSuccessEffect = createEffect(
+    (actions$ = inject(Actions)) => {
+        return actions$.pipe(
+            ofType(forgotPasswordSuccess),
+            map(() =>
+                notifyAction({
+                    severity: 'success',
+                    title: 'Success',
+                    message: 'Password reset link has been sent to email',
+                }),
+            ),
+        );
+    },
+    { functional: true, dispatch: false },
+);
+
+export const resetPasswordEffect = createEffect(
+    (actions$ = inject(Actions), userService = inject(UserService)) => {
+        return actions$.pipe(
+            ofType(resetPassword),
+            switchMap(({ token, password }) => userService.resetPassword(token, password)),
+            map(() => resetPasswordSuccess()),
+            catchError(() => of(resetPasswordFailure())),
+        );
+    },
+    { functional: true },
+);
+
+export const resetPasswordSuccessEffect = createEffect(
+    (actions$ = inject(Actions)) => {
+        return actions$.pipe(
+            ofType(resetPasswordSuccess),
+            map(() => logoutAction()),
         );
     },
     { functional: true },

@@ -3,6 +3,7 @@
 
 using Microsoft.Extensions.Options;
 using Pyro.BackgroundServices;
+using Pyro.Domain.Shared;
 using Pyro.Services;
 
 namespace Pyro;

@@ -3,6 +3,7 @@ import { PyroPermissions } from '@models/pyro-permissions';
 import { authGuard } from './auth.guard';
 import { ActivateComponent } from './components/activate/activate.component';
 import { ForbiddenComponent } from './components/forbidden/forbidden.component';
+import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
 import { LoginComponent } from './components/login/login.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import {
@@ -26,6 +27,7 @@ import {
     StatusTransitionNewComponent,
     StatusTransitionViewComponent,
 } from './components/repository';
+import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
 import {
     AccessTokenListComponent,
     AccessTokenNewComponent,
@@ -190,6 +192,8 @@ export const routes: Routes = [
 
     { path: 'login', component: LoginComponent },
     { path: 'activate', component: ActivateComponent },
+    { path: 'forgot-password', component: ForgotPasswordComponent },
+    { path: 'reset-password', component: ResetPasswordComponent },
     { path: 'forbidden', component: ForbiddenComponent },
     { path: '', redirectTo: 'repositories', pathMatch: 'full' },
     { path: '**', component: NotFoundComponent },

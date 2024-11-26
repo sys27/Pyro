@@ -28,10 +28,16 @@
     </div>
 
     <div class="field">
-      <p-button
-        label="Login"
-        type="submit"
-        [disabled]="!formGroup.valid" />
+      <div class="flex gap-2">
+        <p-button
+          label="Login"
+          type="submit"
+          [disabled]="!formGroup.valid" />
+
+        <p-button
+          label="Forgot Password"
+          routerLink="/forgot-password" />
+      </div>
     </div>
   </form>
 </div>
