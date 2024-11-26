@@ -41,6 +41,12 @@ internal class IdentityClient : BaseClient
     public async Task ChangePassword(ChangePasswordRequest request)
         => await Post("/api/users/change-password", request);
 
+    public async Task ForgotPassword(ForgotPasswordRequest request)
+        => await Post("/api/users/forgot-password", request);
+
+    public async Task ResetPassword(ResetPasswordRequest request)
+        => await Post("/api/users/reset-password", request);
+
     public async Task<IReadOnlyList<AccessTokenResponse>?> GetAccessTokens()
         => await Get<IReadOnlyList<AccessTokenResponse>>("/api/users/access-tokens");
 

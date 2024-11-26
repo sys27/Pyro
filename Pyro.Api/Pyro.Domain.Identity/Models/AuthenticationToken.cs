@@ -27,4 +27,7 @@ public class AuthenticationToken : Entity
 
     public bool IsExpired(TimeProvider timeProvider)
         => ExpiresAt <= timeProvider.GetUtcNow();
+
+    public void Invalidate(TimeProvider timeProvider)
+        => ExpiresAt = timeProvider.GetUtcNow();
 }

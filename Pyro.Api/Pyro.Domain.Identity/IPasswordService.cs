@@ -14,4 +14,6 @@ public interface IPasswordService
     string GeneratePassword();
 
     OneTimePassword GenerateOneTimePasswordFor(User user);
+
+    OneTimePassword GeneratePasswordResetTokenFor(User user);
 }

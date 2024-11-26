@@ -403,6 +403,130 @@ public class UserTests
             Assert.That(user.Password, Is.Not.EqualTo(passwordHash));
             Assert.That(user.Salt, Is.Not.EqualTo(salt));
             Assert.That(user.PasswordExpiresAt, Is.EqualTo(currentDateTime.AddDays(90)));
+            Assert.That(user.AuthenticationTokens, Is.Empty);
+            Assert.That(user.AccessTokens, Is.Empty);
+            Assert.That(user.OneTimePasswords, Is.Empty);
+        });
+    }
+
+    [Test]
+    public void ResetPasswordWithTokenIsNull()
+    {
+        var user = new User
+        {
+            Login = "test",
+            DisplayName = "test",
+            Email = "test@localhost.local",
+        };
+
+        var timeProvider = Substitute.For<TimeProvider>();
+        var passwordService = Substitute.For<IPasswordService>();
+
+        Assert.Throws<ArgumentNullException>(() =>
+            user.ResetPassword(timeProvider, passwordService, null!, string.Empty));
+    }
+
+    [Test]
+    public void ResetPasswordWithExpiredToken()
+    {
+        var currentTime = DateTimeOffset.UtcNow;
+
+        var user = new User
+        {
+            Login = "test",
+            DisplayName = "test",
+            Email = "test@localhost.local",
+        };
+        var oneTimePassword = new OneTimePassword
+        {
+            Token = "token",
+            ExpiresAt = currentTime.AddDays(-1),
+            Purpose = OneTimePasswordPurpose.PasswordReset,
+            User = user,
+        };
+        user.AddOneTimePassword(oneTimePassword);
+
+        var timeProvider = Substitute.For<TimeProvider>();
+        timeProvider
+            .GetUtcNow()
+            .Returns(currentTime);
+
+        var passwordService = Substitute.For<IPasswordService>();
+
+        Assert.Throws<DomainException>(() =>
+            user.ResetPassword(timeProvider, passwordService, oneTimePassword, string.Empty));
+    }
+
+    [Test]
+    public void ResetPasswordWithLockedUser()
+    {
+        var currentTime = DateTimeOffset.UtcNow;
+
+        var user = new User
+        {
+            Login = "test",
+            DisplayName = "test",
+            Email = "test@localhost.local",
+        };
+        var oneTimePassword = new OneTimePassword
+        {
+            Token = "token",
+            ExpiresAt = currentTime.AddDays(1),
+            Purpose = OneTimePasswordPurpose.PasswordReset,
+            User = user,
+        };
+        user.AddOneTimePassword(oneTimePassword);
+        user.Lock();
+
+        var timeProvider = Substitute.For<TimeProvider>();
+        timeProvider
+            .GetUtcNow()
+            .Returns(currentTime);
+
+        var passwordService = Substitute.For<IPasswordService>();
+
+        Assert.Throws<DomainException>(() =>
+            user.ResetPassword(timeProvider, passwordService, oneTimePassword, string.Empty));
+    }
+
+    [Test]
+    public void ResetPassword()
+    {
+        var currentTime = DateTimeOffset.UtcNow;
+        const string password = "12345678";
+
+        var user = new User
+        {
+            Login = "test",
+            DisplayName = "test",
+            Email = "test@localhost.local",
+        };
+        var oneTimePassword = new OneTimePassword
+        {
+            Token = "token",
+            ExpiresAt = currentTime.AddDays(1),
+            Purpose = OneTimePasswordPurpose.PasswordReset,
+            User = user,
+        };
+        user.AddOneTimePassword(oneTimePassword);
+
+        var timeProvider = Substitute.For<TimeProvider>();
+        timeProvider
+            .GetUtcNow()
+            .Returns(currentTime);
+
+        var passwordService = Substitute.For<IPasswordService>();
+        passwordService
+            .GeneratePasswordHash(password)
+            .Returns((new byte[64], new byte[16]));
+
+        user.ResetPassword(timeProvider, passwordService, oneTimePassword, password);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(user.Password, Is.Not.Null);
+            Assert.That(user.Salt, Is.Not.Null);
+            Assert.That(user.OneTimePasswords, Is.Empty);
         });
     }
 }

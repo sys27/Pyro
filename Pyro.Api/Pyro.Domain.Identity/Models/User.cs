@@ -163,6 +163,15 @@ public class User : DomainEntity
         Password = newPasswordHash;
         Salt = newSalt;
         passwordExpiresAt = timeProvider.GetUtcNow().AddDays(90); // TODO: config
+
+        foreach (var authenticationToken in authenticationTokens)
+            authenticationToken.Invalidate(timeProvider);
+
+        foreach (var accessToken in accessTokens)
+            accessToken.Invalidate(timeProvider);
+
+        foreach (var oneTimePassword in oneTimePasswords)
+            oneTimePassword.Invalidate(timeProvider);
     }
 
     public void ChangePassword(
@@ -211,6 +220,25 @@ public class User : DomainEntity
 
         ChangePassword(timeProvider, passwordService, newPassword);
         Unlock();
+        DeleteOneTimePassword(oneTimePassword);
+    }
+
+    public void ResetPassword(
+        TimeProvider timeProvider,
+        IPasswordService passwordService,
+        OneTimePassword oneTimePassword,
+        string newPassword)
+    {
+        if (oneTimePassword is null)
+            throw new ArgumentNullException(nameof(oneTimePassword));
+
+        if (oneTimePassword.ExpiresAt < timeProvider.GetUtcNow())
+            throw new DomainException($"The token '{oneTimePassword.Token}' is expired");
+
+        if (IsLocked)
+            throw new DomainException($"The user '{Login}' is already activated.");
+
+        ChangePassword(timeProvider, passwordService, newPassword);
         DeleteOneTimePassword(oneTimePassword);
     }
 }

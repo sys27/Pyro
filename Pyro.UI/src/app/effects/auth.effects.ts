@@ -69,7 +69,7 @@ export const logoutEffect = createEffect(
 export const loggedOutActionEffect = createEffect(
     (actions$ = inject(Actions), router = inject(Router)) => {
         return actions$.pipe(
-            ofType(loggedOutAction),
+            ofType(loggedOutAction, logoutFailedAction),
             tap(() => router.navigate(['/login'])),
         );
     },

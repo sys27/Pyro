@@ -58,3 +58,14 @@ export const changePassword = createAction(
 );
 export const changePasswordSuccess = createAction('[Users] Change Password Success');
 export const changePasswordFailure = createAction('[Users] Change Password Failure');
+
+export const forgotPassword = createAction('[Users] Forgot Password', props<{ login: string }>());
+export const forgotPasswordSuccess = createAction('[Users] Forgot Password Success');
+export const forgotPasswordFailure = createAction('[Users] Forgot Password Failure');
+
+export const resetPassword = createAction(
+    '[Users] Reset Password',
+    props<{ token: string; password: string }>(),
+);
+export const resetPasswordSuccess = createAction('[Users] Reset Password Success');
+export const resetPasswordFailure = createAction('[Users] Reset Password Failure');

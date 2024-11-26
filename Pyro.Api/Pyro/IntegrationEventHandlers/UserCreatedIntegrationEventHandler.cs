@@ -6,6 +6,7 @@ using MediatR;
 using Microsoft.Extensions.Options;
 using Pyro.Domain.Identity;
 using Pyro.Domain.Identity.Models;
+using Pyro.Domain.Shared;
 using Pyro.Domain.Shared.Email;
 using Pyro.Domain.Shared.Exceptions;
 

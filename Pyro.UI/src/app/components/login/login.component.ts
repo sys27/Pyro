@@ -1,6 +1,7 @@
 import { loginAction } from '@actions/auth.actions';
 import { Component, input } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { ValidationSummaryComponent, Validators } from '@controls/validation-summary';
 import { Store } from '@ngrx/store';
 import { AppState } from '@states/app.state';
@@ -18,6 +19,7 @@ import { PasswordModule } from 'primeng/password';
         InputTextModule,
         PasswordModule,
         ReactiveFormsModule,
+        RouterLink,
         ValidationSummaryComponent,
     ],
     templateUrl: './login.component.html',

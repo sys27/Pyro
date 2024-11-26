@@ -45,7 +45,9 @@ internal static class IdentityEndpoints
             .Produces(401)
             .Produces(403)
             .ProducesProblem(500, MediaTypeNames.Application.Json)
-            .WithName("Get Users")
+            .WithName("GetUsers")
+            .WithSummary("Get Users")
+            .WithDescription("Get all users.")
             .WithOpenApi();
 
         usersBuilder.MapGet("/{login}", async (
@@ -65,7 +67,9 @@ internal static class IdentityEndpoints
             .Produces<UserResponse>()
             .Produces(404)
             .ProducesProblem(500)
-            .WithName("Get User By Login")
+            .WithName("GetUserByLogin")
+            .WithSummary("Get User by login")
+            .WithDescription("Get user by login.")
             .WithOpenApi();
 
         usersBuilder.MapPost("/", async (
@@ -88,7 +92,9 @@ internal static class IdentityEndpoints
             .Produces(401)
             .Produces(403)
             .ProducesProblem(500)
-            .WithName("Create User")
+            .WithName("CreateUser")
+            .WithSummary("Create User")
+            .WithDescription("Create a new user.")
             .WithOpenApi();
 
         usersBuilder.MapPut("/{login}", async (
@@ -115,7 +121,9 @@ internal static class IdentityEndpoints
             .Produces(403)
             .Produces(404)
             .ProducesProblem(500)
-            .WithName("Update User")
+            .WithName("UpdateUser")
+            .WithSummary("Update User")
+            .WithDescription("Update user.")
             .WithOpenApi();
 
         usersBuilder.MapPost("/{login}/lock", async (
@@ -159,7 +167,9 @@ internal static class IdentityEndpoints
             .Produces(403)
             .Produces(404)
             .ProducesProblem(500)
-            .WithName("Unlock User")
+            .WithName("UnlockUser")
+            .WithSummary("Unlock User")
+            .WithDescription("Unlock user.")
             .WithOpenApi();
 
         usersBuilder.MapPost("/activate", async (
@@ -180,7 +190,9 @@ internal static class IdentityEndpoints
             .Produces(401)
             .Produces(403)
             .ProducesProblem(500)
-            .WithName("Activate User")
+            .WithName("ActivateUser")
+            .WithSummary("Activate User")
+            .WithDescription("Activate user.")
             .WithOpenApi();
 
         usersBuilder.MapPost("/change-password", async (
@@ -200,7 +212,55 @@ internal static class IdentityEndpoints
             .Produces(401)
             .Produces(403)
             .ProducesProblem(500)
-            .WithName("Change Password")
+            .WithName("ChangePassword")
+            .WithSummary("Change Password")
+            .WithDescription("Change user password.")
+            .WithOpenApi();
+
+        usersBuilder.MapPost("/forgot-password", async (
+                IMediator mediator,
+                UnitOfWork unitOfWork,
+                ForgotPasswordRequest request,
+                CancellationToken cancellationToken) =>
+            {
+                var command = request.ToCommand();
+                await mediator.Send(command, cancellationToken);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
+
+                return Results.Ok();
+            })
+            .AllowAnonymous()
+            .Produces(200)
+            .ProducesValidationProblem()
+            .Produces(401)
+            .Produces(403)
+            .ProducesProblem(500)
+            .WithName("ForgotPassword")
+            .WithSummary("Forgot Password")
+            .WithDescription("Request password reset.")
+            .WithOpenApi();
+
+        usersBuilder.MapPost("/reset-password", async (
+                IMediator mediator,
+                UnitOfWork unitOfWork,
+                ResetPasswordRequest request,
+                CancellationToken cancellationToken) =>
+            {
+                var command = request.ToCommand();
+                await mediator.Send(command, cancellationToken);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
+
+                return Results.Ok();
+            })
+            .AllowAnonymous()
+            .Produces(200)
+            .ProducesValidationProblem()
+            .Produces(401)
+            .Produces(403)
+            .ProducesProblem(500)
+            .WithName("ResetPassword")
+            .WithSummary("Reset Password")
+            .WithDescription("Reset user password.")
             .WithOpenApi();
 
         var accessTokenBuilder = usersBuilder.MapGroup("/access-tokens")
@@ -221,7 +281,9 @@ internal static class IdentityEndpoints
             .Produces(401)
             .Produces(403)
             .ProducesProblem(500)
-            .WithName("Get Access Tokens")
+            .WithName("GetAccessTokens")
+            .WithSummary("Get Access Tokens")
+            .WithDescription("Get all access tokens.")
             .WithOpenApi();
 
         accessTokenBuilder.MapPost("/", async (
@@ -241,7 +303,9 @@ internal static class IdentityEndpoints
             .Produces(401)
             .Produces(403)
             .ProducesProblem(500)
-            .WithName("Create Access Token")
+            .WithName("CreateAccessToken")
+            .WithSummary("Create Access Token")
+            .WithDescription("Create a new access token.")
             .WithOpenApi();
 
         accessTokenBuilder.MapDelete("/{name}", async (
@@ -261,7 +325,9 @@ internal static class IdentityEndpoints
             .Produces(401)
             .Produces(403)
             .ProducesProblem(500)
-            .WithName("Delete Access Token")
+            .WithName("DeleteAccessToken")
+            .WithSummary("Delete Access Token")
+            .WithDescription("Delete access token.")
             .WithOpenApi();
 
         return app;
@@ -287,7 +353,9 @@ internal static class IdentityEndpoints
             .Produces(401)
             .Produces(403)
             .ProducesProblem(500)
-            .WithName("Get Roles")
+            .WithName("GetRoles")
+            .WithSummary("Get Roles")
+            .WithDescription("Get all roles.")
             .WithOpenApi();
 
         return app;
@@ -313,7 +381,9 @@ internal static class IdentityEndpoints
             .Produces(401)
             .Produces(403)
             .ProducesProblem(500)
-            .WithName("Get Permissions")
+            .WithName("GetPermissions")
+            .WithSummary("Get Permissions")
+            .WithDescription("Get all permissions.")
             .WithOpenApi();
 
         return app;
@@ -338,12 +408,14 @@ internal static class IdentityEndpoints
                     ? Results.Ok(result.TokenPair.ToResponse())
                     : Results.Unauthorized();
             })
+            .AllowAnonymous()
             .Produces<TokenPairResponse>()
             .ProducesValidationProblem()
             .Produces(401)
             .ProducesProblem(500)
             .WithName("Login")
-            .AllowAnonymous()
+            .WithSummary("Login")
+            .WithDescription("Login user.")
             .WithOpenApi();
 
         identity.MapPost("/logout", async (
@@ -360,6 +432,8 @@ internal static class IdentityEndpoints
             .Produces(204)
             .ProducesProblem(500)
             .WithName("Logout")
+            .WithSummary("Logout")
+            .WithDescription("Logout user.")
             .WithOpenApi();
 
         identity.MapPost("/refresh", async (
@@ -378,14 +452,16 @@ internal static class IdentityEndpoints
             .ProducesValidationProblem()
             .Produces(401)
             .ProducesProblem(500)
-            .WithName("Refresh Token")
+            .WithName("RefreshToken")
+            .WithSummary("Refresh Token")
+            .WithDescription("Refresh user token.")
             .AllowAnonymous()
             .WithOpenApi();
 
         return app;
     }
 
-    public static IEndpointRouteBuilder MapProfileEndpoints(this IEndpointRouteBuilder app)
+    private static IEndpointRouteBuilder MapProfileEndpoints(this IEndpointRouteBuilder app)
     {
         var profileBuilder = app.MapGroup("/profile")
             .WithTags("Profile");
@@ -404,7 +480,9 @@ internal static class IdentityEndpoints
             .Produces(401)
             .Produces(403)
             .ProducesProblem(500)
-            .WithName("Get Current Profile")
+            .WithName("GetCurrentProfile")
+            .WithSummary("Get Current Profile")
+            .WithDescription("Get current user profile.")
             .WithOpenApi();
 
         profileBuilder.MapPut("/", async (
@@ -424,7 +502,9 @@ internal static class IdentityEndpoints
             .Produces(401)
             .Produces(403)
             .ProducesProblem(500)
-            .WithName("Update Current Profile")
+            .WithName("UpdateCurrentProfile")
+            .WithSummary("Update Current Profile")
+            .WithDescription("Update current user profile.")
             .WithOpenApi();
 
         return app;

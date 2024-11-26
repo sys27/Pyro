@@ -2,13 +2,10 @@ import { issuesNextPage, issuesPreviousPage, loadIssues } from '@actions/issues.
 import { AsyncPipe, NgClass } from '@angular/common';
 import { Component, input, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { PaginatorComponent } from '@controls/paginator/paginator.component';
 import { TagComponent } from '@controls/tag/tag.component';
 import { DataSourceDirective } from '@directives/data-source.directive';
 import { PyroPermissions } from '@models/pyro-permissions';
 import { Store } from '@ngrx/store';
-import { ColorPipe } from '@pipes/color.pipe';
-import { LuminanceColorPipe } from '@pipes/luminance-color.pipe';
 import { Issue } from '@services/issue.service';
 import { AppState } from '@states/app.state';
 import { selectHasPermission } from '@states/auth.state';
@@ -26,13 +23,10 @@ import { Observable } from 'rxjs';
     imports: [
         AsyncPipe,
         ButtonModule,
-        ColorPipe,
         DataSourceDirective,
         DataViewModule,
         DividerModule,
-        LuminanceColorPipe,
         NgClass,
-        PaginatorComponent,
         RouterLink,
         TagComponent,
     ],

@@ -27,7 +27,11 @@ public class AccessToken : Entity
         init => salt = [..value];
     }
 
-    public required DateTimeOffset ExpiresAt { get; init; }
+    // TODO: remove setter
+    public required DateTimeOffset ExpiresAt { get; set; }
 
     public Guid UserId { get; init; }
+
+    public void Invalidate(TimeProvider timeProvider)
+        => ExpiresAt = timeProvider.GetUtcNow();
 }

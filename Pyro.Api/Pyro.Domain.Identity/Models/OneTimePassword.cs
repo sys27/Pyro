@@ -9,7 +9,8 @@ public class OneTimePassword : Entity
 {
     public required string Token { get; init; }
 
-    public required DateTimeOffset ExpiresAt { get; init; }
+    // TODO: remove setter
+    public required DateTimeOffset ExpiresAt { get; set; }
 
     public required OneTimePasswordPurpose Purpose { get; init; }
 
@@ -17,4 +18,7 @@ public class OneTimePassword : Entity
 
     public bool IsUserRegistration
         => Purpose == OneTimePasswordPurpose.UserRegistration;
+
+    public void Invalidate(TimeProvider timeProvider)
+        => ExpiresAt = timeProvider.GetUtcNow();
 }

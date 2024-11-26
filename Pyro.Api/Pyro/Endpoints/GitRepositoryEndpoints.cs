@@ -54,7 +54,9 @@ internal static class GitRepositoryEndpoints
             .Produces(403)
             .Produces(404)
             .ProducesProblem(500)
-            .WithName("Get Repository")
+            .WithName("GetRepository")
+            .WithSummary("Get Repository")
+            .WithDescription("Get a repository by name.")
             .WithOpenApi();
 
         repositoryBuilder.MapGet("/", async (
@@ -73,7 +75,9 @@ internal static class GitRepositoryEndpoints
             .Produces(401)
             .Produces(403)
             .ProducesProblem(500)
-            .WithName("Get Repositories")
+            .WithName("GetRepositories")
+            .WithSummary("Get Repositories")
+            .WithDescription("Get all repositories.")
             .WithOpenApi();
 
         repositoryBuilder.MapPost("/", async (
@@ -96,7 +100,9 @@ internal static class GitRepositoryEndpoints
             .Produces(401)
             .Produces(403)
             .ProducesProblem(500)
-            .WithName("Create Repository")
+            .WithName("CreateRepository")
+            .WithSummary("Create Repository")
+            .WithDescription("Create a new repository.")
             .WithOpenApi();
 
         repositoryBuilder.MapGet("/{repositoryName}/branches", async (
@@ -115,7 +121,9 @@ internal static class GitRepositoryEndpoints
             .Produces(401)
             .Produces(403)
             .ProducesProblem(500)
-            .WithName("Get Branches")
+            .WithName("GetBranches")
+            .WithSummary("Get Branches")
+            .WithDescription("Get all branches of a repository.")
             .WithOpenApi();
 
         repositoryBuilder.MapGet("/{repositoryName}/tree/{**branchOrPath}", async (
@@ -138,7 +146,9 @@ internal static class GitRepositoryEndpoints
             .Produces(403)
             .Produces(404)
             .ProducesProblem(500)
-            .WithName("Get Tree")
+            .WithName("GetTree")
+            .WithSummary("Get Tree")
+            .WithDescription("Get a tree view of a repository.")
             .WithOpenApi();
 
         repositoryBuilder.MapGet("/{repositoryName}/file/{**branchAndPath}", async (
@@ -165,7 +175,9 @@ internal static class GitRepositoryEndpoints
             .Produces(403)
             .Produces(404)
             .ProducesProblem(500)
-            .WithName("Get File")
+            .WithName("GetFile")
+            .WithSummary("Get File")
+            .WithDescription("Get a file from a repository.")
             .WithOpenApi();
 
         return repositoryBuilder;
@@ -195,7 +207,9 @@ internal static class GitRepositoryEndpoints
             .Produces(403)
             .Produces(404)
             .ProducesProblem(500)
-            .WithName("Get Labels")
+            .WithName("GetLabels")
+            .WithSummary("Get Labels")
+            .WithDescription("Get all labels of a repository.")
             .WithOpenApi();
 
         labelsBuilder.MapGet("/{id:guid}", async (
@@ -217,7 +231,9 @@ internal static class GitRepositoryEndpoints
             .Produces(403)
             .Produces(404)
             .ProducesProblem(500)
-            .WithName("Get Label")
+            .WithName("GetLabel")
+            .WithSummary("Get Label")
+            .WithDescription("Get a label by id.")
             .WithOpenApi();
 
         labelsBuilder.MapPost("/", async (
@@ -241,7 +257,9 @@ internal static class GitRepositoryEndpoints
             .Produces(401)
             .Produces(403)
             .ProducesProblem(500)
-            .WithName("Create Label")
+            .WithName("CreateLabel")
+            .WithSummary("Create Label")
+            .WithDescription("Create a new label.")
             .WithOpenApi();
 
         labelsBuilder.MapPut("/{id:guid}", async (
@@ -266,7 +284,9 @@ internal static class GitRepositoryEndpoints
             .Produces(401)
             .Produces(403)
             .ProducesProblem(500)
-            .WithName("Update Label")
+            .WithName("UpdateLabel")
+            .WithSummary("Update Label")
+            .WithDescription("Update a label.")
             .WithOpenApi();
 
         labelsBuilder.MapPost("/{id:guid}/enable", async (
@@ -289,7 +309,9 @@ internal static class GitRepositoryEndpoints
             .Produces(403)
             .Produces(404)
             .ProducesProblem(500)
-            .WithName("Enable Label")
+            .WithName("EnableLabel")
+            .WithSummary("Enable Label")
+            .WithDescription("Enable a label.")
             .WithOpenApi();
 
         labelsBuilder.MapPost("/{id:guid}/disable", async (
@@ -312,7 +334,9 @@ internal static class GitRepositoryEndpoints
             .Produces(403)
             .Produces(404)
             .ProducesProblem(500)
-            .WithName("Disable Label")
+            .WithName("DisableLabel")
+            .WithSummary("Disable Label")
+            .WithDescription("Disable a label.")
             .WithOpenApi();
 
         return app;

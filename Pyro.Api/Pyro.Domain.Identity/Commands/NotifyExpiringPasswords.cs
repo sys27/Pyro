@@ -36,7 +36,7 @@ public class NotifyExpiringPasswordsHandler : IRequestHandler<NotifyExpiringPass
         await foreach (var user in expiringUsers)
         {
             var body = $"""
-                        Hello {user.DisplayName},
+                        Hello {user.DisplayName}!
 
                         Your password is about to expire. The expiration date is {user.PasswordExpiresAt:yyyy-MM-dd}.
                         Please change your password to avoid any issues.

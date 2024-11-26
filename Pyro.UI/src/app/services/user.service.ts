@@ -68,6 +68,18 @@ export class UserService {
     public changePassword(command: ChangePassword): Observable<void> {
         return this.httpClient.post<void>(`${Endpoints.Users}/change-password`, command);
     }
+
+    public forgotPassword(login: string): Observable<void> {
+        let request = { login };
+
+        return this.httpClient.post<void>(`${Endpoints.Users}/forgot-password`, request);
+    }
+
+    public resetPassword(token: string, password: string): Observable<void> {
+        let request = { token, password };
+
+        return this.httpClient.post<void>(`${Endpoints.Users}/reset-password`, request);
+    }
 }
 
 export interface Permission {

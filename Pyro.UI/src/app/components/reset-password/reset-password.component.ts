@@ -1,5 +1,5 @@
-import { changePassword } from '@actions/users.actions';
-import { Component } from '@angular/core';
+import { resetPassword } from '@actions/users.actions';
+import { Component, input } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { ValidationSummaryComponent, Validators } from '@controls/validation-summary';
 import { Store } from '@ngrx/store';
@@ -8,20 +8,17 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 
 @Component({
-    selector: 'change-password',
+    selector: 'reset-password',
     standalone: true,
     imports: [ButtonModule, InputTextModule, ReactiveFormsModule, ValidationSummaryComponent],
-    templateUrl: './change-password.component.html',
-    styleUrl: './change-password.component.css',
+    templateUrl: './reset-password.component.html',
+    styleUrl: './reset-password.component.css',
 })
-export class ChangePasswordComponent {
-    public form = this.formBuilder.group(
+export class ResetPasswordComponent {
+    public readonly form = this.formBulder.group(
         {
-            oldPassword: ['', [Validators.required('Old Password')]],
-            newPassword: [
-                '',
-                [Validators.required('New Password'), Validators.minLength('New Password', 8)],
-            ],
+            token: [''],
+            password: ['', [Validators.required('Password'), Validators.minLength('Password', 8)]],
             confirmPassword: [
                 '',
                 [
@@ -32,14 +29,16 @@ export class ChangePasswordComponent {
         },
         {
             validators: Validators.sameAs(
-                ['newPassword', 'New Password'],
+                ['password', 'Password'],
                 ['confirmPassword', 'Confirm Password'],
             ),
         },
     );
 
+    public token = input.required<string>();
+
     public constructor(
-        private readonly formBuilder: FormBuilder,
+        private readonly formBulder: FormBuilder,
         private readonly store: Store<AppState>,
     ) {}
 
@@ -48,10 +47,8 @@ export class ChangePasswordComponent {
             return;
         }
 
-        let oldPassword = this.form.value.oldPassword!;
-        let newPassword = this.form.value.newPassword!;
-        this.store.dispatch(changePassword({ oldPassword, newPassword }));
-
-        this.form.reset();
+        this.store.dispatch(
+            resetPassword({ token: this.token(), password: this.form.value.password! }),
+        );
     }
 }

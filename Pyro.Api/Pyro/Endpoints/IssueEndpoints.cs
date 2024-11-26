@@ -51,7 +51,9 @@ internal static class IssueEndpoints
             .Produces(403)
             .Produces(404)
             .ProducesProblem(500)
-            .WithName("Get Issues")
+            .WithName("GetIssues")
+            .WithSummary("Get all issues")
+            .WithDescription("Get all issues in the repository")
             .WithOpenApi();
 
         issuesBuilder.MapGet("/{number:int}", async (
@@ -75,7 +77,9 @@ internal static class IssueEndpoints
             .Produces(403)
             .Produces(404)
             .ProducesProblem(500)
-            .WithName("Get Issue")
+            .WithName("GetIssue")
+            .WithSummary("Get issue")
+            .WithDescription("Get issue by number")
             .WithOpenApi();
 
         issuesBuilder.MapPost("/", async (
@@ -105,7 +109,9 @@ internal static class IssueEndpoints
             .Produces(401)
             .Produces(403)
             .ProducesProblem(500)
-            .WithName("Create Issue")
+            .WithName("CreateIssue")
+            .WithSummary("Create issue")
+            .WithDescription("Create a new issue")
             .WithOpenApi();
 
         issuesBuilder.MapPut("/{number:int}", async (
@@ -136,7 +142,9 @@ internal static class IssueEndpoints
             .Produces(401)
             .Produces(403)
             .ProducesProblem(500)
-            .WithName("Update Issue")
+            .WithName("UpdateIssue")
+            .WithSummary("Update issue")
+            .WithDescription("Update issue by number")
             .WithOpenApi();
 
         issuesBuilder.MapDelete("/{number:int}", async (
@@ -159,7 +167,9 @@ internal static class IssueEndpoints
             .Produces(403)
             .Produces(404)
             .ProducesProblem(500)
-            .WithName("Delete Issue")
+            .WithName("DeleteIssue")
+            .WithSummary("Delete issue")
+            .WithDescription("Delete issue by number")
             .WithOpenApi();
 
         issuesBuilder.MapPost("/{number:int}/lock", async (
@@ -182,7 +192,9 @@ internal static class IssueEndpoints
             .Produces(403)
             .Produces(404)
             .ProducesProblem(500)
-            .WithName("Lock Issue")
+            .WithName("LockIssue")
+            .WithSummary("Lock issue")
+            .WithDescription("Lock issue by number")
             .WithOpenApi();
 
         issuesBuilder.MapPost("/{number:int}/unlock", async (
@@ -205,7 +217,9 @@ internal static class IssueEndpoints
             .Produces(403)
             .Produces(404)
             .ProducesProblem(500)
-            .WithName("Unlock Issue")
+            .WithName("UnlockIssue")
+            .WithSummary("Unlock issue")
+            .WithDescription("Unlock issue by number")
             .WithOpenApi();
 
         return issuesBuilder;
@@ -235,7 +249,9 @@ internal static class IssueEndpoints
             .Produces(401)
             .Produces(403)
             .ProducesProblem(500)
-            .WithName("Get Issue Comments")
+            .WithName("GetIssueComments")
+            .WithSummary("Get issue comments")
+            .WithDescription("Get all comments for the issue")
             .WithOpenApi();
 
         commentsBuilder.MapPost("/", async (
@@ -260,7 +276,9 @@ internal static class IssueEndpoints
             .Produces(401)
             .Produces(403)
             .ProducesProblem(500)
-            .WithName("Create Issue Comment")
+            .WithName("CreateIssueComment")
+            .WithSummary("Create issue comment")
+            .WithDescription("Create a new comment for the issue")
             .WithOpenApi();
 
         commentsBuilder.MapPut("/{commentId:guid}", async (
@@ -286,7 +304,9 @@ internal static class IssueEndpoints
             .Produces(401)
             .Produces(403)
             .ProducesProblem(500)
-            .WithName("Update Issue Comment")
+            .WithName("UpdateIssueComment")
+            .WithSummary("Update issue comment")
+            .WithDescription("Update a comment for the issue")
             .WithOpenApi();
 
         // TODO: hide instead of delete?
@@ -311,7 +331,9 @@ internal static class IssueEndpoints
             .Produces(403)
             .Produces(404)
             .ProducesProblem(500)
-            .WithName("Delete Issue Comment")
+            .WithName("DeleteIssueComment")
+            .WithSummary("Delete issue comment")
+            .WithDescription("Delete a comment for the issue")
             .WithOpenApi();
 
         return issuesBuilder;
@@ -337,7 +359,9 @@ internal static class IssueEndpoints
             .Produces(403)
             .Produces(404)
             .ProducesProblem(500)
-            .WithName("Get Issue Users")
+            .WithName("GetIssueUsers")
+            .WithSummary("Get issue users")
+            .WithDescription("Get all users that can be assigned to issues")
             .WithOpenApi();
 
         return app;
@@ -367,7 +391,9 @@ internal static class IssueEndpoints
             .Produces(403)
             .Produces(404)
             .ProducesProblem(500)
-            .WithName("Get Statuses")
+            .WithName("GetStatuses")
+            .WithSummary("Get all statuses")
+            .WithDescription("Get all statuses in the repository")
             .WithOpenApi();
 
         statusBuilder.MapGet("/{id:guid}", async (
@@ -391,7 +417,9 @@ internal static class IssueEndpoints
             .Produces(403)
             .Produces(404)
             .ProducesProblem(500)
-            .WithName("Get Status")
+            .WithName("GetStatus")
+            .WithSummary("Get status")
+            .WithDescription("Get status by id")
             .WithOpenApi();
 
         statusBuilder.MapPost("/", async (
@@ -415,7 +443,9 @@ internal static class IssueEndpoints
             .Produces(401)
             .Produces(403)
             .ProducesProblem(500)
-            .WithName("Create Status")
+            .WithName("CreateStatus")
+            .WithSummary("Create status")
+            .WithDescription("Create a new status in the repository")
             .WithOpenApi();
 
         statusBuilder.MapPut("/{id:guid}", async (
@@ -440,7 +470,9 @@ internal static class IssueEndpoints
             .Produces(401)
             .Produces(403)
             .ProducesProblem(500)
-            .WithName("Update Status")
+            .WithName("UpdateStatus")
+            .WithSummary("Update status")
+            .WithDescription("Update status by id")
             .WithOpenApi();
 
         statusBuilder.MapPost("/{id:guid}/enable", async (
@@ -463,7 +495,9 @@ internal static class IssueEndpoints
             .Produces(403)
             .Produces(404)
             .ProducesProblem(500)
-            .WithName("Enable Status")
+            .WithName("EnableStatus")
+            .WithSummary("Enable status")
+            .WithDescription("Enable status by id")
             .WithOpenApi();
 
         statusBuilder.MapPost("/{id:guid}/disable", async (
@@ -486,7 +520,9 @@ internal static class IssueEndpoints
             .Produces(403)
             .Produces(404)
             .ProducesProblem(500)
-            .WithName("Disable Status")
+            .WithName("DisableStatus")
+            .WithSummary("Disable status")
+            .WithDescription("Disable status by id")
             .WithOpenApi();
 
         return app;
@@ -516,7 +552,9 @@ internal static class IssueEndpoints
             .Produces(404)
             .ProducesProblem(500)
             .WithTags("Issue Status Transitions")
-            .WithName("Get All Status Transitions")
+            .WithName("GetAllStatusTransitions")
+            .WithSummary("Get all status transitions")
+            .WithDescription("Get all status transitions in the repository")
             .WithOpenApi();
 
         transitionsBuilder.MapPost("/", async (
@@ -540,7 +578,9 @@ internal static class IssueEndpoints
             .Produces(401)
             .Produces(403)
             .ProducesProblem(500)
-            .WithName("Create Status Transition")
+            .WithName("CreateStatusTransition")
+            .WithSummary("Create status transition")
+            .WithDescription("Create a new status transition in the repository")
             .WithOpenApi();
 
         transitionsBuilder.MapDelete("/{id:guid}", async (
@@ -563,7 +603,9 @@ internal static class IssueEndpoints
             .Produces(403)
             .Produces(404)
             .ProducesProblem(500)
-            .WithName("Delete Status Transition")
+            .WithName("DeleteStatusTransition")
+            .WithSummary("Delete status transition")
+            .WithDescription("Delete status transition by id")
             .WithOpenApi();
 
         return app;
@@ -593,7 +635,9 @@ internal static class IssueEndpoints
             .Produces(403)
             .Produces(404)
             .ProducesProblem(500)
-            .WithName("Get Issue Change Logs")
+            .WithName("GetIssueChangeLogs")
+            .WithSummary("Get issue change logs")
+            .WithDescription("Get all change logs for the issue")
             .WithOpenApi();
 
         return app;

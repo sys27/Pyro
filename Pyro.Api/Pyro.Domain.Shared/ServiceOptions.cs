@@ -3,7 +3,7 @@
 
 using Microsoft.Extensions.Options;
 
-namespace Pyro;
+namespace Pyro.Domain.Shared;
 
 public class ServiceOptions : IValidateOptions<ServiceOptions>
 {

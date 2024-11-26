@@ -45,6 +45,10 @@ public static partial class IdentityMapper
 
     public static partial ChangePassword ToCommand(this ChangePasswordRequest request);
 
+    public static partial ForgotPassword ToCommand(this ForgotPasswordRequest request);
+
+    public static partial ResetPassword ToCommand(this ResetPasswordRequest request);
+
     [MapProperty([nameof(JwtTokenPair.AccessToken), nameof(Token.Value)], nameof(TokenPairResponse.AccessToken))]
     [MapProperty([nameof(JwtTokenPair.RefreshToken), nameof(Token.Value)], nameof(TokenPairResponse.RefreshToken))]
     public static partial TokenPairResponse ToResponse(this JwtTokenPair jwtTokenPair);

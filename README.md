@@ -40,7 +40,7 @@ docker run -d \
 
 `Pyro` stores all information (a database file and repositories) in the `/data` directory of the container. And by default, it creates an anonymous volume but you can create your volume and mount it into `/data` or use bind mounts.
 
-Now you can navigate to `http://localhost:8080/` and login with `pyro@localhost.local`/`pyro`.
+Now you can navigate to `http://localhost:8080/` and login with `pyro`/`pyro`.
 
 ## How to build / run tests
 
