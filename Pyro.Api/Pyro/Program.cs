@@ -87,7 +87,7 @@ app.MapHub<PyroHub>(
         options => options.Transports = HttpTransportType.WebSockets | HttpTransportType.ServerSentEvents)
     .RequireAuthorization();
 
-app.MapGitBackendEndpoints();
+app.MapGitBackendEndpoint();
 app.MapOpenApi();
 app.MapScalarApiReference();
 

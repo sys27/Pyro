@@ -18,7 +18,7 @@ public static class ServiceCollectionExtensions
         services
             .Configure<ServiceOptions>(configuration.GetRequiredSection(ServiceOptions.Name))
             .AddSingleton<IValidateOptions<ServiceOptions>, ServiceOptions>()
-            .AddScoped<GitBackend>()
+            .AddScoped<NativeGitBackend>()
             .AddHostedService<OutboxMessageProcessing>()
             .Configure<OutboxMessageProcessingOptions>(
                 configuration
