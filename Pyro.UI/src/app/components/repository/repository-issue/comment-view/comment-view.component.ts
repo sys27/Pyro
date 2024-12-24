@@ -12,7 +12,6 @@ import { CommentNewComponent } from '../comment-new/comment-new.component';
 
 @Component({
     selector: 'comment-view',
-    standalone: true,
     imports: [AsyncPipe, CommentNewComponent, DatePipe, MarkdownPipe, PanelModule],
     templateUrl: './comment-view.component.html',
     styleUrl: './comment-view.component.css',

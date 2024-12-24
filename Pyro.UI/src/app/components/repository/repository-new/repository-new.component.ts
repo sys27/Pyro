@@ -18,7 +18,6 @@ import { filter, map, Observable } from 'rxjs';
 
 @Component({
     selector: 'repository-new',
-    standalone: true,
     imports: [
         AsyncPipe,
         AutoFocusModule,

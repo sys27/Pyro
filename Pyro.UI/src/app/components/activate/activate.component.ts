@@ -8,7 +8,6 @@ import { InputTextModule } from 'primeng/inputtext';
 
 @Component({
     selector: 'activate',
-    standalone: true,
     imports: [ButtonModule, InputTextModule, ReactiveFormsModule, ValidationSummaryComponent],
     templateUrl: './activate.component.html',
     styleUrl: './activate.component.css',

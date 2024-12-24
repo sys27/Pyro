@@ -14,7 +14,6 @@ import { filter } from 'rxjs';
 
 @Component({
     selector: 'status-new',
-    standalone: true,
     imports: [
         AutoFocusModule,
         ButtonModule,
