@@ -9,10 +9,9 @@ import { InputTextModule } from 'primeng/inputtext';
 
 @Component({
     selector: 'reset-password',
-    standalone: true,
     imports: [ButtonModule, InputTextModule, ReactiveFormsModule, ValidationSummaryComponent],
     templateUrl: './reset-password.component.html',
-    styleUrl: './reset-password.component.css',
+    styleUrl: './reset-password.component.css'
 })
 export class ResetPasswordComponent {
     public readonly form = this.formBulder.group(

@@ -25,19 +25,18 @@ import {
 } from '@states/repository.state';
 import { AutoFocusModule } from 'primeng/autofocus';
 import { ButtonModule } from 'primeng/button';
-import { DropdownModule } from 'primeng/dropdown';
 import { InputTextModule } from 'primeng/inputtext';
 import { MultiSelectModule } from 'primeng/multiselect';
+import { SelectModule } from 'primeng/select';
 import { combineLatest, filter, map, Observable } from 'rxjs';
 
 @Component({
     selector: 'repository-issue-edit',
-    standalone: true,
     imports: [
         AutoFocusModule,
         ButtonModule,
         DataSourceDirective,
-        DropdownModule,
+        SelectModule,
         InputTextModule,
         MultiSelectModule,
         ReactiveFormsModule,

@@ -7,7 +7,6 @@ import { combineLatest, filter, from, map, Observable, of, shareReplay, switchMa
 
 @Component({
     selector: 'repository-file',
-    standalone: true,
     imports: [AsyncPipe],
     templateUrl: './repository-file.component.html',
     styleUrls: ['./repository-file.component.css'],

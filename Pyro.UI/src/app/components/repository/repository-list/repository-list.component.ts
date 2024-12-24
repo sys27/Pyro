@@ -19,7 +19,6 @@ import { Observable } from 'rxjs';
 
 @Component({
     selector: 'repo-list',
-    standalone: true,
     imports: [AsyncPipe, ButtonModule, DataSourceDirective, RouterModule, TableModule],
     templateUrl: './repository-list.component.html',
     styleUrl: './repository-list.component.css',

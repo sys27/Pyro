@@ -1,16 +1,13 @@
 import { DatePipe } from '@angular/common';
 import { Component, input } from '@angular/core';
 import { TagComponent } from '@controls/tag/tag.component';
-import { ColorPipe } from '@pipes/color.pipe';
-import { LuminanceColorPipe } from '@pipes/luminance-color.pipe';
 import { ChangeLogs, IssueChangeLogType, User } from '@services/issue.service';
 import { DividerModule } from 'primeng/divider';
 import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
     selector: 'change-log-view',
-    standalone: true,
-    imports: [ColorPipe, DatePipe, DividerModule, LuminanceColorPipe, TagComponent, TooltipModule],
+    imports: [DividerModule, TagComponent, TooltipModule],
     providers: [DatePipe],
     templateUrl: './change-log-view.component.html',
     styleUrl: './change-log-view.component.css',

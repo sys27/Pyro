@@ -13,14 +13,13 @@
         class="w-full"
         formControlName="title"
         pInputText
-        pAutoFocus
-        [autofocus]="true" />
+        [pAutoFocus]="true" />
       <validation-summary controlName="title" />
     </div>
 
     <div class="field">
       <label for="assignee">Assignee:</label>
-      <p-dropdown
+      <p-select
         id="assignee"
         formControlName="assigneeId"
         [dataSource]="users$"
@@ -47,7 +46,7 @@
 
     <div class="field">
       <label for="status">Status:</label>
-      <p-dropdown
+      <p-select
         id="status"
         formControlName="statusId"
         [dataSource]="statuses$"

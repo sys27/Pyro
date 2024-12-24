@@ -17,7 +17,6 @@ import { Observable } from 'rxjs';
 
 @Component({
     selector: 'label-list',
-    standalone: true,
     imports: [AsyncPipe, ButtonModule, ColorPipe, DataSourceDirective, RouterLink, TableModule],
     templateUrl: './label-list.component.html',
     styleUrl: './label-list.component.css',

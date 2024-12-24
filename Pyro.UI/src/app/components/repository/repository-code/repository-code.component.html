@@ -2,7 +2,7 @@
   <div class="col">
     <p-toolbar>
       <div class="p-toolbar-group-start">
-        <p-dropdown
+        <p-select
           [dataSource]="branches$"
           optionLabel="name"
           [ngModel]="selectedBranch$ | async"
@@ -15,7 +15,7 @@
           icon="pi pi-clone"
           severity="success"
           (onClick)="cloneDialog.toggle($event)" />
-        <p-overlayPanel #cloneDialog>
+        <p-popover #cloneDialog>
           <div class="flex flex-column gap-2 w-25rem">
             <span>Clone with HTTP/HTTPS</span>
             <p-inputGroup>
@@ -31,7 +31,7 @@
               </button>
             </p-inputGroup>
           </div>
-        </p-overlayPanel>
+        </p-popover>
       </div>
     </p-toolbar>
 
@@ -101,7 +101,7 @@
       </p-table>
 
       @if (displayTabView$ | async) {
-        <div pDefer>
+        <div pDefer> <!-- TODO: replace -->
           <ng-template>
             <p-tabView>
               @if (readmeName$ | async; as readmeName) {

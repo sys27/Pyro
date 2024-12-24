@@ -9,11 +9,10 @@ import { ButtonModule } from 'primeng/button';
 import { DividerModule } from 'primeng/divider';
 import { InputTextModule } from 'primeng/inputtext';
 import { PanelModule } from 'primeng/panel';
-import { TabViewModule } from 'primeng/tabview';
+import { TabViewModule } from 'primeng/tabview'; // TODO: replace
 
 @Component({
     selector: 'comment-new',
-    standalone: true,
     imports: [
         AsyncPipe,
         ButtonModule,
@@ -37,7 +36,7 @@ export class CommentNewComponent implements OnInit {
         comment: ['', [Validators.required('Comment'), Validators.maxLength('Comment', 2000)]],
     });
     public readonly commentAdded = output<Comment>();
-    public readonly onCancel = output();
+    public readonly cancelled = output();
 
     public constructor(
         private readonly injector: Injector,
@@ -78,7 +77,11 @@ export class CommentNewComponent implements OnInit {
                   this.comment()!.id,
                   comment,
               )
-            : this.issueService.createIssueComment(this.repositoryName(), this.issue().issueNumber, comment);
+            : this.issueService.createIssueComment(
+                  this.repositoryName(),
+                  this.issue().issueNumber,
+                  comment,
+              );
 
         httpCall.pipe(createErrorHandler(this.injector)).subscribe(comment => {
             this.isLoading.set(false);
@@ -92,7 +95,7 @@ export class CommentNewComponent implements OnInit {
     }
 
     public cancel(): void {
-        this.onCancel.emit();
+        this.cancelled.emit();
     }
 
     public get isEditMode(): boolean {

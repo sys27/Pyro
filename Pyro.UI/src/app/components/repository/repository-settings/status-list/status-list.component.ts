@@ -6,8 +6,6 @@ import { TagComponent } from '@controls/tag/tag.component';
 import { DataSourceDirective } from '@directives/data-source.directive';
 import { PyroPermissions } from '@models/pyro-permissions';
 import { Store } from '@ngrx/store';
-import { ColorPipe } from '@pipes/color.pipe';
-import { LuminanceColorPipe } from '@pipes/luminance-color.pipe';
 import { IssueStatus } from '@services/issue-status.service';
 import { AppState } from '@states/app.state';
 import { selectHasPermission } from '@states/auth.state';
@@ -19,24 +17,13 @@ import { Observable } from 'rxjs';
 
 @Component({
     selector: 'status-list',
-    standalone: true,
-    imports: [
-        AsyncPipe,
-        ButtonModule,
-        ColorPipe,
-        DataSourceDirective,
-        LuminanceColorPipe,
-        RouterLink,
-        TableModule,
-        TagComponent,
-    ],
+    imports: [AsyncPipe, ButtonModule, DataSourceDirective, RouterLink, TableModule, TagComponent],
     templateUrl: './status-list.component.html',
     styleUrl: './status-list.component.css',
 })
 export class StatusListComponent implements OnInit {
     public readonly repositoryName = input.required<string>();
-    public statuses$: Observable<DataSourceState<IssueStatus>> =
-        this.store.select(selectStatuses);
+    public statuses$: Observable<DataSourceState<IssueStatus>> = this.store.select(selectStatuses);
     public hasManagePermission$: Observable<boolean> = this.store.select(
         selectHasPermission(PyroPermissions.IssueManage),
     );

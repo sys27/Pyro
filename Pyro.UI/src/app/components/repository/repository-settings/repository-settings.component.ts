@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { PanelMenuModule } from 'primeng/panelmenu';
 
 @Component({
     selector: 'repo-settings',
-    standalone: true,
-    imports: [PanelMenuModule],
+    imports: [PanelMenuModule, RouterOutlet],
     templateUrl: './repository-settings.component.html',
     styleUrl: './repository-settings.component.css',
 })

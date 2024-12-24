@@ -14,7 +14,6 @@ import { Observable } from 'rxjs';
 
 @Component({
     selector: 'access-token-list',
-    standalone: true,
     imports: [ButtonModule, DataSourceDirective, DatePipe, RouterModule, TableModule],
     templateUrl: './access-token-list.component.html',
     styleUrl: './access-token-list.component.css',

@@ -12,19 +12,18 @@ import { DataSourceState } from '@states/data-source.state';
 import { selectEnabledLabels, selectEnabledStatuses, selectUsers } from '@states/repository.state';
 import { AutoFocusModule } from 'primeng/autofocus';
 import { ButtonModule } from 'primeng/button';
-import { DropdownModule } from 'primeng/dropdown';
 import { InputTextModule } from 'primeng/inputtext';
 import { MultiSelectModule } from 'primeng/multiselect';
+import { SelectModule } from 'primeng/select';
 import { Observable } from 'rxjs';
 
 @Component({
     selector: 'repo-issue-new',
-    standalone: true,
     imports: [
         AutoFocusModule,
         ButtonModule,
         DataSourceDirective,
-        DropdownModule,
+        SelectModule,
         InputTextModule,
         MultiSelectModule,
         ReactiveFormsModule,
