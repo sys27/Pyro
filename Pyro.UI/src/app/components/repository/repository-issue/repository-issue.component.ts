@@ -26,7 +26,6 @@ import { CommentViewComponent } from './comment-view/comment-view.component';
 
 @Component({
     selector: 'repo-issue',
-    standalone: true,
     imports: [
         AsyncPipe,
         ButtonModule,

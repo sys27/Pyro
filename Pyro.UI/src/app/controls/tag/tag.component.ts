@@ -6,7 +6,6 @@ import { TagModule } from 'primeng/tag';
 
 @Component({
     selector: 'tag',
-    standalone: true,
     imports: [ColorPipe, LuminanceColorPipe, TagModule],
     templateUrl: './tag.component.html',
     styleUrl: './tag.component.css',

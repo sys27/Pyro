@@ -6,7 +6,6 @@ import { filter, map, Observable, of, switchMap, withLatestFrom } from 'rxjs';
 
 @Component({
     selector: 'validation-summary',
-    standalone: true,
     imports: [AsyncPipe],
     templateUrl: './validation-summary.component.html',
     styleUrl: './validation-summary.component.css',

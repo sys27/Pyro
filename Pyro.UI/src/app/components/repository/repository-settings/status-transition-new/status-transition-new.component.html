@@ -8,7 +8,7 @@
 
     <div class="field">
       <label for="from">From:</label>
-      <p-dropdown
+      <p-select
         id="from"
         formControlName="fromId"
         [dataSource]="statuses$"
@@ -21,7 +21,7 @@
 
     <div class="field">
       <label for="to">To:</label>
-      <p-dropdown
+      <p-select
         id="to"
         formControlName="toId"
         [dataSource]="statuses$"

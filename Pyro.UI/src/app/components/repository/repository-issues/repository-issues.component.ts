@@ -19,7 +19,6 @@ import { Observable } from 'rxjs';
 
 @Component({
     selector: 'repo-issues',
-    standalone: true,
     imports: [
         AsyncPipe,
         ButtonModule,

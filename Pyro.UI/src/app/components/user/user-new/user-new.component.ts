@@ -19,7 +19,6 @@ import { Observable } from 'rxjs';
 
 @Component({
     selector: 'user-new',
-    standalone: true,
     imports: [
         AutoFocusModule,
         ButtonModule,
