@@ -2,6 +2,7 @@ import { loadRepository, reloadRepository } from '@actions/repository.actions';
 import { AsyncPipe } from '@angular/common';
 import { Component, DestroyRef, input, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { RouterOutlet } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { WebSocketEvents } from '@services/web-socket.service';
 import { AppState } from '@states/app.state';
@@ -9,13 +10,12 @@ import { selectIsRepositoryInitialized } from '@states/repository.state';
 import { selectMessage } from '@states/web-socket.state';
 import { MenuItem } from 'primeng/api';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { TabMenuModule } from 'primeng/tabmenu';
+import { TabMenuModule } from 'primeng/tabmenu'; // TODO: replace
 import { distinctUntilChanged, filter, map, Observable } from 'rxjs';
 
 @Component({
     selector: 'repo-list',
-    standalone: true,
-    imports: [AsyncPipe, ProgressSpinnerModule, TabMenuModule],
+    imports: [AsyncPipe, ProgressSpinnerModule, RouterOutlet, TabMenuModule],
     templateUrl: './repository.component.html',
     styleUrl: './repository.component.css',
 })

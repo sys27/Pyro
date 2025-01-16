@@ -12,7 +12,6 @@ import { PasswordModule } from 'primeng/password';
 
 @Component({
     selector: 'login',
-    standalone: true,
     imports: [
         AutoFocusModule,
         ButtonModule,

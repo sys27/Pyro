@@ -13,7 +13,6 @@ import { filter } from 'rxjs';
 
 @Component({
     selector: 'profile-edit',
-    standalone: true,
     imports: [ButtonModule, InputTextModule, ReactiveFormsModule, ValidationSummaryComponent],
     templateUrl: './profile-edit.component.html',
     styleUrl: './profile-edit.component.css',

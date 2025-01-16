@@ -16,7 +16,6 @@ import { filter, map } from 'rxjs';
 
 @Component({
     selector: 'label-edit',
-    standalone: true,
     imports: [
         AutoFocusModule,
         ButtonModule,

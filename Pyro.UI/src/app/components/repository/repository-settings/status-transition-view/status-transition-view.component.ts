@@ -9,8 +9,6 @@ import { TagComponent } from '@controls/tag/tag.component';
 import { DataSourceDirective } from '@directives/data-source.directive';
 import { PyroPermissions } from '@models/pyro-permissions';
 import { Store } from '@ngrx/store';
-import { ColorPipe } from '@pipes/color.pipe';
-import { LuminanceColorPipe } from '@pipes/luminance-color.pipe';
 import { IssueStatusTransition } from '@services/issue-status.service';
 import { AppState } from '@states/app.state';
 import { selectHasPermission } from '@states/auth.state';
@@ -22,17 +20,7 @@ import { Observable } from 'rxjs';
 
 @Component({
     selector: 'status-transition-view',
-    standalone: true,
-    imports: [
-        AsyncPipe,
-        ButtonModule,
-        ColorPipe,
-        DataSourceDirective,
-        LuminanceColorPipe,
-        RouterLink,
-        TableModule,
-        TagComponent,
-    ],
+    imports: [AsyncPipe, ButtonModule, DataSourceDirective, RouterLink, TableModule, TagComponent],
     templateUrl: './status-transition-view.component.html',
     styleUrl: './status-transition-view.component.css',
 })

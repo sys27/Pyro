@@ -15,7 +15,6 @@ import { Observable } from 'rxjs';
 
 @Component({
     selector: 'status-transition-new',
-    standalone: true,
     imports: [
         ButtonModule,
         DataSourceDirective,
@@ -48,8 +47,7 @@ export class StatusTransitionNewComponent implements OnInit {
     );
     public readonly isLoading = signal<boolean>(false);
 
-    public statuses$: Observable<DataSourceState<IssueStatus>> =
-        this.store.select(selectStatuses);
+    public statuses$: Observable<DataSourceState<IssueStatus>> = this.store.select(selectStatuses);
 
     public constructor(
         private readonly injector: Injector,

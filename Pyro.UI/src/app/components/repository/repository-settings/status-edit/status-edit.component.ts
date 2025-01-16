@@ -15,7 +15,6 @@ import { filter, map } from 'rxjs';
 
 @Component({
     selector: 'status-edit',
-    standalone: true,
     imports: [
         AutoFocusModule,
         ButtonModule,

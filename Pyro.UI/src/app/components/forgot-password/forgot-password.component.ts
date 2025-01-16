@@ -9,7 +9,6 @@ import { InputTextModule } from 'primeng/inputtext';
 
 @Component({
     selector: 'forgot-password',
-    standalone: true,
     imports: [ButtonModule, InputTextModule, ReactiveFormsModule, ValidationSummaryComponent],
     templateUrl: './forgot-password.component.html',
     styleUrl: './forgot-password.component.css',

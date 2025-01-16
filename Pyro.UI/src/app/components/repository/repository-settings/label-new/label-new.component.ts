@@ -14,7 +14,6 @@ import { filter } from 'rxjs';
 
 @Component({
     selector: 'label-new',
-    standalone: true,
     imports: [
         AutoFocusModule,
         ButtonModule,

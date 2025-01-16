@@ -4,7 +4,6 @@ import { ButtonModule } from 'primeng/button';
 
 @Component({
     selector: 'not-found',
-    standalone: true,
     imports: [ButtonModule, RouterLink],
     templateUrl: './not-found.component.html',
     styleUrl: './not-found.component.css',
