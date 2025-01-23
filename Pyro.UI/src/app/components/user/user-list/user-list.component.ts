@@ -27,7 +27,6 @@ import { map, Observable } from 'rxjs';
 
 @Component({
     selector: 'user-list',
-    standalone: true,
     imports: [
         AsyncPipe,
         ButtonModule,

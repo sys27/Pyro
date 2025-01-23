@@ -26,6 +26,15 @@ export class ThemeService {
         if (themeLink) {
             themeLink.href = `${theme}.css`;
         }
+
+        let element = document.querySelector('html');
+        if (element) {
+            if (theme === 'dark') {
+                element.classList.add('my-app-dark');
+            } else {
+                element.classList.remove('my-app-dark');
+            }
+        }
     }
 
     public toggleTheme(): Theme {

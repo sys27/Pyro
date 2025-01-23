@@ -9,18 +9,17 @@ import { AppState } from '@states/app.state';
 import { selectSelectedAccessToken } from '@states/profile.state';
 import { AutoFocusModule } from 'primeng/autofocus';
 import { ButtonModule } from 'primeng/button';
-import { CalendarModule } from 'primeng/calendar';
+import { DatePicker } from 'primeng/datepicker';
 import { InputGroupModule } from 'primeng/inputgroup';
 import { InputTextModule } from 'primeng/inputtext';
 import { filter } from 'rxjs';
 
 @Component({
     selector: 'access-token-new',
-    standalone: true,
     imports: [
         AutoFocusModule,
         ButtonModule,
-        CalendarModule,
+        DatePicker,
         InputGroupModule,
         InputTextModule,
         ReactiveFormsModule,

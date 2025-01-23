@@ -11,14 +11,13 @@
         class="w-full"
         formControlName="name"
         pInputText
-        pAutoFocus
-        [autofocus]="true" />
+        [pAutoFocus]="true" />
       <validation-summary controlName="name" />
     </div>
 
     <div class="field">
       <label for="expiresAt">Expires At:</label>
-      <p-calendar
+      <p-datepicker
         [minDate]="minDate"
         [showTime]="true"
         hourFormat="24"

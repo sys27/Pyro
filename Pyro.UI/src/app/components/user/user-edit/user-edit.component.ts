@@ -18,7 +18,6 @@ import { filter, Observable } from 'rxjs';
 
 @Component({
     selector: 'user',
-    standalone: true,
     imports: [
         ButtonModule,
         CheckboxModule,

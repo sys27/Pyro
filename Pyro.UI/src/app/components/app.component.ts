@@ -1,12 +1,12 @@
 import { logoutAction } from '@actions/auth.actions';
 import { AsyncPipe } from '@angular/common';
 import { Component, OnInit, signal } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { ThemeService } from '@services/theme.service';
 import { AppState } from '@states/app.state';
 import { selectIsLoggedIn } from '@states/auth.state';
-import { MenuItem, PrimeNGConfig } from 'primeng/api';
+import { MenuItem } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { ButtonGroupModule } from 'primeng/buttongroup';
 import { IconFieldModule } from 'primeng/iconfield';
@@ -19,7 +19,6 @@ import { Observable } from 'rxjs';
 
 @Component({
     selector: 'app-root',
-    standalone: true,
     imports: [
         AsyncPipe,
         ButtonModule,
@@ -30,7 +29,6 @@ import { Observable } from 'rxjs';
         RouterOutlet,
         SplitButtonModule,
         RouterLink,
-        RouterLinkActive,
         ToolbarModule,
         ToastModule,
     ],
@@ -53,7 +51,6 @@ export class AppComponent implements OnInit {
     public isLoggedIn$: Observable<boolean> = this.store.select(selectIsLoggedIn);
 
     public constructor(
-        private readonly primeNg: PrimeNGConfig,
         private readonly router: Router,
         private readonly store: Store<AppState>,
         private readonly themeService: ThemeService,
@@ -61,7 +58,6 @@ export class AppComponent implements OnInit {
 
     public ngOnInit(): void {
         this.themeService.useTheme();
-        this.primeNg.ripple = true;
     }
 
     public toggleThemeClick(): void {

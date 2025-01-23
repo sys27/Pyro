@@ -20,31 +20,30 @@ import {
 } from '@states/repository.state';
 import { ButtonModule } from 'primeng/button';
 import { DeferModule } from 'primeng/defer';
-import { DropdownModule } from 'primeng/dropdown';
 import { InputGroupModule } from 'primeng/inputgroup';
 import { InputTextModule } from 'primeng/inputtext';
-import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { PopoverModule } from 'primeng/popover';
+import { SelectModule } from 'primeng/select';
 import { SkeletonModule } from 'primeng/skeleton';
 import { TableModule } from 'primeng/table';
-import { TabViewModule } from 'primeng/tabview';
+import { TabViewModule } from 'primeng/tabview'; // TODO: replace
 import { ToolbarModule } from 'primeng/toolbar';
 import { combineLatest, distinctUntilChanged, filter, map, Observable, switchMap } from 'rxjs';
 
 @Component({
     selector: 'repo-code',
-    standalone: true,
     imports: [
         AsyncPipe,
         ButtonModule,
         DataSourceDirective,
         DatePipe,
         DeferModule,
-        DropdownModule,
+        SelectModule,
         FormsModule,
         InputGroupModule,
         InputTextModule,
         MarkdownPipe,
-        OverlayPanelModule,
+        PopoverModule,
         RouterLink,
         SkeletonModule,
         SlicePipe,
